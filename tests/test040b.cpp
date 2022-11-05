@@ -1,6 +1,6 @@
 // test040b.cpp - multiple translation units, part 2
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int help_func()

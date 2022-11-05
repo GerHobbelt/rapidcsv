@@ -7,11 +7,13 @@ exit ${RV}
 
 #include <iostream>
 #include <vector>
-#include "rapidcsv.h"
+#include <cmath>
 
-void ConvFixPoint(const std::string& pStr, int& pVal)
+#include <rapidcsv/rapidcsv.h>
+
+int ConvFixPoint(const std::string& pStr)
 {
-  pVal = static_cast<int>(roundf(100.0f * std::stof(pStr)));
+  return static_cast<int>(roundf(100.0f * std::stof(pStr)));
 }
 
 struct MyStruct
@@ -19,9 +21,11 @@ struct MyStruct
   int val = 0;
 };
 
-void ConvMyStruct(const std::string& pStr, MyStruct& pVal)
+MyStruct ConvMyStruct(const std::string& pStr)
 {
-  pVal.val = static_cast<int>(roundf(100.0f * std::stof(pStr)));
+  MyStruct ms;
+  ms.val = static_cast<int>(roundf(100.0f * std::stof(pStr)));
+  return ms;
 }
 
 int main()
@@ -31,7 +35,7 @@ int main()
   std::cout << "regular         = " << doc.GetCell<int>("Close", "2017-02-21") << "\n";
   std::cout << "fixpointfunc    = " << doc.GetCell<int>("Close", "2017-02-21", ConvFixPoint) << "\n";
 
-  auto convFixLambda = [](const std::string& pStr, int& pVal) { pVal = static_cast<int>(roundf(100.0f * stof(pStr))); };
+  auto convFixLambda = [](const std::string& pStr) { return static_cast<int>(roundf(100.0f * stof(pStr))); };
   std::cout << "fixpointlambda  = " << doc.GetCell<int>("Close", "2017-02-21", convFixLambda) << "\n";
 
   std::cout << "mystruct        = " << doc.GetCell<MyStruct>("Close", "2017-02-21", ConvMyStruct).val << "\n";

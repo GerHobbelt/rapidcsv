@@ -1,7 +1,7 @@
 // test087.cpp - numeric locale
 
 #include <clocale>
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()
@@ -48,12 +48,12 @@ int main()
 
       rapidcsv::LabelParams labelParams(0, 0);
       rapidcsv::SeparatorParams separatorParams;
-      rapidcsv::ConverterParams converterParams;
-      converterParams.mNumericLocale = false; // do not honor numeric locale
-      rapidcsv::Document doc(path, labelParams, separatorParams, converterParams);
-      unittest::ExpectEqual(float, doc.GetCell<float>("A", "2"), 0.1f);
-      unittest::ExpectEqual(float, doc.GetCell<float>("B", "2"), 0.01f);
-      unittest::ExpectEqual(float, doc.GetCell<float>("C", "2"), 0.001f);
+      //rapidcsv::ConverterParams converterParams;
+      //converterParams.mNumericLocale = false; // do not honor numeric locale
+      rapidcsv::Document doc(path, labelParams, separatorParams); //, converterParams);
+      unittest::ExpectEqual(float, doc.GetCell<float COMMA 0 COMMA 0>("A", "2"), 0.1f);
+      unittest::ExpectEqual(float, doc.GetCell<float COMMA 0 COMMA 0>("B", "2"), 0.01f);
+      unittest::ExpectEqual(float, doc.GetCell<float COMMA 0 COMMA 0>("C", "2"), 0.001f);
     }
   }
   catch (const std::exception& ex)

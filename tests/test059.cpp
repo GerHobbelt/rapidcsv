@@ -1,6 +1,6 @@
 // test059.cpp - write UTF-16 LE
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

@@ -1,6 +1,6 @@
 // test029.cpp - delete columns, no row/column labels
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

@@ -1,6 +1,6 @@
 // test075.cpp - generate new document by column labels
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

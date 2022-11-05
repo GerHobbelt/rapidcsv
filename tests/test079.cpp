@@ -1,6 +1,6 @@
 // test079.cpp - perform multiple Load calls on single Document instance
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

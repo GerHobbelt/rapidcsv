@@ -1,6 +1,6 @@
 // ptest002.cpp - file load
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "perftest.h"
 #include "unittest.h"
 

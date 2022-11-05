@@ -1,6 +1,6 @@
 // test047.cpp - exception on invalid conversion
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

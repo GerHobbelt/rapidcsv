@@ -1,6 +1,6 @@
 // test002.cpp - set cell value
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

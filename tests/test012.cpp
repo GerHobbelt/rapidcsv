@@ -1,6 +1,6 @@
 // test012.cpp - read cell value, no row labels
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

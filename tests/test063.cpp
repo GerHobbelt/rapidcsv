@@ -2,13 +2,13 @@
 
 #include <iomanip>
 #include <math.h>
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 // Conversion function for int data to be converted to fixed-point two decimal numbers
-void ToVal(const std::string& pStr, int& pVal)
+int ToVal(const std::string& pStr)
 {
-  pVal = static_cast<int>(roundf(100.0f * std::stof(pStr)));
+  return static_cast<int>(roundf(100.0f * std::stof(pStr)));
 }
 
 struct Struct
@@ -16,9 +16,11 @@ struct Struct
   int val = 0;
 };
 
-void ToStruct(const std::string& pStr, Struct& pVal)
+Struct ToStruct(const std::string& pStr)
 {
-  pVal.val = static_cast<int>(roundf(100.0f * std::stof(pStr)));
+  Struct sVal;
+  sVal.val = static_cast<int>(roundf(100.0f * std::stof(pStr)));
+  return sVal;
 }
 
 int main()

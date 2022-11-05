@@ -1,6 +1,6 @@
 // test041.cpp - handling no linebreak at end of last line
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

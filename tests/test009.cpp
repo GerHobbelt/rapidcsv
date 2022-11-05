@@ -1,6 +1,6 @@
 // test009.cpp - generate new document by row
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

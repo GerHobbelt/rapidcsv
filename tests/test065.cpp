@@ -1,6 +1,6 @@
 // test065.cpp - row/column count with header index out of data size
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

@@ -1,6 +1,6 @@
 // test081.cpp - generate new document with insert column
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

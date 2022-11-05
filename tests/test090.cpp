@@ -1,6 +1,6 @@
 // test090.cpp - custom quote char handling
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

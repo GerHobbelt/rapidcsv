@@ -1,6 +1,6 @@
 // test085.cpp - read UTF-16 LE file
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

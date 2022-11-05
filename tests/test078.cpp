@@ -4,7 +4,7 @@
 #include <Windows.h>
 #endif
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

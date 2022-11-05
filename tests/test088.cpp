@@ -1,6 +1,6 @@
 // test088.cpp - test parsing of files larger than 64 KB
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

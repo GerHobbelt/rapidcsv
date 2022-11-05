@@ -1,6 +1,6 @@
 // test043.cpp - read column and row values as char
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

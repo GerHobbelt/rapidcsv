@@ -1,6 +1,6 @@
 // test083.cpp - empty lines
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()
@@ -21,7 +21,6 @@ int main()
   try
   {
     rapidcsv::Document doc(path, rapidcsv::LabelParams(), rapidcsv::SeparatorParams(),
-                           rapidcsv::ConverterParams(),
                            rapidcsv::LineReaderParams(false, '#', true));
     unittest::ExpectEqual(size_t, doc.GetColumn<int>("A").size(), 2);
     unittest::ExpectEqual(size_t, doc.GetColumn<int>("B").size(), 2);

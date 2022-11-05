@@ -1,6 +1,6 @@
 // test056.cpp - write cells containing separator character
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

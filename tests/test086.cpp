@@ -1,6 +1,6 @@
 // test086.cpp - exception message reading out-of-range column
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

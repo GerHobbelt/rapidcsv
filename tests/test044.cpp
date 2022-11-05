@@ -1,6 +1,6 @@
 // test044.cpp - set column values as char
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

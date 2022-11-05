@@ -1,6 +1,6 @@
 // test037.cpp - double quote handling
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

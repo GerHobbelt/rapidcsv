@@ -1,6 +1,6 @@
 // test051.cpp - get column and row names
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

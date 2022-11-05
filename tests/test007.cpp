@@ -1,6 +1,6 @@
 // test007.cpp - delete columns
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

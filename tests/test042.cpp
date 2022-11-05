@@ -1,6 +1,6 @@
 // test042.cpp - test GetColumnCount() and GetRowCount()
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

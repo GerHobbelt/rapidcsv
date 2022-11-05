@@ -1,6 +1,6 @@
 // test036.cpp - supported datatypes
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

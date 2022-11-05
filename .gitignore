@@ -73,7 +73,8 @@ dkms.conf
 # Compiled Static libraries
 *.lai
 
-# Executables
+# build folders
+build-*/
 
 ### CMake ###
 CMakeLists.txt.user
@@ -94,6 +95,7 @@ _deps
 
 ### Linux ###
 *~
+*.swp
 
 # temporary files which can be created if a process still has a handle open of a deleted file
 .fuse_hidden*

@@ -10,6 +10,7 @@
 #include <string>
 #include <sstream>
 
+#define COMMA ,
 
 #define ExpectEqual(t, a, b) ExpectEqualFun<t>(a, b, #a, #b, __FILE__, __LINE__)
 #define ExpectTrue(a) ExpectTrueFun(a, #a, __FILE__, __LINE__)

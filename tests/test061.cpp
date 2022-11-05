@@ -1,6 +1,6 @@
 // test061.cpp - read trimmed cell values
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

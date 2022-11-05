@@ -7,15 +7,20 @@ exit ${RV}
 
 #include <iostream>
 #include <vector>
-#include "rapidcsv.h"
+#include <cmath>
+
+#include <rapidcsv/rapidcsv.h>
 
 namespace rapidcsv
 {
   template<>
-  void Converter<int>::ToVal(const std::string& pStr, int& pVal) const
+  struct ConverterToVal<int,1,0>
   {
-    pVal = static_cast<int>(roundf(100.0f * std::stof(pStr)));
-  }
+    static int ToVal(const std::string& pStr)
+    {
+      return static_cast<int>(roundf(100.0f * std::stof(pStr)));
+    }
+  };
 }
 
 int main()

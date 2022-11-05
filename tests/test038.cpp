@@ -1,6 +1,6 @@
 // test038.cpp - read windows CR/LF linebreaks
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()

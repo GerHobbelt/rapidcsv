@@ -29,7 +29,7 @@ endif()
 
 # Library
 add_library(rapidcsv INTERFACE)
-target_include_directories(rapidcsv INTERFACE src)
+target_include_directories(rapidcsv INTERFACE include)
 
 # Ccache
 find_program(CCACHE_PROGRAM ccache)
@@ -196,6 +196,7 @@ if(RAPIDCSV_BUILD_TESTS)
   add_example(ex007 examples/ex007.cpp)
   add_example(ex008 examples/ex008.cpp)
   add_example(ex009 examples/ex009.cpp)
+  add_example(ex010 examples/ex010.cpp)
 
 endif()
 
@@ -204,10 +205,12 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
   message(STATUS "Install/uninstall targets enabled.")
 
   # Install
-  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/rapidcsv.h DESTINATION include)
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/rapidcsv.h
+                ${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/convertor.h
+          DESTINATION include/rapidcsv/)
 
   # Uninstall
-  add_custom_target(uninstall COMMAND "${CMAKE_COMMAND}" -E remove "${CMAKE_INSTALL_PREFIX}/include/rapidcsv.h"
+  add_custom_target(uninstall COMMAND "${CMAKE_COMMAND}" -E remove "${CMAKE_INSTALL_PREFIX}/include/rapidcsv"
 )
 else()
   message(STATUS "Install/uninstall targets disabled.")

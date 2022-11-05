@@ -2,24 +2,24 @@
 
 #include <iomanip>
 #include <math.h>
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 // Data requested as ints to be converted to fixed-point two decimal numbers
 namespace rapidcsv
 {
   template<>
-  void Converter<int>::ToVal(const std::string& pStr, int& pVal) const
+  int ConverterToVal<int,1,0>::ToVal(const std::string& pStr)
   {
-    pVal = static_cast<int>(roundf(100.0f * std::stof(pStr)));
+    return static_cast<int>(roundf(100.0f * std::stof(pStr)));
   }
 
   template<>
-  void Converter<int>::ToStr(const int& pVal, std::string& pStr) const
+  std::string ConverterToStr<int,0>::ToStr(const int& pVal)
   {
     std::ostringstream out;
     out << std::fixed << std::setprecision(2) << static_cast<float>(pVal) / 100.0f;
-    pStr = out.str();
+    return out.str();
   }
 }
 

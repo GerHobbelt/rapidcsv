@@ -1,6 +1,6 @@
 // test050.cpp - read column header / label by index
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()
