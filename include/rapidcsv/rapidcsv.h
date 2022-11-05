@@ -339,25 +339,22 @@ namespace rapidcsv
     {
       const size_t dataColumnIdx = GetDataColumnIndex(pColumnIdx);
       std::vector<T> column;
-      for (auto itRow = mData.begin(); itRow != mData.end(); ++itRow)
+      ssize_t rowIdx = static_cast<ssize_t>(GetDataRowIndex(0));
+      for (auto itRow = mData.begin()+rowIdx; itRow != mData.end(); ++itRow, ++rowIdx)
       {
-        if (std::distance(mData.begin(), itRow) > mLabelParams.mColumnNameIdx)
+        if (dataColumnIdx < itRow->size())
         {
-          if (dataColumnIdx < itRow->size())
-          {
-            T val = convertToVal(itRow->at(dataColumnIdx));
-            column.push_back(val);
-          }
-          else
-          {
-            const std::string errStr = "requested column index " +
-              std::to_string(pColumnIdx) + " >= " +
-              std::to_string(itRow->size() - GetDataColumnIndex(0)) +
-              " (number of columns on row index " +
-              std::to_string(std::distance(mData.begin(), itRow) -
-                             (mLabelParams.mColumnNameIdx + 1)) + ")";
-            throw std::out_of_range(errStr);
-          }
+          T val = convertToVal(itRow->at(dataColumnIdx));
+          column.push_back(val);
+        }
+        else
+        {
+          const std::string errStr = "requested column index " +
+            std::to_string(pColumnIdx) + " >= " +
+            std::to_string(itRow->size() - GetDataColumnIndex(0)) +
+            " (number of columns on row index " +
+            std::to_string(rowIdx - (mLabelParams.mColumnNameIdx + 1)) + ")";
+          throw std::out_of_range(errStr);
         }
       }
       return column;
@@ -406,11 +403,10 @@ namespace rapidcsv
         }
       }
 
-      for (auto itRow = pColumn.begin(); itRow != pColumn.end(); ++itRow)
+      size_t rowIdx = GetDataRowIndex(0);
+      for (auto itRow = pColumn.begin(); itRow != pColumn.end(); ++itRow, ++rowIdx)
       {
-        std::string str = convertToStr(*itRow);
-        mData.at(static_cast<size_t>(std::distance(pColumn.begin(), itRow) + mLabelParams.mColumnNameIdx + 1)).at(
-          dataColumnIdx) = str;  //TODO
+        mData.at(rowIdx).at(dataColumnIdx) = convertToStr(*itRow);
       }
     }
 
@@ -482,14 +478,10 @@ namespace rapidcsv
       else
       {
         column.resize(GetDataRowIndex(pColumn.size()));
-        for (auto itRow = pColumn.begin(); itRow != pColumn.end(); ++itRow)
+        size_t rowIdx = GetDataRowIndex(0);
+        for (auto itRow = pColumn.begin(); itRow != pColumn.end(); ++itRow, ++rowIdx)
         {
-          std::string str = convertToStr(*itRow);
-          //  const ssize_t rowIdx = pRowIdx + (mLabelParams.mColumnNameIdx + 1);
-          //  const size_t dataRowIdx = GetDataRowIndex(pRowIdx);
-          const size_t rowIdx = GetDataRowIndex(static_cast<size_t>(std::distance(pColumn.begin(), itRow)));
-            //static_cast<size_t>(std::distance(pColumn.begin(), itRow) + (mLabelParams.mColumnNameIdx + 1)); // TODO
-          column.at(rowIdx) = str;
+          column.at(rowIdx) = convertToStr(*itRow);
         }
       }
 
@@ -502,9 +494,9 @@ namespace rapidcsv
         mData.push_back(row);
       }
 
-      for (auto itRow = mData.begin(); itRow != mData.end(); ++itRow)
+      size_t rowIdx = 0;
+      for (auto itRow = mData.begin(); itRow != mData.end(); ++itRow, ++rowIdx)
       {
-        const size_t rowIdx = static_cast<size_t>(std::distance(mData.begin(), itRow));
         itRow->insert(itRow->begin() + static_cast<ssize_t>(dataColumnIdx), column.at(rowIdx));
       }
 
@@ -556,13 +548,11 @@ namespace rapidcsv
     {
       const size_t dataRowIdx = GetDataRowIndex(pRowIdx);
       std::vector<T> row;
-      for (auto itCol = mData.at(dataRowIdx).begin(); itCol != mData.at(dataRowIdx).end(); ++itCol)
+      const ssize_t colIdx = static_cast<ssize_t>(GetDataColumnIndex(0));
+      for (auto itCol = mData.at(dataRowIdx).begin() + colIdx; itCol != mData.at(dataRowIdx).end(); ++itCol)
       {
-        if (std::distance(mData.at(dataRowIdx).begin(), itCol) > mLabelParams.mRowNameIdx) // TODO
-        {
-          T val = convertToVal(*itCol);
-          row.push_back(val);
-        }
+        T val = convertToVal(*itCol);
+        row.push_back(val);
       }
       return row;
     }
@@ -611,11 +601,10 @@ namespace rapidcsv
         }
       }
 
-      for (auto itCol = pRow.begin(); itCol != pRow.end(); ++itCol)
+      size_t colIdx = GetDataColumnIndex(0);
+      for (auto itCol = pRow.begin(); itCol != pRow.end(); ++itCol, ++colIdx)
       {
-        std::string str = convertToStr(*itCol);
-        mData.at(dataRowIdx).at(static_cast<size_t>(std::distance(pRow.begin(),
-                                                                  itCol) + mLabelParams.mRowNameIdx + 1)) = str;  //TODO
+        mData.at(dataRowIdx).at(colIdx) = convertToStr(*itCol);
       }
     }
 
@@ -683,10 +672,10 @@ namespace rapidcsv
       else
       {
         row.resize(GetDataColumnIndex(pRow.size()));
-        for (auto itCol = pRow.begin(); itCol != pRow.end(); ++itCol)
+        size_t colIdx = GetDataColumnIndex(0);
+        for (auto itCol = pRow.begin(); itCol != pRow.end(); ++itCol, ++colIdx)
         {
-          std::string str = convertToStr(*itCol);
-          row.at(static_cast<size_t>(std::distance(pRow.begin(), itCol) + mLabelParams.mRowNameIdx + 1)) = str; // TODO
+          row.at(colIdx) = convertToStr(*itCol);
         }
       }
 
@@ -1008,12 +997,10 @@ namespace rapidcsv
       std::vector<std::string> rownames;
       if (mLabelParams.mRowNameIdx >= 0)
       {
-        for (auto itRow = mData.begin(); itRow != mData.end(); ++itRow)
+        const ssize_t rowIdx = static_cast<ssize_t>(GetDataRowIndex(0));
+        for (auto itRow = mData.begin() + rowIdx; itRow != mData.end(); ++itRow)
         {
-          if (std::distance(mData.begin(), itRow) > mLabelParams.mColumnNameIdx)
-          {
-            rownames.push_back(itRow->at(static_cast<size_t>(mLabelParams.mRowNameIdx)));
-          }
+          rownames.push_back(itRow->at(static_cast<size_t>(mLabelParams.mRowNameIdx)));
         }
       }
       return rownames;
@@ -1283,21 +1270,31 @@ namespace rapidcsv
       }
     }
 
-    size_t GetDataRowCount() const
+    inline size_t GetDataRowCount() const
     {
       return mData.size();
     }
 
-    size_t GetDataColumnCount() const
+    inline size_t GetDataColumnCount() const
     {
       return (mData.size() > 0) ? mData.at(0).size() : 0;
     }
 
+    /**
+     * @brief   Get actual index, taking into account header-row if present.
+     * @param   pRowIdx               zero-based row index.
+     * @returns zero-based row index when header-row is absent OR one-based row index when header-row is present.
+     */
     inline size_t GetDataRowIndex(const size_t pRowIdx) const
     {
       return pRowIdx + static_cast<size_t>(mLabelParams.mColumnNameIdx + 1);
     }
 
+    /**
+     * @brief   Get actual index, taking into account header-column if present.
+     * @param   pColumnIdx            zero-based column index.
+     * @returns zero-based column index when header-column is absent OR one-based column index when header-column is present.
+     */
     inline size_t GetDataColumnIndex(const size_t pColumnIdx) const
     {
       return pColumnIdx + static_cast<size_t>(mLabelParams.mRowNameIdx + 1);

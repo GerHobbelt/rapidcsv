@@ -27,7 +27,7 @@ namespace rapidcsv
   template<typename T>
   struct NaNaccess<T,1>
   {
-    inline static
+    static
     typename std::enable_if<std::is_arithmetic<T>::value, T>::type
     getNaN()
     {
@@ -41,7 +41,7 @@ namespace rapidcsv
   template<typename T, int USE_NUMERIC_LOCALE=1, int USE_NAN=0>
   struct ConverterToVal
   {
-    inline static
+    static
     typename std::enable_if<0 != USE_NAN, T>::type
     ToVal(const std::string & pStr)
     {
@@ -69,7 +69,7 @@ namespace rapidcsv
   template<typename T>
   struct ConverterToVal<T,0,0>
   {
-    inline static
+    static
     typename std::enable_if<!std::is_same<T,std::string>::value, T>::type
     ToVal(const std::string & pStr)
     {
@@ -135,7 +135,7 @@ namespace rapidcsv
   template<typename T, int USE_NUMERIC_LOCALE=0>
   struct ConverterToStr
   {
-    inline static
+    static
     typename std::enable_if<!std::is_same<T,std::string>::value &&
                             !std::is_same<T,char>::value, std::string>::type
     ToStr(const T & pVal)
