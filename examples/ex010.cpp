@@ -43,8 +43,8 @@ void testType(const std::string& typeData, const T& orgT)
   const std::string strT = rapidcsv::ConverterToStr<T>::ToStr(orgT);
   const T convT = rapidcsv::ConverterToVal<T>::ToVal(strT);
 
-  std::cout << std::setprecision(25) << "org" << typeData << " = " << orgT << 
-               " ; str" << typeData << " = " << strT << " ; conv" << typeData << " = " << convT << std::endl;
+  std::cout << std::setprecision(25) << "org" << typeData << " = " << orgT << " ; str"
+            << typeData << " = " << strT << " ; conv" << typeData << " = " << convT << std::endl;
 }
 
 int main()
@@ -67,6 +67,7 @@ int main()
   const std::string strLongDouble = rapidcsv::ConverterToStr<long double,2>::ToStr(orgLongDouble);
   const int convInt = rapidcsv::ConverterToVal<int,2,0>::ToVal(strLongDouble);
 
-  std::cout << "orgLongDouble = " << orgLongDouble << " ; strLongDouble = " << strLongDouble << " ; convInt = " << convInt << std::endl;
+  std::cout << "orgLongDouble = " << orgLongDouble << " ; strLongDouble = "
+            << strLongDouble << " ; convInt = " << convInt << std::endl;
 
 }

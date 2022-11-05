@@ -30,7 +30,8 @@ vector of floats.
 ```cpp
     #include <iostream>
     #include <vector>
-    #include "rapidcsv.h"
+
+    #include <rapidcsv/rapidcsv.h>
 
     int main()
     {
@@ -55,7 +56,8 @@ been tested on:
 Installation
 ============
 Simply copy
-[src/rapidcsv.h](https://raw.githubusercontent.com/d99kris/rapidcsv/master/src/rapidcsv.h)
+[include/rapidcsv/rapidcsv.h](https://raw.githubusercontent.com/panchaBhuta/rapidcsv_CT/master/include/rapidcsv/rapidcsv.h)
+[include/rapidcsv/converter.h](https://raw.githubusercontent.com/panchaBhuta/rapidcsv_CT/master/include/rapidcsv/converter.h)
 to your project/include directory and include it. 
 
 More Examples
@@ -92,7 +94,8 @@ as row headers one needs to use LabelParams and set pRowNameIdx to 0.
 ```cpp
     #include <iostream>
     #include <vector>
-    #include "rapidcsv.h"
+
+    #include <rapidcsv/rapidcsv.h>
 
     int main()
     {
@@ -120,7 +123,8 @@ as row headers one needs to use LabelParams and set pRowNameIdx to 0.
 ```cpp
     #include <iostream>
     #include <vector>
-    #include "rapidcsv.h"
+
+    #include <rapidcsv/rapidcsv.h>
 
     int main()
     {
@@ -145,7 +149,8 @@ as row headers one needs to use LabelParams and set pRowNameIdx to 0.
 ```cpp
     #include <iostream>
     #include <vector>
-    #include "rapidcsv.h"
+
+    #include <rapidcsv/rapidcsv.h>
 
     int main()
     {
@@ -179,7 +184,8 @@ semi-colon as separator.
 ```cpp
     #include <iostream>
     #include <vector>
-    #include "rapidcsv.h"
+
+    #include <rapidcsv/rapidcsv.h>
 
     int main()
     {
@@ -216,7 +222,8 @@ as a character. The following example illustrates the supported data types.
 ```cpp
     #include <iostream>
     #include <vector>
-    #include "rapidcsv.h"
+
+    #include <rapidcsv/rapidcsv.h>
 
     int main()
     {
@@ -242,22 +249,27 @@ Global Custom Data Type Conversion
 One may override conversion routines (or add new ones) by implementing ToVal()
 and/or ToStr(). Below is an example overriding int conversion, to instead provide
 two decimal fixed-point numbers. Also see 
-[tests/test035.cpp](https://github.com/d99kris/rapidcsv/blob/master/tests/test035.cpp)
+[tests/test035.cpp](https://github.com/panchaBhuta/rapidcsv_CT/blob/master/tests/test035.cpp)
 for a test overriding ToVal() and ToStr().
 
 [ex008.cpp](examples/ex008.cpp) content:
 ```cpp
     #include <iostream>
     #include <vector>
-    #include "rapidcsv.h"
+    #include <cmath>
+
+    #include <rapidcsv/rapidcsv.h>
 
     namespace rapidcsv
     {
       template<>
-      void Converter<int>::ToVal(const std::string& pStr, int& pVal) const
+      struct ConverterToVal<int,1,0>
       {
-        pVal = static_cast<int>(roundf(100.0f * std::stof(pStr)));
-      }
+        static int ToVal(const std::string& pStr)
+        {
+          return static_cast<int>(roundf(100.0f * std::stof(pStr)));
+        }
+      };
     }
 
     int main()
@@ -275,17 +287,19 @@ Custom Data Type Conversion Per Call
 It is also possible to override conversions on a per-call basis, enabling more
 flexibility. This is illustrated in the following example. Additional conversion
 override usage can be found in the test 
-[tests/test063.cpp](https://github.com/d99kris/rapidcsv/blob/master/tests/test063.cpp)
+[tests/test063.cpp](https://github.com/panchaBhuta/rapidcsv_CT/blob/master/tests/test063.cpp)
 
 [ex009.cpp](examples/ex009.cpp) content:
 ```cpp
     #include <iostream>
     #include <vector>
-    #include "rapidcsv.h"
+    #include <cmath>
 
-    void ConvFixPoint(const std::string& pStr, int& pVal)
+    #include <rapidcsv/rapidcsv.h>
+
+    int ConvFixPoint(const std::string& pStr)
     {
-      pVal = static_cast<int>(roundf(100.0f * std::stof(pStr)));
+      return static_cast<int>(roundf(100.0f * std::stof(pStr)));
     }
 
     struct MyStruct
@@ -293,9 +307,11 @@ override usage can be found in the test
       int val = 0;
     };
 
-    void ConvMyStruct(const std::string& pStr, MyStruct& pVal)
+    MyStruct ConvMyStruct(const std::string& pStr)
     {
-      pVal.val = static_cast<int>(roundf(100.0f * std::stof(pStr)));
+      MyStruct ms;
+      ms.val = static_cast<int>(roundf(100.0f * std::stof(pStr)));
+      return ms;
     }
 
     int main()
@@ -305,7 +321,7 @@ override usage can be found in the test
       std::cout << "regular         = " << doc.GetCell<int>("Close", "2017-02-21") << "\n";
       std::cout << "fixpointfunc    = " << doc.GetCell<int>("Close", "2017-02-21", ConvFixPoint) << "\n";
 
-      auto convFixLambda = [](const std::string& pStr, int& pVal) { pVal = static_cast<int>(roundf(100.0f * stof(pStr))); };
+      auto convFixLambda = [](const std::string& pStr) { return static_cast<int>(roundf(100.0f * stof(pStr))); };
       std::cout << "fixpointlambda  = " << doc.GetCell<int>("Close", "2017-02-21", convFixLambda) << "\n";
 
       std::cout << "mystruct        = " << doc.GetCell<MyStruct>("Close", "2017-02-21", ConvMyStruct).val << "\n";
@@ -323,7 +339,8 @@ functionality. Here is a simple example reading CSV data from a string:
 ```cpp
     #include <iostream>
     #include <vector>
-    #include "rapidcsv.h"
+
+    #include <rapidcsv/rapidcsv.h>
 
     int main()
     {
@@ -344,6 +361,81 @@ functionality. Here is a simple example reading CSV data from a string:
 
       long long volume = doc.GetCell<long long>("Volume", "2017-02-22");
       std::cout << "Volume " << volume << " on 2017-02-22." << std::endl;
+    }
+```
+
+Data Conversion Precision
+-------------------------
+If only data conversions is needed, then just include [rapidcsv/rapidcsv.h](include/rapidcsv/rapidcsv.h).
+This is illustrated in the following example, where data conversion precision is checked
+by implementing a complete conversion cycle i.e    data -> string -> data
+
+[ex010.cpp](examples/ex010.cpp) content:
+```cpp
+    #include <iostream>
+    #include <vector>
+    #include <iomanip>
+    #include <cmath>
+
+    #include <rapidcsv/converter.h>
+
+    namespace rapidcsv
+    {
+      template<>
+      struct ConverterToVal<int,2,0>
+      {
+        static int ToVal(const std::string& pStr)
+        {
+          return static_cast<int>(roundf(100.0f * std::stof(pStr)));
+        }
+      };
+
+      template<typename T>
+      struct ConverterToStr<T,2>
+      {
+        static std::string ToStr(const typename
+                                 std::enable_if<std::is_floating_point<T>::value, T>::type & val)
+        {
+          std::ostringstream out;
+          out.precision( std::numeric_limits<T>::digits10 + 1 );
+          out << std::fixed << val;
+          return out.str();
+        }
+      };
+    }
+
+    template<typename T>
+    void testType(const std::string& typeData, const T& orgT)
+    {
+      const std::string strT = rapidcsv::ConverterToStr<T>::ToStr(orgT);
+      const T convT = rapidcsv::ConverterToVal<T>::ToVal(strT);
+
+      std::cout << std::setprecision(25) << "org" << typeData << " = " << orgT << " ; str"
+                << typeData << " = " << strT << " ; conv" << typeData << " = " << convT << std::endl; }
+
+    int main()
+    {
+
+      testType<int>("Int", -100);
+      testType<long>("Long", -10000000);
+      testType<long long>("LongLong", -10000000000);
+      testType<unsigned>("Unsigned", 100);
+      testType<unsigned long>("UnsignedLong", 10000000);
+      testType<unsigned long long>("UnsignedLongLong", 10000000000);
+      testType<float>("Float", 313.1234567890123456789012345F);
+      testType<double>("Double", 3462424.1234567890123456789012345);
+      testType<long double>("LongDouble", 23453.1234567890123456789012345L);
+      testType<char>("Char", 'G');
+
+      std::cout << "using specialization" << std::endl;
+
+      const long double orgLongDouble = 100.1234567890123456789012345L;
+      const std::string strLongDouble = rapidcsv::ConverterToStr<long double,2>::ToStr(orgLongDouble);
+      const int convInt = rapidcsv::ConverterToVal<int,2,0>::ToVal(strLongDouble);
+
+      std::cout << "orgLongDouble = " << orgLongDouble << " ; strLongDouble = "
+                << strLongDouble << " ; convInt = " << convInt << std::endl;
+
     }
 ```
 
@@ -437,7 +529,7 @@ Locale Independent Parsing
 Rapidcsv uses locale-dependent conversion functions when parsing float values
 by default. It is possible to configure rapidcsv to use locale independent
 parsing by setting `mNumericLocale` in `ConverterParams`, see for example
-[tests/test087.cpp](https://github.com/d99kris/rapidcsv/blob/master/tests/test087.cpp)
+[tests/test087.cpp](https://github.com/panchaBhuta/rapidcsv_CT/blob/master/tests/test087.cpp)
 
 API Documentation
 =================
@@ -445,10 +537,9 @@ The following classes makes up the Rapidcsv interface:
  - [class rapidcsv::Document](doc/rapidcsv_Document.md)
  - [class rapidcsv::LabelParams](doc/rapidcsv_LabelParams.md)
  - [class rapidcsv::SeparatorParams](doc/rapidcsv_SeparatorParams.md)
- - [class rapidcsv::ConverterParams](doc/rapidcsv_ConverterParams.md)
  - [class rapidcsv::LineReaderParams](doc/rapidcsv_LineReaderParams.md)
- - [class rapidcsv::no_converter](doc/rapidcsv_no_converter.md)
- - [class rapidcsv::Converter< T >](doc/rapidcsv_Converter.md)
+ - [class rapidcsv::ConverterToVal< T, USE_NUMERIC_LOCALE, USE_NAN >](doc/rapidcsv_ConverterToVal.md)
+ - [class rapidcsv::ConverterToStr< T, USE_NUMERIC_LOCALE >](doc/rapidcsv_ConverterToStr.md)
 
 Technical Details
 =================
@@ -459,11 +550,11 @@ Rapidcsv uses cmake for its tests. Commands to build and execute the test suite:
 Rapidcsv uses [doxygenmd](https://github.com/d99kris/doxygenmd) to generate
 its Markdown API documentation:
 
-    doxygenmd src doc
+    doxygenmd include doc
 
 Rapidcsv uses Uncrustify to ensure consistent code formatting:
 
-    uncrustify -c uncrustify.cfg --no-backup src/rapidcsv.h
+    uncrustify -c uncrustify.cfg --no-backup include/rapidcsv/rapidcsv.h
 
 Alternatives
 ============
@@ -474,7 +565,7 @@ There are many CSV parsers for C++, for example:
 License
 =======
 Rapidcsv is distributed under the BSD 3-Clause license. See
-[LICENSE](https://github.com/d99kris/rapidcsv/blob/master/LICENSE) file.
+[LICENSE](https://github.com/panchaBhuta/rapidcsv_CT/blob/master/LICENSE) file.
 
 Contributions
 =============

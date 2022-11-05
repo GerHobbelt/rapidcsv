@@ -1,3 +1,16 @@
+/*
+ * converter.h
+ *
+ * URL:      https://github.com/panchaBhuta/rapidcsv_CT
+ * Version:  1.0.ct-8.67
+ *
+ * Copyright (C) 2022-2022 Gautam Dhar
+ * All rights reserved.
+ *
+ * rapidcsv_CT is distributed under the BSD 3-Clause license, see LICENSE for details.
+ *
+ */
+
 #pragma once
 
 #include <functional>
@@ -18,16 +31,30 @@ namespace rapidcsv
   inline T ToVal(const std::string & pStr);
 
 
+
+  /**
+   * @brief     Class declaration providing Not-A-Number (NaN) for numerical datatypes when converting from strings.
+   */
   template<typename T, int USE_NAN>
   struct NaNaccess;
 
+  /**
+   * @brief     Specialized Class implementation when Not-A-Number (NaN) is disabled.
+   */
   template<typename T>
   struct NaNaccess<T,0> {};
 
+  /**
+   * @brief     Specialized Class implementation for default Not-A-Number (NaN) values when enabled.
+   */
   template<typename T>
   struct NaNaccess<T,1>
   {
-    static
+    /**
+     * @brief   If 'numeric_limits' provides 'signaling_NaN' retun that else zero.
+     * @returns 'signaling_NaN()' (for floating numbers) OR 'zero'.
+     */
+    inline static
     typename std::enable_if<std::is_arithmetic<T>::value, T>::type
     getNaN()
     {
@@ -38,9 +65,19 @@ namespace rapidcsv
 
 
 
+  /**
+   * @brief     Class providing conversion from strings to numerical datatypes.
+   *            Use specialization for custom datatype conversions.
+   */
   template<typename T, int USE_NUMERIC_LOCALE=1, int USE_NAN=0>
   struct ConverterToVal
   {
+    /**
+     * @brief   Converts string holding a numerical value to numerical datatype representation.
+     *          A conversion error would return a value of 'NaN' for particular data-type.
+     * @param   pStr                  string holding a numerical value
+     * @returns                       output T data-type
+     */
     static
     typename std::enable_if<0 != USE_NAN, T>::type
     ToVal(const std::string & pStr)
@@ -54,10 +91,17 @@ namespace rapidcsv
     }
   };
 
-
+  /**
+   * @brief     Specialized implementation where a Not-A-Number error is propagated to its callee.
+   */
   template<typename T, int USE_NUMERIC_LOCALE>
   struct ConverterToVal<T,USE_NUMERIC_LOCALE,0>
   {
+    /**
+     * @brief   Converts string holding a numerical value to numerical datatype representation.
+     * @param   pStr                  string holding a numerical value
+     * @returns                       output T data-type
+     */
     inline static
     typename std::enable_if<!std::is_same<T,std::string>::value && (0 != USE_NUMERIC_LOCALE), T>::type
     ToVal(const std::string & pStr)
@@ -66,9 +110,18 @@ namespace rapidcsv
     }
   };
 
+  /**
+   * @brief     Specialized implementation using string-stream for data conversion.
+   *            On Not-A-Number error is thrown.
+   */
   template<typename T>
   struct ConverterToVal<T,0,0>
   {
+    /**
+     * @brief   Converts string holding a numerical value to numerical datatype representation.
+     * @param   pStr                  string holding a numerical value
+     * @returns                       output T data-type
+     */
     static
     typename std::enable_if<!std::is_same<T,std::string>::value, T>::type
     ToVal(const std::string & pStr)
@@ -86,9 +139,17 @@ namespace rapidcsv
     }
   };
 
+  /**
+   * @brief     Specialized implementation handling string to string conversion.
+   */
   template<int USE_NUMERIC_LOCALE>
   struct ConverterToVal<std::string,USE_NUMERIC_LOCALE,0>
   {
+    /**
+     * @brief     Specialized implementation handling string to string conversion.
+     * @param     pStr                  string
+     * @return                          string
+     */
     inline static std::string ToVal(const std::string & pStr) { return pStr; }
   };
 
@@ -132,9 +193,18 @@ namespace rapidcsv
   inline std::string ToStr(const T & pVal);
 
 
+  /**
+   * @brief     Class providing conversion from numerical datatypes to strings.
+   *            Use specialization for custom datatype conversions.
+   */
   template<typename T, int USE_NUMERIC_LOCALE=0>
   struct ConverterToStr
   {
+    /**
+     * @brief   Converts a numerical value to string.
+     * @param   pVal                  numerical value
+     * @returns                       string
+     */
     static
     typename std::enable_if<!std::is_same<T,std::string>::value &&
                             !std::is_same<T,char>::value, std::string>::type
@@ -152,10 +222,18 @@ namespace rapidcsv
     }
   };
 
+  /**
+   * @brief     Specialized implementation using Numeric-Local conversions.
+   */
   //  for types refer :: https://en.cppreference.com/w/cpp/language/type
   template<typename T>
   struct ConverterToStr<T,1>
   {
+    /**
+     * @brief   Converts numerical value to string using system numeric-local function.
+     * @param   pVal                  numerical value
+     * @returns                       string
+     */
     inline static
     // refer  ::  https://stackoverflow.com/questions/11055923/stdenable-if-parameter-vs-template-parameter/11056146#11056146
     typename std::enable_if<std::is_integral<T>::value && (!std::is_same<T,char>::value), std::string>::type
@@ -166,9 +244,17 @@ namespace rapidcsv
     }
   };
 
+  /**
+   * @brief     Specialized implementation using Numeric-Local conversions.
+   */
   template<typename T>
   struct ConverterToStr<T,-1>
   {
+    /**
+     * @brief   Converts floating point numbers to string using system numeric-local function.
+     * @param   pVal                  numerical value
+     * @returns                       string
+     */
     inline static
     typename std::enable_if<std::is_floating_point<T>::value && (!std::is_same<T,char>::value), std::string>::type
     ToStr(const T & pVal)
@@ -200,15 +286,31 @@ namespace rapidcsv
     }
   };
 
+  /**
+   * @brief     Specialized implementation handling char to string conversion.
+   */
   template<int USE_NUMERIC_LOCALE>
   struct ConverterToStr<char,USE_NUMERIC_LOCALE>
   {
+    /**
+     * @brief     Specialized implementation handling string to string conversion.
+     * @param     pVal                  char
+     * @return                          string
+     */
     inline static std::string ToStr(const char & pVal) { return std::string(1,pVal); }
   };
 
+  /**
+   * @brief     Specialized implementation handling string to string conversion.
+   */
   template<int USE_NUMERIC_LOCALE>
   struct ConverterToStr<std::string,USE_NUMERIC_LOCALE>
   {
+    /**
+     * @brief     Specialized implementation handling string to string conversion.
+     * @param     pVal                  string
+     * @return                          string
+     */
     inline static std::string ToStr(const std::string & pVal) { return pVal; }
   };
 

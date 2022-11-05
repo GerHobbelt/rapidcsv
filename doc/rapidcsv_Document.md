@@ -5,7 +5,7 @@ Class representing a CSV document.
 ---
 
 ```c++
-Document (const std::string & pPath = std::string(), const LabelParams & pLabelParams = LabelParams(), const SeparatorParams & pSeparatorParams = SeparatorParams(), const ConverterParams & pConverterParams = ConverterParams(), const LineReaderParams & pLineReaderParams = LineReaderParams())
+Document (const std::string & pPath = std::string(), const LabelParams & pLabelParams = LabelParams(), const SeparatorParams & pSeparatorParams = SeparatorParams(), const LineReaderParams & pLineReaderParams = LineReaderParams())
 ```
 Constructor. 
 
@@ -13,13 +13,12 @@ Constructor.
 - `pPath` specifies the path of an existing CSV-file to populate the Document data with. 
 - `pLabelParams` specifies which row and column should be treated as labels. 
 - `pSeparatorParams` specifies which field and row separators should be used. 
-- `pConverterParams` specifies how invalid numbers (including empty strings) should be handled. 
 - `pLineReaderParams` specifies how special line formats should be treated. 
 
 ---
 
 ```c++
-Document (std::istream & pStream, const LabelParams & pLabelParams = LabelParams(), const SeparatorParams & pSeparatorParams = SeparatorParams(), const ConverterParams & pConverterParams = ConverterParams(), const LineReaderParams & pLineReaderParams = LineReaderParams())
+Document (std::istream & pStream, const LabelParams & pLabelParams = LabelParams(), const SeparatorParams & pSeparatorParams = SeparatorParams(), const LineReaderParams & pLineReaderParams = LineReaderParams())
 ```
 Constructor. 
 
@@ -27,7 +26,6 @@ Constructor.
 - `pStream` specifies a binary input stream to read CSV data from. 
 - `pLabelParams` specifies which row and column should be treated as labels. 
 - `pSeparatorParams` specifies which field and row separators should be used. 
-- `pConverterParams` specifies how invalid numbers (including empty strings) should be handled. 
 - `pLineReaderParams` specifies how special line formats should be treated. 
 
 ---
@@ -40,13 +38,14 @@ Clears loaded Document data.
 ---
 
 ```c++
-template<typename T > T GetCell (const size_t pColumnIdx, const size_t pRowIdx)
+template<typename T , int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0> T GetCell (const size_t pColumnIdx, const size_t pRowIdx, f_ConvFuncToVal< T > pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal)
 ```
 Get cell by index. 
 
 **Parameters**
 - `pColumnIdx` zero-based column index. 
 - `pRowIdx` zero-based row index. 
+- `pConvertToVal` conversion function (optional argument). 
 
 **Returns:**
 - cell data. 
@@ -54,28 +53,14 @@ Get cell by index.
 ---
 
 ```c++
-template<typename T > T GetCell (const size_t pColumnIdx, const size_t pRowIdx, ConvFunc< T > pToVal)
-```
-Get cell by index. 
-
-**Parameters**
-- `pColumnIdx` zero-based column index. 
-- `pRowIdx` zero-based row index. 
-- `pToVal` conversion function. 
-
-**Returns:**
-- cell data. 
-
----
-
-```c++
-template<typename T > T GetCell (const std::string & pColumnName, const std::string & pRowName)
+template<typename T , int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0> T GetCell (const std::string & pColumnName, const std::string & pRowName, f_ConvFuncToVal< T > pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal)
 ```
 Get cell by name. 
 
 **Parameters**
 - `pColumnName` column label name. 
 - `pRowName` row label name. 
+- `pConvertToVal` conversion function (optional argument). 
 
 **Returns:**
 - cell data. 
@@ -83,28 +68,14 @@ Get cell by name.
 ---
 
 ```c++
-template<typename T > T GetCell (const std::string & pColumnName, const std::string & pRowName, ConvFunc< T > pToVal)
-```
-Get cell by name. 
-
-**Parameters**
-- `pColumnName` column label name. 
-- `pRowName` row label name. 
-- `pToVal` conversion function. 
-
-**Returns:**
-- cell data. 
-
----
-
-```c++
-template<typename T > T GetCell (const std::string & pColumnName, const size_t pRowIdx)
+template<typename T , int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0> T GetCell (const std::string & pColumnName, const size_t pRowIdx, f_ConvFuncToVal< T > pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal)
 ```
 Get cell by column name and row index. 
 
 **Parameters**
 - `pColumnName` column label name. 
 - `pRowIdx` zero-based row index. 
+- `pConvertToVal` conversion function (optional argument). 
 
 **Returns:**
 - cell data. 
@@ -112,28 +83,14 @@ Get cell by column name and row index.
 ---
 
 ```c++
-template<typename T > T GetCell (const std::string & pColumnName, const size_t pRowIdx, ConvFunc< T > pToVal)
-```
-Get cell by column name and row index. 
-
-**Parameters**
-- `pColumnName` column label name. 
-- `pRowIdx` zero-based row index. 
-- `pToVal` conversion function. 
-
-**Returns:**
-- cell data. 
-
----
-
-```c++
-template<typename T > T GetCell (const size_t pColumnIdx, const std::string & pRowName)
+template<typename T , int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0> T GetCell (const size_t pColumnIdx, const std::string & pRowName, f_ConvFuncToVal< T > pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal)
 ```
 Get cell by column index and row name. 
 
 **Parameters**
 - `pColumnIdx` zero-based column index. 
 - `pRowName` row label name. 
+- `pConvertToVal` conversion function (optional argument). 
 
 **Returns:**
 - cell data. 
@@ -141,27 +98,13 @@ Get cell by column index and row name.
 ---
 
 ```c++
-template<typename T > T GetCell (const size_t pColumnIdx, const std::string & pRowName, ConvFunc< T > pToVal)
-```
-Get cell by column index and row name. 
-
-**Parameters**
-- `pColumnIdx` zero-based column index. 
-- `pRowName` row label name. 
-- `pToVal` conversion function. 
-
-**Returns:**
-- cell data. 
-
----
-
-```c++
-template<typename T > std::vector<T> GetColumn (const size_t pColumnIdx)
+template<typename T , int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0> std::vector<T> GetColumn (const size_t pColumnIdx, f_ConvFuncToVal< T > pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal)
 ```
 Get column by index. 
 
 **Parameters**
 - `pColumnIdx` zero-based column index. 
+- `pConvertToVal` conversion function (optional argument). 
 
 **Returns:**
 - vector of column data. 
@@ -169,40 +112,13 @@ Get column by index.
 ---
 
 ```c++
-template<typename T > std::vector<T> GetColumn (const size_t pColumnIdx, ConvFunc< T > pToVal)
-```
-Get column by index. 
-
-**Parameters**
-- `pColumnIdx` zero-based column index. 
-- `pToVal` conversion function. 
-
-**Returns:**
-- vector of column data. 
-
----
-
-```c++
-template<typename T > std::vector<T> GetColumn (const std::string & pColumnName)
+template<typename T , int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0> std::vector<T> GetColumn (const std::string & pColumnName, f_ConvFuncToVal< T > pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal)
 ```
 Get column by name. 
 
 **Parameters**
 - `pColumnName` column label name. 
-
-**Returns:**
-- vector of column data. 
-
----
-
-```c++
-template<typename T > std::vector<T> GetColumn (const std::string & pColumnName, ConvFunc< T > pToVal)
-```
-Get column by name. 
-
-**Parameters**
-- `pColumnName` column label name. 
-- `pToVal` conversion function. 
+- `pConvertToVal` conversion function (optional argument). 
 
 **Returns:**
 - vector of column data. 
@@ -256,12 +172,13 @@ Get column names.
 ---
 
 ```c++
-template<typename T > std::vector<T> GetRow (const size_t pRowIdx)
+template<typename T , int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0> std::vector<T> GetRow (const size_t pRowIdx, f_ConvFuncToVal< T > pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal)
 ```
 Get row by index. 
 
 **Parameters**
 - `pRowIdx` zero-based row index. 
+- `pConvertToVal` conversion function (optional argument). 
 
 **Returns:**
 - vector of row data. 
@@ -269,40 +186,13 @@ Get row by index.
 ---
 
 ```c++
-template<typename T > std::vector<T> GetRow (const size_t pRowIdx, ConvFunc< T > pToVal)
-```
-Get row by index. 
-
-**Parameters**
-- `pRowIdx` zero-based row index. 
-- `pToVal` conversion function. 
-
-**Returns:**
-- vector of row data. 
-
----
-
-```c++
-template<typename T > std::vector<T> GetRow (const std::string & pRowName)
+template<typename T , int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0> std::vector<T> GetRow (const std::string & pRowName, f_ConvFuncToVal< T > pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal)
 ```
 Get row by name. 
 
 **Parameters**
 - `pRowName` row label name. 
-
-**Returns:**
-- vector of row data. 
-
----
-
-```c++
-template<typename T > std::vector<T> GetRow (const std::string & pRowName, ConvFunc< T > pToVal)
-```
-Get row by name. 
-
-**Parameters**
-- `pRowName` row label name. 
-- `pToVal` conversion function. 
+- `pConvertToVal` conversion function (optional argument). 
 
 **Returns:**
 - vector of row data. 
@@ -356,7 +246,7 @@ Get row names.
 ---
 
 ```c++
-template<typename T > void InsertColumn (const size_t pColumnIdx, const std::vector< T > & pColumn = std::vector<T>(), const std::string & pColumnName = std::string())
+template<typename T , int USE_NUMERIC_LOCALE = 0> void InsertColumn (const size_t pColumnIdx, const std::vector< T > & pColumn = std::vector<T>(), const std::string & pColumnName = std::string(), f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
 ```
 Insert column at specified index. 
 
@@ -364,11 +254,12 @@ Insert column at specified index.
 - `pColumnIdx` zero-based column index. 
 - `pColumn` vector of column data (optional argument). 
 - `pColumnName` column label name (optional argument). 
+- `pConvertToStr` conversion function (optional argument). 
 
 ---
 
 ```c++
-template<typename T > void InsertRow (const size_t pRowIdx, const std::vector< T > & pRow = std::vector<T>(), const std::string & pRowName = std::string())
+template<typename T , int USE_NUMERIC_LOCALE = 0> void InsertRow (const size_t pRowIdx, const std::vector< T > & pRow = std::vector<T>(), const std::string & pRowName = std::string(), f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
 ```
 Insert row at specified index. 
 
@@ -376,11 +267,12 @@ Insert row at specified index.
 - `pRowIdx` zero-based row index. 
 - `pRow` vector of row data (optional argument). 
 - `pRowName` row label name (optional argument). 
+- `pConvertToStr` conversion function (optional argument). 
 
 ---
 
 ```c++
-void Load (const std::string & pPath, const LabelParams & pLabelParams = LabelParams(), const SeparatorParams & pSeparatorParams = SeparatorParams(), const ConverterParams & pConverterParams = ConverterParams(), const LineReaderParams & pLineReaderParams = LineReaderParams())
+void Load (const std::string & pPath, const LabelParams & pLabelParams = LabelParams(), const SeparatorParams & pSeparatorParams = SeparatorParams(), const LineReaderParams & pLineReaderParams = LineReaderParams())
 ```
 Read Document data from file. 
 
@@ -388,13 +280,12 @@ Read Document data from file.
 - `pPath` specifies the path of an existing CSV-file to populate the Document data with. 
 - `pLabelParams` specifies which row and column should be treated as labels. 
 - `pSeparatorParams` specifies which field and row separators should be used. 
-- `pConverterParams` specifies how invalid numbers (including empty strings) should be handled. 
 - `pLineReaderParams` specifies how special line formats should be treated. 
 
 ---
 
 ```c++
-void Load (std::istream & pStream, const LabelParams & pLabelParams = LabelParams(), const SeparatorParams & pSeparatorParams = SeparatorParams(), const ConverterParams & pConverterParams = ConverterParams(), const LineReaderParams & pLineReaderParams = LineReaderParams())
+void Load (std::istream & pStream, const LabelParams & pLabelParams = LabelParams(), const SeparatorParams & pSeparatorParams = SeparatorParams(), const LineReaderParams & pLineReaderParams = LineReaderParams())
 ```
 Read Document data from stream. 
 
@@ -402,7 +293,6 @@ Read Document data from stream.
 - `pStream` specifies a binary input stream to read CSV data from. 
 - `pLabelParams` specifies which row and column should be treated as labels. 
 - `pSeparatorParams` specifies which field and row separators should be used. 
-- `pConverterParams` specifies how invalid numbers (including empty strings) should be handled. 
 - `pLineReaderParams` specifies how special line formats should be treated. 
 
 ---
@@ -468,7 +358,7 @@ Write Document data to stream.
 ---
 
 ```c++
-template<typename T > void SetCell (const size_t pColumnIdx, const size_t pRowIdx, const T & pCell)
+template<typename T , int USE_NUMERIC_LOCALE = 0> void SetCell (const size_t pColumnIdx, const size_t pRowIdx, const T & pCell, f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
 ```
 Set cell by index. 
 
@@ -476,11 +366,12 @@ Set cell by index.
 - `pRowIdx` zero-based row index. 
 - `pColumnIdx` zero-based column index. 
 - `pCell` cell data. 
+- `pConvertToStr` conversion function (optional argument). 
 
 ---
 
 ```c++
-template<typename T > void SetCell (const std::string & pColumnName, const std::string & pRowName, const T & pCell)
+template<typename T , int USE_NUMERIC_LOCALE = 0> void SetCell (const std::string & pColumnName, const std::string & pRowName, const T & pCell, f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
 ```
 Set cell by name. 
 
@@ -488,28 +379,57 @@ Set cell by name.
 - `pColumnName` column label name. 
 - `pRowName` row label name. 
 - `pCell` cell data. 
+- `pConvertToStr` conversion function (optional argument). 
 
 ---
 
 ```c++
-template<typename T > void SetColumn (const size_t pColumnIdx, const std::vector< T > & pColumn)
+template<typename T , int USE_NUMERIC_LOCALE = 0> void SetCell (const std::string & pColumnName, const size_t pRowIdx, const T & pCell, f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+```
+Set cell by name. 
+
+**Parameters**
+- `pColumnName` column label name. 
+- `pRowIdx` zero-based row index. 
+- `pCell` cell data. 
+- `pConvertToStr` conversion function (optional argument). 
+
+---
+
+```c++
+template<typename T , int USE_NUMERIC_LOCALE = 0> void SetCell (const size_t pColumnIdx, const std::string & pRowName, const T & pCell, f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+```
+Set cell by name. 
+
+**Parameters**
+- `pColumnIdx` zero-based column index. 
+- `pRowName` row label name. 
+- `pCell` cell data. 
+- `pConvertToStr` conversion function (optional argument). 
+
+---
+
+```c++
+template<typename T , int USE_NUMERIC_LOCALE = 0> void SetColumn (const size_t pColumnIdx, const std::vector< T > & pColumn, f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
 ```
 Set column by index. 
 
 **Parameters**
 - `pColumnIdx` zero-based column index. 
 - `pColumn` vector of column data. 
+- `pConvertToStr` conversion function (optional argument). 
 
 ---
 
 ```c++
-template<typename T > void SetColumn (const std::string & pColumnName, const std::vector< T > & pColumn)
+template<typename T , int USE_NUMERIC_LOCALE = 0> void SetColumn (const std::string & pColumnName, const std::vector< T > & pColumn, f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
 ```
 Set column by name. 
 
 **Parameters**
 - `pColumnName` column label name. 
 - `pColumn` vector of column data. 
+- `pConvertToStr` conversion function (optional argument). 
 
 ---
 
@@ -525,24 +445,26 @@ Set column name.
 ---
 
 ```c++
-template<typename T > void SetRow (const size_t pRowIdx, const std::vector< T > & pRow)
+template<typename T , int USE_NUMERIC_LOCALE = 0> void SetRow (const size_t pRowIdx, const std::vector< T > & pRow, f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
 ```
 Set row by index. 
 
 **Parameters**
 - `pRowIdx` zero-based row index. 
 - `pRow` vector of row data. 
+- `pConvertToStr` conversion function (optional argument). 
 
 ---
 
 ```c++
-template<typename T > void SetRow (const std::string & pRowName, const std::vector< T > & pRow)
+template<typename T , int USE_NUMERIC_LOCALE = 0> void SetRow (const std::string & pRowName, const std::vector< T > & pRow, f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
 ```
 Set row by name. 
 
 **Parameters**
 - `pRowName` row label name. 
 - `pRow` vector of row data. 
+- `pConvertToStr` conversion function (optional argument). 
 
 ---
 
