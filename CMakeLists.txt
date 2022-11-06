@@ -206,7 +206,7 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
 
   # Install
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/rapidcsv.h
-                ${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/convertor.h
+                ${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/converter.h
           DESTINATION include/rapidcsv/)
 
   # Uninstall
