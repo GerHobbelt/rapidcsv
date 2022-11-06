@@ -3,7 +3,7 @@ Rapidcsv
 
 | **Linux** | **Mac** | **Windows** |
 |-----------|---------|-------------|
-| [![Linux](https://github.com/d99kris/rapidcsv/workflows/Linux/badge.svg)](https://github.com/d99kris/rapidcsv/actions?query=workflow%3ALinux) | [![macOS](https://github.com/d99kris/rapidcsv/workflows/macOS/badge.svg)](https://github.com/d99kris/rapidcsv/actions?query=workflow%3AmacOS) | [![Windows](https://github.com/d99kris/rapidcsv/workflows/Windows/badge.svg)](https://github.com/d99kris/rapidcsv/actions?query=workflow%3AWindows) |
+| [![Linux](https://github.com/panchaBhuta/rapidcsv_CT/workflows/Linux/badge.svg)](https://github.com/panchaBhuta/rapidcsv_CT/actions?query=workflow%3ALinux) | [![macOS](https://github.com/panchaBhuta/rapidcsv_CT/workflows/macOS/badge.svg)](https://github.com/panchaBhuta/rapidcsv_CT/actions?query=workflow%3AmacOS) | [![Windows](https://github.com/panchaBhuta/rapidcsv_CT/workflows/Windows/badge.svg)](https://github.com/panchaBhuta/rapidcsv_CT/actions?query=workflow%3AWindows) |
 
 Rapidcsv is an easy-to-use C++ CSV parser library. It supports C++11 (and
 later), is header-only and comes with a basic test suite.
@@ -446,16 +446,17 @@ data as a numeric data type, as it basically propagates the underlying
 conversion routines' exceptions to the calling application.
 
 The reason for this is to ensure data correctness. If one wants to be able
-to read data with invalid numbers as numeric data types, one can use
-ConverterParams to configure the converter to default to a numeric value.
-The value is configurable and by default it's
-std::numeric_limits<long double>::signaling_NaN() for float types, and 0 for
-integer types. Example:
+to read data with invalid numbers as numeric data types, one can set
+template param `USE_NAN=1` to configure the converter to default to a 'NAN' value.
+The value is configurable (by Specialized Class implementation of struct NaNaccess\<T,USE_NAN\>,
+refer `struct NaNaccess\<T,1\>`) and by default it's `std::numeric_limits\< T \>::signaling_NaN()` 
+for float-point types, and 0 for integer types. Example:
 
 ```cpp
     rapidcsv::Document doc("file.csv", rapidcsv::LabelParams(),
-                           rapidcsv::SeparatorParams(),
-                           rapidcsv::ConverterParams(true));
+                           rapidcsv::SeparatorParams());
+    ...
+    inr cellVAl = doc.GetCell("colName", rowIdx, rapidcsv::ConverterToVal<int,1,1>::ToVal);
 ```
 
 Check if a Column Exists
@@ -493,7 +494,6 @@ starting with a specific character, example:
 
 ```cpp
     rapidcsv::Document doc("file.csv", rapidcsv::LabelParams(), rapidcsv::SeparatorParams(),
-                           rapidcsv::ConverterParams(),
                            rapidcsv::LineReaderParams(true /* pSkipCommentLines */,
                                                       '#' /* pCommentPrefix */));
 ```
@@ -502,7 +502,6 @@ Using LineReaderParams it is also possible to skip empty lines, example:
 
 ```cpp
     rapidcsv::Document doc("file.csv", rapidcsv::LabelParams(), rapidcsv::SeparatorParams(),
-                           rapidcsv::ConverterParams(),
                            rapidcsv::LineReaderParams(false /* pSkipCommentLines */,
                                                       '#' /* pCommentPrefix */,
                                                       true /* pSkipEmptyLines */));
@@ -526,10 +525,21 @@ particular its [CMakeLists.txt](examples/cmake-fetchcontent/CMakeLists.txt).
 
 Locale Independent Parsing
 --------------------------
-Rapidcsv uses locale-dependent conversion functions when parsing float values
-by default. It is possible to configure rapidcsv to use locale independent
-parsing by setting `mNumericLocale` in `ConverterParams`, see for example
+Rapidcsv uses locale-dependent conversion functions when parsing float-type values from string
+by default ( `T ConverterToVal\<T,USE_NUMERIC_LOCALE=1,0\>::ToVal(const std::string & pStr)` ). 
+It is possible to configure rapidcsv to use locale independent
+parsing by setting template-parameter `USE_NUMERIC_LOCALE=0` in `doc.GetCell<float, 0, 0>`, see for example
 [tests/test087.cpp](https://github.com/panchaBhuta/rapidcsv_CT/blob/master/tests/test087.cpp)
+
+Rapidcsv uses string-stream when converting any type values to string
+by default ( `std::string ConverterToStr\<T,USE_NUMERIC_LOCALE=0\>::ToStr(const T & pVal)` ). 
+It is possible to configure rapidcsv to use locale-dependent for integer-types by 
+setting template-parameter `USE_NUMERIC_LOCALE=1` in `doc.SetCell<float, 0>`.
+
+WARNING :: With floating point types std::to_string may yield unexpected results as the number
+           of significant digits in the returned string can be zero, for e.g: pVal = 1e-09.
+           The return value may differ significantly from what std::cout prints by default.
+           That's why this particular specialization is with USE_NUMERIC_LOCALE=-1  and not with 1.
 
 API Documentation
 =================
@@ -540,6 +550,7 @@ The following classes makes up the Rapidcsv interface:
  - [class rapidcsv::LineReaderParams](doc/rapidcsv_LineReaderParams.md)
  - [class rapidcsv::ConverterToVal< T, USE_NUMERIC_LOCALE, USE_NAN >](doc/rapidcsv_ConverterToVal.md)
  - [class rapidcsv::ConverterToStr< T, USE_NUMERIC_LOCALE >](doc/rapidcsv_ConverterToStr.md)
+ - [class rapidcsv::NaNaccess< T, USE_NUMERIC_LOCALE >](doc/rapidcsv_NaNaccess.md)
 
 Technical Details
 =================

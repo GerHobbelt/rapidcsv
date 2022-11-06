@@ -35,7 +35,7 @@ namespace rapidcsv
   /**
    * @brief     Class declaration providing Not-A-Number (NaN) for numerical datatypes when converting from strings.
    */
-  template<typename T, int USE_NAN>
+  template<typename T, int USE_NAN = 1>
   struct NaNaccess;
 
   /**
