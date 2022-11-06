@@ -1,8 +1,10 @@
 name: Linux
 
-on: [push, pull_request]
-  branches:
-    - convertor
+on: # [push, pull_request]
+  push:
+  pull_request:
+    branches:
+      - convertor
 
 jobs:
   linux-build:
