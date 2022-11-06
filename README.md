@@ -56,8 +56,8 @@ been tested on:
 Installation
 ============
 Simply copy
-[include/rapidcsv/rapidcsv.h](https://raw.githubusercontent.com/panchaBhuta/rapidcsv_CT/master/include/rapidcsv/rapidcsv.h)
-[include/rapidcsv/converter.h](https://raw.githubusercontent.com/panchaBhuta/rapidcsv_CT/master/include/rapidcsv/converter.h)
+[include/rapidcsv/rapidcsv.h](https://raw.githubusercontent.com/panchaBhuta/rapidcsv_CT/convertor/include/rapidcsv/rapidcsv.h)
+[include/rapidcsv/converter.h](https://raw.githubusercontent.com/panchaBhuta/rapidcsv_CT/convertor/include/rapidcsv/converter.h)
 to your project/include directory and include it. 
 
 More Examples
@@ -249,7 +249,7 @@ Global Custom Data Type Conversion
 One may override conversion routines (or add new ones) by implementing ToVal()
 and/or ToStr(). Below is an example overriding int conversion, to instead provide
 two decimal fixed-point numbers. Also see 
-[tests/test035.cpp](https://github.com/panchaBhuta/rapidcsv_CT/blob/master/tests/test035.cpp)
+[tests/test035.cpp](https://github.com/panchaBhuta/rapidcsv_CT/blob/convertor/tests/test035.cpp)
 for a test overriding ToVal() and ToStr().
 
 [ex008.cpp](examples/ex008.cpp) content:
@@ -287,7 +287,7 @@ Custom Data Type Conversion Per Call
 It is also possible to override conversions on a per-call basis, enabling more
 flexibility. This is illustrated in the following example. Additional conversion
 override usage can be found in the test 
-[tests/test063.cpp](https://github.com/panchaBhuta/rapidcsv_CT/blob/master/tests/test063.cpp)
+[tests/test063.cpp](https://github.com/panchaBhuta/rapidcsv_CT/blob/convertor/tests/test063.cpp)
 
 [ex009.cpp](examples/ex009.cpp) content:
 ```cpp
@@ -529,7 +529,7 @@ Rapidcsv uses locale-dependent conversion functions when parsing float-type valu
 by default ( `T ConverterToVal\<T,USE_NUMERIC_LOCALE=1,0\>::ToVal(const std::string & pStr)` ). 
 It is possible to configure rapidcsv to use locale independent
 parsing by setting template-parameter `USE_NUMERIC_LOCALE=0` in `doc.GetCell<float, 0, 0>`, see for example
-[tests/test087.cpp](https://github.com/panchaBhuta/rapidcsv_CT/blob/master/tests/test087.cpp)
+[tests/test087.cpp](https://github.com/panchaBhuta/rapidcsv_CT/blob/convertor/tests/test087.cpp)
 
 Rapidcsv uses string-stream when converting any type values to string
 by default ( `std::string ConverterToStr\<T,USE_NUMERIC_LOCALE=0\>::ToStr(const T & pVal)` ). 
@@ -576,12 +576,12 @@ There are many CSV parsers for C++, for example:
 License
 =======
 Rapidcsv is distributed under the BSD 3-Clause license. See
-[LICENSE](https://github.com/panchaBhuta/rapidcsv_CT/blob/master/LICENSE) file.
+[LICENSE](https://github.com/panchaBhuta/rapidcsv_CT/blob/convertor/LICENSE) file.
 
 Contributions
 =============
 Bugs, PRs, etc are welcome on the GitHub project page
-https://github.com/d99kris/rapidcsv
+https://github.com/panchaBhuta/rapidcsv_CT/tree/convertor
 
 Keywords
 ========
