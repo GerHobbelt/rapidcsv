@@ -5,6 +5,8 @@ on: # [push, pull_request]
   pull_request:
     branches:
       - convertor
+    paths-ignore:
+      - 'docs/**'
 
 jobs:
   mac-build:

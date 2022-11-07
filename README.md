@@ -8,8 +8,41 @@ Rapidcsv
 Rapidcsv is an easy-to-use C++ CSV parser library. It supports C++11 (and
 later), is header-only and comes with a basic test suite.
 
-The library was showcased in the book
+The [library on upstream repo](https://github.com/d99kris/rapidcsv) was showcased in the book
 [C++20 for Programmers](https://deitel.com/c-plus-plus-20-for-programmers/).
+
+Differences with the [upstream repo](https://github.com/d99kris/rapidcsv)
+-------------------------------------------------------------------------
+### Removed header `<typeinfo>` and call to function `typeid(...)`
+Inclusion of header `<typeinfo>` in template based library is a bit anticlimatic, particularly when
+C++ template supports specialization based on types. Even though the `typeid(...)` function used in
+branch conditions of class-member-functions `void Converter::ToStr(const T& pVal, std::string& pStr) const` and
+`void Converter::ToVal(const std::string& pStr, T& pVal) const` in upstream
+[rapidcsv.h](https://github.com/d99kris/rapidcsv/blob/eaf04fec409fdba3b263c7a52e5dc24e5bf9d4f3/src/rapidcsv.h)
+gets evaluated and pruned out during compilation, and binary code wouldn't have the branching-conditions.
+Using template-specialization, is a better alternative to `typeid(...)` where possible.
+Class-static-functions `T ConverterToVal<T,USE_NUMERIC_LOCALE=1, USE_NAN=0>::ToVal(const std::string & pStr)` and
+`std::string ConverterToStr<T,USE_NUMERIC_LOCALE=0>::ToStr(const T & pVal)` uses template-specialization
+based on type.
+
+### Removed `struct ConverterParams`
+`struct ConverterParams` functionality is provided through template parameters
+`int USE_NUMERIC_LOCALE, int USE_NAN` and static-function `T struct NaNaccess<T,USE_NAN=1>::getNaN()`.
+
+When `USE_NUMERIC_LOCALE=0` would trigger conversions using string-stream. This is default for `ConverterToStr`
+as string-stream preserves the decimal portion of floating-point-numbers. Using numeric-local functions
+for floating-points from value to string effects the precision of the number in string form.
+
+When `USE_NUMERIC_LOCALE=1` would trigger conversions using numeric-local. This is default for `ConverterToVal`.
+For e.g `int` -> function `int std::stoi(const std::string&)` is used. 
+
+### Removed `class no_converter : public std::exception`
+For types which are not supported will generate compile-time error. This approach is better then getting
+a run-time exception.
+
+### Small Performance gains
+Inside some of the for-loops in upstream-repo, Conditional branching based on result of `std::distance(...)`
+has been eliminated by shifting-ahead the starting iterator of the for-loop.
 
 Example Usage
 =============
@@ -449,14 +482,14 @@ The reason for this is to ensure data correctness. If one wants to be able
 to read data with invalid numbers as numeric data types, one can set
 template param `USE_NAN=1` to configure the converter to default to a 'NAN' value.
 The value is configurable (by Specialized Class implementation of struct NaNaccess\<T,USE_NAN\>,
-refer `struct NaNaccess\<T,1\>`) and by default it's `std::numeric_limits\< T \>::signaling_NaN()` 
+refer `struct NaNaccess<T,1>`) and by default it's `std::numeric_limits<T>::signaling_NaN()` 
 for float-point types, and 0 for integer types. Example:
 
 ```cpp
     rapidcsv::Document doc("file.csv", rapidcsv::LabelParams(),
                            rapidcsv::SeparatorParams());
     ...
-    inr cellVAl = doc.GetCell("colName", rowIdx, rapidcsv::ConverterToVal<int,1,1>::ToVal);
+    int cellVAl = doc.GetCell("colName", rowIdx, rapidcsv::ConverterToVal<int,1,1>::ToVal);
 ```
 
 Check if a Column Exists
@@ -526,13 +559,13 @@ particular its [CMakeLists.txt](examples/cmake-fetchcontent/CMakeLists.txt).
 Locale Independent Parsing
 --------------------------
 Rapidcsv uses locale-dependent conversion functions when parsing float-type values from string
-by default ( `T ConverterToVal\<T,USE_NUMERIC_LOCALE=1,0\>::ToVal(const std::string & pStr)` ). 
+by default ( `T ConverterToVal<T,USE_NUMERIC_LOCALE=1,0>::ToVal(const std::string & pStr)` ). 
 It is possible to configure rapidcsv to use locale independent
 parsing by setting template-parameter `USE_NUMERIC_LOCALE=0` in `doc.GetCell<float, 0, 0>`, see for example
 [tests/test087.cpp](https://github.com/panchaBhuta/rapidcsv_CT/blob/convertor/tests/test087.cpp)
 
 Rapidcsv uses string-stream when converting any type values to string
-by default ( `std::string ConverterToStr\<T,USE_NUMERIC_LOCALE=0\>::ToStr(const T & pVal)` ). 
+by default ( `std::string ConverterToStr<T,USE_NUMERIC_LOCALE=0>::ToStr(const T & pVal)` ). 
 It is possible to configure rapidcsv to use locale-dependent for integer-types by 
 setting template-parameter `USE_NUMERIC_LOCALE=1` in `doc.SetCell<float, 0>`.
 
