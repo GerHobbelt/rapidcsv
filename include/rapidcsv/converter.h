@@ -35,7 +35,7 @@ namespace rapidcsv
   /**
    * @brief     Class declaration providing Not-A-Number (NaN) for numerical datatypes when converting from strings.
    */
-  template<typename T, int USE_NAN = 1>
+  template<typename T, int USE_NAN>
   struct NaNaccess;
 
   /**
@@ -183,6 +183,9 @@ namespace rapidcsv
 
   template<>
   inline char ToVal<char,1>(const std::string & pStr) { return  pStr[0]; }
+
+  template<>
+  inline bool ToVal<bool,1>(const std::string & pStr) { return  std::stoll(pStr)>0?true:false; }
 
 
 

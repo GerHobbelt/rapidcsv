@@ -60,6 +60,7 @@ int main()
   testType<double>("Double", 3462424.1234567890123456789012345);
   testType<long double>("LongDouble", 23453.1234567890123456789012345L);
   testType<char>("Char", 'G');
+  testType<bool>("Bool", true);
 
   std::cout << "using specialization" << std::endl;
 
