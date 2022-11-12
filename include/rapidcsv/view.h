@@ -21,14 +21,14 @@
 
 namespace rapidcsv
 {
-  template<f_EvalBoolExpr evaluateBooleanExpression>
+  template<Document::f_EvalBoolExpr evaluateBooleanExpression>
   struct ViewDocument
   {
     explicit ViewDocument(const Document& document)
       : _document(document), _mapViewRowIdx2RowIdx(), _mapRowIdx2ViewRowIdx()
     {
         size_t rowIdx = 0;
-        size_t viewRowIdx = 0;
+        ssize_t viewRowIdx = 0;
         const ssize_t colIdxStart = static_cast<ssize_t>(_document.GetDataColumnIndex(0));
         for (auto itRow = _document.mData.begin() + colIdxStart;
              itRow != document.mData.end(); ++itRow, ++rowIdx)
@@ -63,7 +63,7 @@ namespace rapidcsv
     std::vector<T> GetViewColumn(const size_t pColumnIdx,
                                  f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
     {
-      return _document._GetColumn<T,USE_NUMERIC_LOCALE,USE_NAN,(&evaluateBooleanExpression)>(pColumnIdx, pConvertToVal);
+      return _document._GetColumn<T,USE_NUMERIC_LOCALE,USE_NAN,evaluateBooleanExpression>(pColumnIdx, pConvertToVal);
     }
 
     /**
@@ -94,8 +94,8 @@ namespace rapidcsv
     std::vector<T> GetViewRow(const size_t pViewRowIdx,
                               f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
     {
-      const ssize_t rowIdx = _mapViewRowIdx2RowIdx.at(pViewRowIdx);
-      return _document.GetRow<T,USE_NUMERIC_LOCALE,USE_NAN>(static_cast<size_t>(rowIdx), pConvertToVal);
+      const size_t rowIdx = _mapViewRowIdx2RowIdx.at(pViewRowIdx);
+      return _document.GetRow<T,USE_NUMERIC_LOCALE,USE_NAN>(rowIdx, pConvertToVal);
     }
 
     /**
@@ -113,13 +113,107 @@ namespace rapidcsv
       {
         throw std::out_of_range("row not found: " + pRowName);
       }
+
       if (_mapRowIdx2ViewRowIdx.at(static_cast<size_t>(rowIdx)) < 0)
       {
         throw std::out_of_range("row filtered out: " + pRowName);
       }
+
       return _document.GetRow<T,USE_NUMERIC_LOCALE,USE_NAN>(static_cast<size_t>(rowIdx), pConvertToVal);
     }
 
+    /**
+     * @brief   Get view-cell by index.
+     * @param   pColumnIdx            zero-based column index.
+     * @param   pViewRowIdx           zero-based row view-index.
+     * @param   pConvertToVal         conversion function (optional argument).
+     * @returns cell data.
+     */
+    template<typename T, int USE_NUMERIC_LOCALE=1, int USE_NAN=0>
+    T GetViewCell(const size_t pColumnIdx, const size_t pViewRowIdx,
+                  f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
+    {
+      const size_t rowIdx = _mapViewRowIdx2RowIdx.at(pViewRowIdx);
+      return _document.GetCell<T,USE_NUMERIC_LOCALE,USE_NAN>(pColumnIdx, rowIdx, pConvertToVal);
+    }
+
+    /**
+     * @brief   Get cell by name.
+     * @param   pColumnName           column label name.
+     * @param   pRowName              row label name.
+     * @param   pConvertToVal         conversion function (optional argument).
+     * @returns cell data.
+     */
+    template<typename T, int USE_NUMERIC_LOCALE=1, int USE_NAN=0>
+    T GetViewCell(const std::string& pColumnName, const std::string& pRowName,
+              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
+    {
+      const ssize_t rowIdx = _document.GetRowIdx(pRowName);
+      if (rowIdx < 0)
+      {
+        throw std::out_of_range("row not found: " + pRowName);
+      }
+
+      if (_mapRowIdx2ViewRowIdx.at(static_cast<size_t>(rowIdx)) < 0)
+      {
+        throw std::out_of_range("row filtered out: " + pRowName);
+      }
+
+      const ssize_t columnIdx = _document.GetColumnIdx(pColumnName);
+      if (columnIdx < 0)
+      {
+        throw std::out_of_range("column not found: " + pColumnName);
+      }
+
+      return _document.GetCell<T,USE_NUMERIC_LOCALE,USE_NAN>(
+                  static_cast<size_t>(columnIdx), static_cast<size_t>(rowIdx), pConvertToVal);
+    }
+
+    /**
+     * @brief   Get cell by column name and row index.
+     * @param   pColumnName           column label name.
+     * @param   pViewRowIdx           zero-based row view-index.
+     * @param   pConvertToVal         conversion function (optional argument).
+     * @returns cell data.
+     */
+    template<typename T, int USE_NUMERIC_LOCALE=1, int USE_NAN=0>
+    T GetViewCell(const std::string& pColumnName, const size_t pViewRowIdx,
+              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
+    {
+      const ssize_t columnIdx = _document.GetColumnIdx(pColumnName);
+      if (columnIdx < 0)
+      {
+        throw std::out_of_range("column not found: " + pColumnName);
+      }
+
+      return GetViewCell<T,USE_NUMERIC_LOCALE,USE_NAN>(static_cast<size_t>(columnIdx), pViewRowIdx, pConvertToVal);
+    }
+
+    /**
+     * @brief   Get cell by column index and row name.
+     * @param   pColumnIdx            zero-based column index.
+     * @param   pRowName              row label name.
+     * @param   pConvertToVal         conversion function (optional argument).
+     * @returns cell data.
+     */
+    template<typename T, int USE_NUMERIC_LOCALE=1, int USE_NAN=0>
+    T GetViewCell(const size_t pColumnIdx, const std::string& pRowName,
+              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
+    {
+      const ssize_t rowIdx = _document.GetRowIdx(pRowName);
+      if (rowIdx < 0)
+      {
+        throw std::out_of_range("row not found: " + pRowName);
+      }
+
+      if (_mapRowIdx2ViewRowIdx.at(static_cast<size_t>(rowIdx)) < 0)
+      {
+        throw std::out_of_range("row filtered out: " + pRowName);
+      }
+
+      return _document.GetCell<T,USE_NUMERIC_LOCALE,USE_NAN>(pColumnIdx, static_cast<size_t>(rowIdx), pConvertToVal);
+    }
+  
   private:
     const Document& _document;
     std::vector<size_t> _mapViewRowIdx2RowIdx;

@@ -40,9 +40,21 @@ For e.g `int` -> function `int std::stoi(const std::string&)` is used.
 For types which are not supported will generate compile-time error. This approach is better then getting
 a run-time exception.
 
-### Small Performance gains
+### Minor Performance gains
 Inside some of the for-loops in upstream-repo, Conditional branching based on result of `std::distance(...)`
 has been eliminated by shifting-ahead the starting iterator of the for-loop.
+
+### Code changes if anyone wants to upgrade from the [upstream repo](https://github.com/d99kris/rapidcsv)
+Where `struct ConverterParams` is passed as a parameter to `class Document` constructor, delete this parameter.
+Instead pass as template parameters for `<typename T, int USE_NUMERIC_LOCALE, int USE_NAN>` for all Getter functions
+and pass as template parameter for `<typename T, int USE_NUMERIC_LOCALE>` for all Setter functions of `Document` objects.
+
+If any converter functions i.e `void Converter<T>::ToStr(const T& pVal, std::string& pStr) const` OR 
+`void Converter<T>::ToVal(const std::string& pStr, T& pVal) const` were overloaded, then change the signature to static functions
+`static T ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal(const std::string & pStr)` OR
+`static std::string ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr(const T & pVal)`
+
+As unsupported types will result in compilation error, exception for `class no_converter` needs to be removed from your code.
 
 Example Usage
 =============

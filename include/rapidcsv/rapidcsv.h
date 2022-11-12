@@ -204,6 +204,10 @@ namespace rapidcsv
   class Document
   {
   public:
+
+    using t_dataRow = std::vector<std::string>;
+    typedef bool (*f_EvalBoolExpr)(const t_dataRow& dataRow);
+
     /**
      * @brief   Constructor
      * @param   pPath                 specifies the path of an existing CSV-file to populate the Document
@@ -386,7 +390,7 @@ namespace rapidcsv
 
       while (GetDataRowIndex(pColumn.size()) > GetDataRowCount())
       {
-        t_row row;
+        t_dataRow row;
         row.resize(GetDataColumnCount());
         mData.push_back(row);
       }
@@ -485,7 +489,7 @@ namespace rapidcsv
 
       while (column.size() > GetDataRowCount())
       {
-        t_row row;
+        t_dataRow row;
         const size_t columnCount = std::max<size_t>(GetDataRowIndex(0), GetDataColumnCount());
         row.resize(columnCount);
         mData.push_back(row);
@@ -586,7 +590,7 @@ namespace rapidcsv
 
       while ((dataRowIdx + 1) > GetDataRowCount())
       {
-        t_row row;
+        t_dataRow row;
         row.resize(GetDataColumnCount());
         mData.push_back(row);
       }
@@ -664,7 +668,7 @@ namespace rapidcsv
     {
       const size_t rowIdx = GetDataRowIndex(pRowIdx);
 
-      t_row row;
+      t_dataRow row;
       if (pRow.empty())
       {
         row.resize(GetDataColumnCount());
@@ -681,7 +685,7 @@ namespace rapidcsv
 
       while (rowIdx > GetDataRowCount())
       {
-        t_row tempRow;
+        t_dataRow tempRow;
         tempRow.resize(GetDataColumnCount());
         mData.push_back(tempRow);
       }
@@ -748,7 +752,8 @@ namespace rapidcsv
         throw std::out_of_range("row not found: " + pRowName);
       }
 
-      return GetCell<T,USE_NUMERIC_LOCALE,USE_NAN>(static_cast<size_t>(columnIdx), static_cast<size_t>(rowIdx), pConvertToVal);
+      return GetCell<T,USE_NUMERIC_LOCALE,USE_NAN>(static_cast<size_t>(columnIdx),
+                                                   static_cast<size_t>(rowIdx), pConvertToVal);
     }
 
     /**
@@ -807,7 +812,7 @@ namespace rapidcsv
 
       while ((dataRowIdx + 1) > GetDataRowCount())
       {
-        t_row row;
+        t_dataRow row;
         row.resize(GetDataColumnCount());
         mData.push_back(row);
       }
@@ -1095,7 +1100,7 @@ namespace rapidcsv
     {
       const std::streamsize bufLength = 64 * 1024;
       std::vector<char> buffer(bufLength);
-      t_row row;
+      t_dataRow row;
       std::string cell;
       bool quoted = false;
       int cr = 0;
@@ -1408,15 +1413,11 @@ namespace rapidcsv
       }
     }
 
-    using t_row = std::vector<std::string>;
-    using f_EvalBoolExpr = std::function<bool (const Document::t_row& row)>;
-
-  private:
     std::string mPath;
     LabelParams mLabelParams;
     SeparatorParams mSeparatorParams;
     LineReaderParams mLineReaderParams;
-    std::vector<t_row> mData;
+    std::vector<t_dataRow> mData;
     std::map<std::string, size_t> mColumnNames;
     std::map<std::string, size_t> mRowNames;
 #ifdef HAS_CODECVT
@@ -1432,7 +1433,7 @@ namespace rapidcsv
      * @returns vector of column data.
      */
     template<typename T, int USE_NUMERIC_LOCALE=1, int USE_NAN=0,
-             f_EvalBoolExpr *fpEvaluateBooleanExpression = nullptr>
+             f_EvalBoolExpr fpEvaluateBooleanExpression = nullptr>
     inline
     std::vector<T> _GetColumn(const size_t pColumnIdx,
                               f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
@@ -1446,7 +1447,7 @@ namespace rapidcsv
         if (dataColumnIdx < itRow->size())
         {
           if( fpEvaluateBooleanExpression == nullptr ||
-              (*fpEvaluateBooleanExpression)(*itRow) )
+              fpEvaluateBooleanExpression(*itRow) )
           {
             T val = pConvertToVal(itRow->at(dataColumnIdx));
             column.push_back(val);
@@ -1465,8 +1466,7 @@ namespace rapidcsv
     }
 
 
-    struct ViewDocument;
-
+    template<f_EvalBoolExpr evaluateBooleanExpression>
     friend struct ViewDocument;
   };
 }

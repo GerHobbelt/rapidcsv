@@ -174,6 +174,8 @@ if(RAPIDCSV_BUILD_TESTS)
   add_unit_test(test089)
   add_unit_test(test090)
 
+  add_unit_test(testView001)
+
   # perf tests
   add_perf_test(ptest001)
   add_perf_test(ptest002)
@@ -196,7 +198,7 @@ if(RAPIDCSV_BUILD_TESTS)
   add_example(ex007 examples/ex007.cpp)
   add_example(ex008 examples/ex008.cpp)
   add_example(ex009 examples/ex009.cpp)
-  add_example(ex010 examples/ex010.cpp)
+  add_example(exConv001 examples/exConv001.cpp)
 
 endif()
 
@@ -207,6 +209,7 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
   # Install
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/rapidcsv.h
                 ${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/converter.h
+                ${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/view.h
           DESTINATION include/rapidcsv/)
 
   # Uninstall
