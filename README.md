@@ -16,18 +16,34 @@ Differences with the [upstream repo](https://github.com/d99kris/rapidcsv)
 ### Removed header `<typeinfo>` and call to function `typeid(...)`
 Inclusion of header `<typeinfo>` in template based library is a bit anticlimatic, particularly when
 C++ template supports specialization based on types. Even though the `typeid(...)` function used in
-branch conditions of class-member-functions `void Converter::ToStr(const T& pVal, std::string& pStr) const` and
-`void Converter::ToVal(const std::string& pStr, T& pVal) const` in upstream
-[rapidcsv.h](https://github.com/d99kris/rapidcsv/blob/eaf04fec409fdba3b263c7a52e5dc24e5bf9d4f3/src/rapidcsv.h)
+branch conditions of class-member-functions ...
+
+```
+void Converter::ToStr(const T& pVal, std::string& pStr) const
+    AND
+void Converter::ToVal(const std::string& pStr, T& pVal) const
+```
+
+...in upstream [rapidcsv.h](https://github.com/d99kris/rapidcsv/blob/eaf04fec409fdba3b263c7a52e5dc24e5bf9d4f3/src/rapidcsv.h)
 gets evaluated and pruned out during compilation, and binary code wouldn't have the branching-conditions.
 Using template-specialization, is a better alternative to `typeid(...)` where possible.
-Class-static-functions `T ConverterToVal<T,USE_NUMERIC_LOCALE=1, USE_NAN=0>::ToVal(const std::string & pStr)` and
-`std::string ConverterToStr<T,USE_NUMERIC_LOCALE=0>::ToStr(const T & pVal)` uses template-specialization
-based on type.
+
+Class-static-functions ...
+
+```
+T ConverterToVal<T,USE_NUMERIC_LOCALE=1, USE_NAN=0>::ToVal(const std::string & pStr)
+    AND
+std::string ConverterToStr<T,USE_NUMERIC_LOCALE=0>::ToStr(const T & pVal)
+```
+
+...uses template-specialization based on type.
 
 ### Removed `struct ConverterParams`
 `struct ConverterParams` functionality is provided through template parameters
-`int USE_NUMERIC_LOCALE, int USE_NAN` and static-function `T struct NaNaccess<T,USE_NAN=1>::getNaN()`.
+
+`int USE_NUMERIC_LOCALE, int USE_NAN` 
+
+and static-function `T struct NaNaccess<T,USE_NAN=1>::getNaN()`.
 
 When `USE_NUMERIC_LOCALE=0` would trigger conversions using string-stream. This is default for `ConverterToStr`
 as string-stream preserves the decimal portion of floating-point-numbers. Using numeric-local functions
@@ -46,13 +62,25 @@ has been eliminated by shifting-ahead the starting iterator of the for-loop.
 
 ### Code changes if anyone wants to upgrade from the [upstream repo](https://github.com/d99kris/rapidcsv)
 Where `struct ConverterParams` is passed as a parameter to `class Document` constructor, delete this parameter.
-Instead pass as template parameters for `<typename T, int USE_NUMERIC_LOCALE, int USE_NAN>` for all Getter functions
-and pass as template parameter for `<typename T, int USE_NUMERIC_LOCALE>` for all Setter functions of `Document` objects.
 
-If any converter functions i.e `void Converter<T>::ToStr(const T& pVal, std::string& pStr) const` OR 
-`void Converter<T>::ToVal(const std::string& pStr, T& pVal) const` were overloaded, then change the signature to static functions
-`static T ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal(const std::string & pStr)` OR
-`static std::string ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr(const T & pVal)`
+Instead, for all Getter functions of `Document` objects, pass template parameters `<typename T, USE_NUMERIC_LOCALE, USE_NAN>`
+
+and for all Setter functions of `Document` objects, pass as template parameter for `<typename T, USE_NUMERIC_LOCALE>`.
+
+
+If any converter functions i.e ...
+```
+void Converter<T>::ToStr(const T& pVal, std::string& pStr) const
+      OR
+void Converter<T>::ToVal(const std::string& pStr, T& pVal) const
+```
+...were overloaded, then change the signature to static functions ...
+
+```
+static T ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal(const std::string & pStr)
+      OR
+static std::string ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr(const T & pVal)
+```
 
 As unsupported types will result in compilation error, exception for `class no_converter` needs to be removed from your code.
 

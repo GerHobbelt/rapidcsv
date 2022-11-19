@@ -14,6 +14,7 @@
 #pragma once
 
 #include <vector>
+#include <map>
 #include <iostream>
 #include <string>
 
@@ -21,34 +22,147 @@
 
 namespace rapidcsv
 {
-  template<Document::f_EvalBoolExpr evaluateBooleanExpression>
-  struct ViewDocument
+  enum e_SortOrder { ASCEND=0, DESCEND };
+
+  template<typename T>
+  class SortParams
   {
+  public:
+    const size_t columnIndex;
+    const f_ConvFuncToVal<T> convFuncToVal;
+    const e_SortOrder sortOrder;
+
+    SortParams(const size_t COLUMN_INDEX,
+                         const f_ConvFuncToVal<T> pConvFuncToVal,
+                         const e_SortOrder SORT_ORDER=e_SortOrder::ASCEND):
+      columnIndex(COLUMN_INDEX),
+      convFuncToVal(pConvFuncToVal),
+      sortOrder(SORT_ORDER)
+    {}
+  };
+
+  template<typename T, typename... Types>
+  class RowCompareLessThan
+  {
+  private:
+    const SortParams<T>& _sortParams;
+    const RowCompareLessThan<Types...> _nextColumnInfo;
+
+  public:
+    template<typename ... SPtypes>
+    RowCompareLessThan(const SortParams<T>& pSortParams, const SPtypes&... spArgs)
+       : _sortParams(pSortParams),
+         _nextColumnInfo(spArgs...)
+    { }
+
+    bool operator()( const Document::t_dataRow& lhRow, const Document::t_dataRow& rhRow ) const
+    {
+      const std::string& lhCell = lhRow.at(_sortParams.columnIndex);
+      const T lhVal = _sortParams.convFuncToVal(lhCell);
+      const std::string& rhCell = rhRow.at(_sortParams.columnIndex);
+      const T rhVal = _sortParams.convFuncToVal(rhCell);
+
+      if( e_SortOrder::ASCEND == _sortParams.sortOrder)
+      {
+        if(lhVal < rhVal) return true;
+        if(lhVal > rhVal) return false;
+      } else {
+        if(lhVal > rhVal) return true;
+        if(lhVal < rhVal) return false;
+      }
+
+      //  lhVal == rhVal
+      return _nextColumnInfo(lhRow,rhRow);
+    }
+  };
+
+  template<typename T>
+  struct RowCompareLessThan<T>  // Template base case
+  {
+    const SortParams<T>& _sortParams;
+
+    RowCompareLessThan(const SortParams<T>& pSortParams)
+       : _sortParams(pSortParams)
+    { }
+
+    bool operator()( const Document::t_dataRow& lhRow, const Document::t_dataRow& rhRow ) const
+    {
+      const std::string& lhCell = lhRow.at(_sortParams.columnIndex);
+      const T lhVal = _sortParams.convFuncToVal(lhCell);
+      const std::string& rhCell = rhRow.at(_sortParams.columnIndex);
+      const T rhVal = _sortParams.convFuncToVal(rhCell);
+
+      if( e_SortOrder::ASCEND == _sortParams.sortOrder)
+      {
+        return lhVal < rhVal;
+      } else {
+        return lhVal > rhVal;
+      }
+    }
+  };
+
+  template<Document::f_EvalBoolExpr evaluateBooleanExpression, typename... Types>
+  class ViewDocument
+  {
+  public:
     explicit ViewDocument(const Document& document)
       : _document(document), _mapViewRowIdx2RowIdx(), _mapRowIdx2ViewRowIdx()
     {
-        size_t rowIdx = 0;
-        ssize_t viewRowIdx = 0;
-        const ssize_t colIdxStart = static_cast<ssize_t>(_document.GetDataColumnIndex(0));
-        for (auto itRow = _document.mData.begin() + colIdxStart;
-             itRow != document.mData.end(); ++itRow, ++rowIdx)
+      size_t rowIdx = 0;
+      ssize_t viewRowIdx = 0;
+      const ssize_t colIdxStart = static_cast<ssize_t>(_document.GetDataColumnIndex(0));
+      for (auto itRow =  _document.mData.begin() + colIdxStart;
+                itRow != _document.mData.end(); ++itRow, ++rowIdx)
+      {
+        if(evaluateBooleanExpression(*itRow))
         {
-          if(evaluateBooleanExpression(*itRow))
-          {
-            _mapViewRowIdx2RowIdx.push_back(rowIdx);
-            _mapRowIdx2ViewRowIdx.push_back(viewRowIdx);
-            ++viewRowIdx;
-          } else {
-            _mapRowIdx2ViewRowIdx.push_back(-10);
-          }
+          _mapViewRowIdx2RowIdx.push_back(rowIdx);
+          _mapRowIdx2ViewRowIdx.push_back(viewRowIdx);
+          ++viewRowIdx;
+        } else {
+          _mapRowIdx2ViewRowIdx.push_back(-10);
         }
+      }
+    }
+
+    template<typename ... SPtypes>
+    explicit ViewDocument(const Document& document, const SPtypes&... spArgs)
+      : _document(document), _mapViewRowIdx2RowIdx(), _mapRowIdx2ViewRowIdx()
+    {
+      RowCompareLessThan<Types...> sortPredicate(spArgs...);
+      std::map<const Document::t_dataRow , size_t, RowCompareLessThan<Types...> > sortedData(sortPredicate);
+      size_t rowIdx = 0;
+      const ssize_t colIdxStart = static_cast<ssize_t>(_document.GetDataColumnIndex(0));
+      for (auto itRow = _document.mData.begin() + colIdxStart;
+                itRow != document.mData.end(); ++itRow, ++rowIdx)
+      {
+        if(evaluateBooleanExpression(*itRow))
+        {
+          sortedData[(*itRow)] = rowIdx;
+        }
+      }
+
+      ssize_t viewRowIdx = 0;
+      for (auto itMap =  sortedData.begin();
+                itMap != sortedData.end(); ++itMap, ++viewRowIdx)
+      {
+        rowIdx = itMap->second;
+        if(evaluateBooleanExpression(itMap->first))
+        {
+          _mapViewRowIdx2RowIdx.push_back(rowIdx);
+          _mapRowIdx2ViewRowIdx.push_back(viewRowIdx);
+          ++viewRowIdx;
+        } else {
+          _mapRowIdx2ViewRowIdx.push_back(-10);
+        }
+      }
     }
 
     /**
      * @brief   Get number of view rows (excluding label rows).
      * @returns view-row count.
      */
-    size_t GetViewRowCount() const
+    inline size_t GetViewRowCount() const
     {
       return _mapViewRowIdx2RowIdx.size();
     }
@@ -146,7 +260,7 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE=1, int USE_NAN=0>
     T GetViewCell(const std::string& pColumnName, const std::string& pRowName,
-              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
+                  f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
     {
       const ssize_t rowIdx = _document.GetRowIdx(pRowName);
       if (rowIdx < 0)
@@ -178,7 +292,7 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE=1, int USE_NAN=0>
     T GetViewCell(const std::string& pColumnName, const size_t pViewRowIdx,
-              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
+                  f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
     {
       const ssize_t columnIdx = _document.GetColumnIdx(pColumnName);
       if (columnIdx < 0)
@@ -198,7 +312,7 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE=1, int USE_NAN=0>
     T GetViewCell(const size_t pColumnIdx, const std::string& pRowName,
-              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
+                  f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
     {
       const ssize_t rowIdx = _document.GetRowIdx(pRowName);
       if (rowIdx < 0)

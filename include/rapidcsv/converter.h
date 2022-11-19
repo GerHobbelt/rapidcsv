@@ -30,40 +30,15 @@ namespace rapidcsv
   template<typename T, int USE_NUMERIC_LOCALE>
   inline T ToVal(const std::string & pStr);
 
-
-
   /**
-   * @brief     Class declaration providing Not-A-Number (NaN) for numerical datatypes when converting from strings.
+   * @brief     variable declaration providing Not-A-Number (NaN) when encountering
+   *            conversion error for numerical datatypes when converting from strings.
    */
-  template<typename T, int USE_NAN>
-  struct NaNaccess;
-
-  /**
-   * @brief     Specialized Class implementation when Not-A-Number (NaN) is disabled.
-   */
-  template<typename T>
-  struct NaNaccess<T,0> {};
-
-  /**
-   * @brief     Specialized Class implementation for default Not-A-Number (NaN) values when enabled.
-   */
-  template<typename T>
-  struct NaNaccess<T,1>
-  {
-    /**
-     * @brief   If 'numeric_limits' provides 'signaling_NaN' retun that else zero.
-     * @returns 'signaling_NaN()' (for floating numbers) OR 'zero'.
-     */
-    inline static
-    typename std::enable_if<std::is_arithmetic<T>::value, T>::type
-    getNaN()
-    {
-      return (std::numeric_limits<T>::has_signaling_NaN ?
-              std::numeric_limits<T>::signaling_NaN()   : 0);
-    }
-  };
-
-
+  template<typename T, int USE_NAN=1>
+  static constexpr
+  typename std::enable_if<USE_NAN!=0 && std::is_arithmetic<T>::value, T>::type
+  idNaN = (std::numeric_limits<T>::has_signaling_NaN ?
+           std::numeric_limits<T>::signaling_NaN()   : 0);
 
   /**
    * @brief     Class providing conversion from strings to numerical datatypes.
@@ -86,7 +61,7 @@ namespace rapidcsv
       {
         return ConverterToVal<T,USE_NUMERIC_LOCALE,0>::ToVal(pStr);
       } catch (...) {
-        return NaNaccess<T,USE_NAN>::getNaN();
+        return idNaN<T,USE_NAN>;
       }
     }
   };

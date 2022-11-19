@@ -198,6 +198,8 @@ namespace rapidcsv
     bool mSkipEmptyLines;
   };
 
+//  class SortParams;
+
   /**
    * @brief     Class representing a CSV document.
    */
@@ -1466,7 +1468,7 @@ namespace rapidcsv
     }
 
 
-    template<f_EvalBoolExpr evaluateBooleanExpression>
+    template<Document::f_EvalBoolExpr evaluateBooleanExpression, typename... Types>
     friend struct ViewDocument;
   };
 }

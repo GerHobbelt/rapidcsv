@@ -6,16 +6,18 @@
 namespace rapidcsv
 {
   template<typename T>
-  struct NaNaccess<T,2>
+  static constexpr
+  T getNaN()
   {
-    static T getNaN()
-    {
-      if(std::is_integral<T>::value)
-        return T(1);
-      if(std::is_floating_point<T>::value)
-        return T(0.0);
-    }
-  };
+    if(std::is_integral<T>::value)
+      return T(1);
+    if(std::is_floating_point<T>::value)
+      return T(0.0);
+  }
+
+  template<typename T>
+  static constexpr
+  typename std::enable_if<std::is_arithmetic<T>::value, T>::type idNaN<T,2> = getNaN<T>();
 }
 
 int main()

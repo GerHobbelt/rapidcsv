@@ -31,7 +31,11 @@ int main()
   try
   {
     rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0));
+
     rapidcsv::ViewDocument<isFirstCellPositive> viewdoc(doc);
+
+    const rapidcsv::SortParams<long long> sp0(0, rapidcsv::ToVal<long long,1>);
+    rapidcsv::ViewDocument<isFirstCellPositive, long long> viewdoc1(doc, sp0);
 
     unittest::ExpectEqual(int, viewdoc.GetViewCell<int>(0, 0), 3);
     unittest::ExpectEqual(int, viewdoc.GetViewCell<int>(1, 0), 9);
