@@ -32,72 +32,155 @@ namespace rapidcsv
     const f_ConvFuncToVal<T> convFuncToVal;
     const e_SortOrder sortOrder;
 
-    SortParams(const size_t COLUMN_INDEX,
-                         const f_ConvFuncToVal<T> pConvFuncToVal,
-                         const e_SortOrder SORT_ORDER=e_SortOrder::ASCEND):
+    constexpr SortParams(const size_t COLUMN_INDEX,
+               const f_ConvFuncToVal<T> pConvFuncToVal,
+               const e_SortOrder SORT_ORDER=e_SortOrder::ASCEND):
       columnIndex(COLUMN_INDEX),
       convFuncToVal(pConvFuncToVal),
       sortOrder(SORT_ORDER)
     {}
+
+    T getValue( const Document::t_dataRow& row ) const
+    {
+      const std::string& cellStr = row.at(columnIndex);
+      return convFuncToVal(cellStr);
+    }
   };
 
   template<typename T, typename... Types>
-  class RowCompareLessThan
+  class RowIndex
   {
-  private:
-    const SortParams<T>& _sortParams;
-    const RowCompareLessThan<Types...> _nextColumnInfo;
-
   public:
+    const T value;
+    const RowIndex<Types...> nextIndex;
+
     template<typename ... SPtypes>
-    RowCompareLessThan(const SortParams<T>& pSortParams, const SPtypes&... spArgs)
-       : _sortParams(pSortParams),
-         _nextColumnInfo(spArgs...)
-    { }
+    RowIndex( const Document::t_dataRow& row,
+              const SortParams<T>& pSortParams,
+              const SPtypes&... spArgs)
+       : value(pSortParams.getValue(row)),
+         nextIndex(row, spArgs...)
+    {}
 
-    bool operator()( const Document::t_dataRow& lhRow, const Document::t_dataRow& rhRow ) const
+    bool operator<(const RowIndex<T, Types...>& other) const
     {
-      const std::string& lhCell = lhRow.at(_sortParams.columnIndex);
-      const T lhVal = _sortParams.convFuncToVal(lhCell);
-      const std::string& rhCell = rhRow.at(_sortParams.columnIndex);
-      const T rhVal = _sortParams.convFuncToVal(rhCell);
+      if( value < other.value ) return true;
+      if( value > other.value ) return false;
 
-      if( e_SortOrder::ASCEND == _sortParams.sortOrder)
-      {
-        if(lhVal < rhVal) return true;
-        if(lhVal > rhVal) return false;
-      } else {
-        if(lhVal > rhVal) return true;
-        if(lhVal < rhVal) return false;
-      }
+      return nextIndex < other.nextIndex;
+    }
 
-      //  lhVal == rhVal
-      return _nextColumnInfo(lhRow,rhRow);
+    bool operator>(const RowIndex<T, Types...>& other) const
+    {
+      if( value > other.value ) return true;
+      if( value < other.value ) return false;
+
+      return nextIndex > other.nextIndex;
     }
   };
 
   template<typename T>
-  struct RowCompareLessThan<T>  // Template base case
+  class RowIndex<T>  // Template base case
   {
-    const SortParams<T>& _sortParams;
+  public:
+    const T value;
 
-    RowCompareLessThan(const SortParams<T>& pSortParams)
-       : _sortParams(pSortParams)
-    { }
+    RowIndex( const Document::t_dataRow& row,
+              const SortParams<T>& pSortParams)
+       : value(pSortParams.getValue(row))
+    {}
 
-    bool operator()( const Document::t_dataRow& lhRow, const Document::t_dataRow& rhRow ) const
+    inline bool operator<(const RowIndex<T>& other) const { return value < other.value; }
+
+    inline bool operator>(const RowIndex<T>& other) const { return value > other.value; }
+  };
+
+  template<typename T, typename... Types>
+  class RowComparator
+  {
+  private:
+    const RowComparator<Types...> _nextColumnInfo;
+
+    bool (RowComparator<T,Types...>::*_sortOrder)
+                        ( const RowIndex<T, Types...>& lhVal,
+                          const RowIndex<T, Types...>& rhVal ) const;
+
+    bool _ascendingOrder( const RowIndex<T, Types...>& lhVal,
+                          const RowIndex<T, Types...>& rhVal ) const
     {
-      const std::string& lhCell = lhRow.at(_sortParams.columnIndex);
-      const T lhVal = _sortParams.convFuncToVal(lhCell);
-      const std::string& rhCell = rhRow.at(_sortParams.columnIndex);
-      const T rhVal = _sortParams.convFuncToVal(rhCell);
+      if(lhVal.value < rhVal.value) return true;
+      if(lhVal.value > rhVal.value) return false;
 
-      if( e_SortOrder::ASCEND == _sortParams.sortOrder)
+      //  lhVal == rhVal
+      return _nextColumnInfo(lhVal.nextIndex,rhVal.nextIndex);
+    }
+
+    bool _descendingOrder( const RowIndex<T, Types...>& lhVal,
+                           const RowIndex<T, Types...>& rhVal ) const
+    {
+      if(lhVal.value > rhVal.value) return true;
+      if(lhVal.value < rhVal.value) return false;
+
+      //  lhVal == rhVal
+      return _nextColumnInfo(lhVal.nextIndex,rhVal.nextIndex);
+    }
+
+  public:
+    template<typename ... SPtypes>
+    RowComparator(const SortParams<T>& pSortParams,
+                  const SPtypes&... spArgs)
+       : _nextColumnInfo(spArgs...)
+    {
+      if (e_SortOrder::ASCEND == pSortParams.sortOrder)
       {
-        return lhVal < rhVal;
+        _sortOrder = &RowComparator<T,Types...>::_ascendingOrder;
       } else {
-        return lhVal > rhVal;
+        _sortOrder = &RowComparator<T,Types...>::_descendingOrder;
       }
+    }
+
+    bool operator()( const RowIndex<T, Types...>& lhVal,
+                     const RowIndex<T, Types...>& rhVal ) const
+    {
+      return (this->*_sortOrder)(lhVal,rhVal);
+    }
+  };
+
+  template<typename T>
+  class RowComparator<T>  // Template base case
+  {
+  private:
+
+    bool (RowComparator<T>::*_sortOrder)
+                        ( const RowIndex<T>& lhVal,
+                          const RowIndex<T>& rhVal ) const;
+
+    bool _ascendingOrder( const RowIndex<T>& lhVal,
+                          const RowIndex<T>& rhVal ) const
+    {
+        return lhVal.value < rhVal.value;
+    }
+
+    bool _descendingOrder( const RowIndex<T>& lhVal,
+                           const RowIndex<T>& rhVal ) const
+    {
+        return lhVal.value > rhVal.value;
+    }
+
+  public:
+    RowComparator(const SortParams<T>& pSortParams)
+    {
+      if (e_SortOrder::ASCEND == pSortParams.sortOrder)
+      {
+        _sortOrder = &RowComparator<T>::_ascendingOrder;
+      } else {
+        _sortOrder = &RowComparator<T>::_descendingOrder;
+      }
+    }
+
+    bool operator()( const RowIndex<T>& lhVal, const RowIndex<T>& rhVal ) const
+    {
+      return (this->*_sortOrder)(lhVal,rhVal);
     }
   };
 
@@ -129,8 +212,8 @@ namespace rapidcsv
     explicit ViewDocument(const Document& document, const SPtypes&... spArgs)
       : _document(document), _mapViewRowIdx2RowIdx(), _mapRowIdx2ViewRowIdx()
     {
-      RowCompareLessThan<Types...> sortPredicate(spArgs...);
-      std::map<const Document::t_dataRow , size_t, RowCompareLessThan<Types...> > sortedData(sortPredicate);
+      RowComparator<Types...> sortPredicate(spArgs...);
+      std::map<const RowIndex<Types...> , size_t, RowComparator<Types...> > sortedData(sortPredicate);
       size_t rowIdx = 0;
       const ssize_t colIdxStart = static_cast<ssize_t>(_document.GetDataColumnIndex(0));
       for (auto itRow = _document.mData.begin() + colIdxStart;
@@ -138,8 +221,10 @@ namespace rapidcsv
       {
         if(evaluateBooleanExpression(*itRow))
         {
-          sortedData[(*itRow)] = rowIdx;
+          RowIndex<Types...> rowIndexValues((*itRow), spArgs...);
+          sortedData[rowIndexValues] = rowIdx;
         }
+        _mapRowIdx2ViewRowIdx.push_back(-10);
       }
 
       ssize_t viewRowIdx = 0;
@@ -147,14 +232,9 @@ namespace rapidcsv
                 itMap != sortedData.end(); ++itMap, ++viewRowIdx)
       {
         rowIdx = itMap->second;
-        if(evaluateBooleanExpression(itMap->first))
-        {
-          _mapViewRowIdx2RowIdx.push_back(rowIdx);
-          _mapRowIdx2ViewRowIdx.push_back(viewRowIdx);
-          ++viewRowIdx;
-        } else {
-          _mapRowIdx2ViewRowIdx.push_back(-10);
-        }
+        _mapViewRowIdx2RowIdx.push_back(rowIdx);
+        _mapRowIdx2ViewRowIdx.at(rowIdx) = viewRowIdx;
+        ++viewRowIdx;
       }
     }
 
@@ -333,4 +413,9 @@ namespace rapidcsv
     std::vector<size_t> _mapViewRowIdx2RowIdx;
     std::vector<ssize_t> _mapRowIdx2ViewRowIdx;
   };
+
+  constexpr bool selectAll(const Document::t_dataRow& ) { return true; }
+
+  template<typename... Types>
+  class ViewDocument<selectAll, Types...>;
 }
