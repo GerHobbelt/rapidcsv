@@ -28,21 +28,21 @@ namespace rapidcsv
   class SortParams
   {
   public:
-    const size_t columnIndex;
+    const size_t rawDataColumnIndex;
     const f_ConvFuncToVal<T> convFuncToVal;
     const e_SortOrder sortOrder;
 
-    constexpr SortParams(const size_t COLUMN_INDEX,
+    constexpr SortParams(const size_t RAW_DATA_COLUMN_INDEX,
                const f_ConvFuncToVal<T> pConvFuncToVal,
                const e_SortOrder SORT_ORDER=e_SortOrder::ASCEND):
-      columnIndex(COLUMN_INDEX),
+      rawDataColumnIndex(RAW_DATA_COLUMN_INDEX),
       convFuncToVal(pConvFuncToVal),
       sortOrder(SORT_ORDER)
     {}
 
     T getValue( const Document::t_dataRow& row ) const
     {
-      const std::string& cellStr = row.at(columnIndex);
+      const std::string& cellStr = row.at(rawDataColumnIndex);
       return convFuncToVal(cellStr);
     }
   };
@@ -187,7 +187,7 @@ namespace rapidcsv
   template<Document::f_EvalBoolExpr evaluateBooleanExpression, typename... Types>
   class ViewDocument
   {
-  public:
+  protected:
     explicit ViewDocument(const Document& document)
       : _document(document), _mapViewRowIdx2RowIdx(), _mapRowIdx2ViewRowIdx()
     {
@@ -222,6 +222,7 @@ namespace rapidcsv
         if(evaluateBooleanExpression(*itRow))
         {
           RowIndex<Types...> rowIndexValues((*itRow), spArgs...);
+          //std::cout << "rowIndexValues.value = " << rowIndexValues.value << std::endl;
           sortedData[rowIndexValues] = rowIdx;
         }
         _mapRowIdx2ViewRowIdx.push_back(-10);
@@ -234,10 +235,11 @@ namespace rapidcsv
         rowIdx = itMap->second;
         _mapViewRowIdx2RowIdx.push_back(rowIdx);
         _mapRowIdx2ViewRowIdx.at(rowIdx) = viewRowIdx;
-        ++viewRowIdx;
+        //std::cout << "rowIdx("<< rowIdx <<") <-> viewRowIdx(" << viewRowIdx << ")" << std::endl;
       }
     }
 
+  public:
     /**
      * @brief   Get number of view rows (excluding label rows).
      * @returns view-row count.
@@ -257,7 +259,28 @@ namespace rapidcsv
     std::vector<T> GetViewColumn(const size_t pColumnIdx,
                                  f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
     {
-      return _document._GetColumn<T,USE_NUMERIC_LOCALE,USE_NAN,evaluateBooleanExpression>(pColumnIdx, pConvertToVal);
+      const size_t dataColumnIdx = _document.GetDataColumnIndex(pColumnIdx);
+      const size_t firstRowIdx = _document.GetDataRowIndex(0);
+      std::vector<T> column;
+      for (auto itViewRowIdx =  _mapViewRowIdx2RowIdx.begin();
+                itViewRowIdx != _mapViewRowIdx2RowIdx.end(); ++itViewRowIdx)
+      {
+        const size_t rowIdx = firstRowIdx + static_cast<size_t>(*itViewRowIdx);
+        const rapidcsv::Document::t_dataRow& row = _document.mData.at(rowIdx);
+        if (dataColumnIdx < row.size())
+        {
+          const std::string& cellStrVal = row.at(dataColumnIdx);
+          T val = pConvertToVal(cellStrVal);
+          column.push_back(val);
+        } else {
+          const std::string errStr = "ViewDocument::GetViewColumn() # requested column index " +
+            std::to_string(pColumnIdx) + " >= " +
+            std::to_string(row.size() - _document.GetDataColumnIndex(0)) +
+            " (number of columns on row index " + std::to_string(rowIdx) + ")";
+          throw std::out_of_range(errStr);
+        }
+      }
+      return column;
     }
 
     /**
@@ -414,8 +437,39 @@ namespace rapidcsv
     std::vector<ssize_t> _mapRowIdx2ViewRowIdx;
   };
 
-  constexpr bool selectAll(const Document::t_dataRow& ) { return true; }
 
+  template<Document::f_EvalBoolExpr evaluateBooleanExpression, typename... Types>
+  class FilterDocument
+          : public ViewDocument<evaluateBooleanExpression, Types...>
+  {
+  public:
+    explicit FilterDocument(const Document& document)
+      : ViewDocument<evaluateBooleanExpression, Types...>(document)
+    {}
+  };
+
+
+  constexpr bool selectAll(const Document::t_dataRow& ) { return true; }
   template<typename... Types>
-  class ViewDocument<selectAll, Types...>;
+  class SortDocument
+          : public ViewDocument<selectAll, Types...>
+  {
+  public:
+    template<typename ... SPtypes>
+    explicit SortDocument(const Document& document, const SPtypes&... spArgs)
+      : ViewDocument<selectAll, Types...>(document, spArgs...)
+    {}
+  };
+
+
+  template<Document::f_EvalBoolExpr evaluateBooleanExpression, typename... Types>
+  class FilterSortDocument
+          : public ViewDocument<evaluateBooleanExpression, Types...>
+  {
+  public:
+    template<typename ... SPtypes>
+    explicit FilterSortDocument(const Document& document, const SPtypes&... spArgs)
+      : ViewDocument<evaluateBooleanExpression, Types...>(document, spArgs...)
+    {}
+  };
 }

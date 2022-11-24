@@ -24,12 +24,14 @@ int main()
     unittest::ExpectEqual(std::string, doc.GetColumnName(1), "B");
     unittest::ExpectEqual(std::string, doc.GetColumnName(2), "C");
 
+    std::cout << "test086 :: doc.GetColumnCount()=" << doc.GetColumnCount() << std::endl;
+
     ExpectExceptionMsg(doc.GetColumn<int>(2), std::out_of_range,
-                       "requested column index 2 >= 2 (number of columns on row index 1)");
+                       "Document::GetColumn() # requested column index 2 >= 2 (number of columns on row index 1)");
     ExpectExceptionMsg(doc.GetColumn<int>("C"), std::out_of_range,
-                       "requested column index 2 >= 2 (number of columns on row index 1)");
+                       "Document::GetColumn() # requested column index 2 >= 2 (number of columns on row index 1)");
     ExpectExceptionMsg(doc.GetColumn<int>(3), std::out_of_range,
-                       "requested column index 3 >= 3 (number of columns on row index 0)");
+                       "Document::GetColumn() # requested column index 3 >= 3 (number of columns on row index 0)");
   }
   catch (const std::exception& ex)
   {

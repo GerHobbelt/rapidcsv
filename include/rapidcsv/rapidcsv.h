@@ -357,7 +357,26 @@ namespace rapidcsv
     std::vector<T> GetColumn(const size_t pColumnIdx,
                              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
     {
-      return _GetColumn<T,USE_NUMERIC_LOCALE,USE_NAN>(pColumnIdx, pConvertToVal);
+      const size_t dataColumnIdx = GetDataColumnIndex(pColumnIdx);
+      std::vector<T> column;
+      size_t rowIdx = 0;
+      for (auto itRow = mData.begin()+static_cast<ssize_t>(GetDataRowIndex(0));
+           itRow != mData.end(); ++itRow, ++rowIdx)
+      {
+        if (dataColumnIdx < itRow->size())
+        {
+          const std::string& cellStrVal = itRow->at(dataColumnIdx);
+          T val = pConvertToVal(cellStrVal);
+          column.push_back(val);
+        } else {
+          const std::string errStr = "Document::GetColumn() # requested column index " +
+            std::to_string(pColumnIdx) + " >= " +
+            std::to_string(itRow->size() - GetDataColumnIndex(0)) +
+            " (number of columns on row index " + std::to_string(rowIdx) + ")";
+          throw std::out_of_range(errStr);
+        }
+      }
+      return column;
     }
 
     /**
@@ -1426,46 +1445,6 @@ namespace rapidcsv
     bool mIsUtf16 = false;
     bool mIsLE = false;
 #endif
-
-
-    /**
-     * @brief   Get column by index.
-     * @param   pColumnIdx            zero-based column index.
-     * @param   pConvertToVal         conversion function (optional argument).
-     * @returns vector of column data.
-     */
-    template<typename T, int USE_NUMERIC_LOCALE=1, int USE_NAN=0,
-             f_EvalBoolExpr fpEvaluateBooleanExpression = nullptr>
-    inline
-    std::vector<T> _GetColumn(const size_t pColumnIdx,
-                              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
-    {
-      const size_t dataColumnIdx = GetDataColumnIndex(pColumnIdx);
-      std::vector<T> column;
-      size_t rowIdx = 0;
-      for (auto itRow = mData.begin()+static_cast<ssize_t>(GetDataRowIndex(0));
-           itRow != mData.end(); ++itRow, ++rowIdx)
-      {
-        if (dataColumnIdx < itRow->size())
-        {
-          if( fpEvaluateBooleanExpression == nullptr ||
-              fpEvaluateBooleanExpression(*itRow) )
-          {
-            T val = pConvertToVal(itRow->at(dataColumnIdx));
-            column.push_back(val);
-          }
-        }
-        else
-        {
-          const std::string errStr = "requested column index " +
-            std::to_string(pColumnIdx) + " >= " +
-            std::to_string(itRow->size() - GetDataColumnIndex(0)) +
-            " (number of columns on row index " + std::to_string(rowIdx) + ")";
-          throw std::out_of_range(errStr);
-        }
-      }
-      return column;
-    }
 
 
     template<Document::f_EvalBoolExpr evaluateBooleanExpression, typename... Types>

@@ -30,28 +30,29 @@ int main()
 
   try
   {
+    std::vector<int> ints;
+    std::vector<std::string> strs;
+
     rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0));
 
     /////  Filter
     rapidcsv::FilterDocument<isFirstCellPositive> viewdoc(doc);
 
-    unittest::ExpectEqual(int, viewdoc.GetViewRowCount(), 4);
+    ints = viewdoc.GetViewColumn<int>(0);
 
-    unittest::ExpectEqual(int, viewdoc.GetViewCell<int>(0, 0), 3);
-    unittest::ExpectEqual(int, viewdoc.GetViewCell<int>(1, 0), 9);
-    unittest::ExpectEqual(int, viewdoc.GetViewCell<int>(2, 0), 81);
+    unittest::ExpectEqual(size_t, ints.size(), 4);
+    unittest::ExpectEqual(int, ints.at(0), 3);
+    unittest::ExpectEqual(int, ints.at(3), 9);
 
-    unittest::ExpectEqual(int, viewdoc.GetViewCell<int>("A", 1), 5);
-    unittest::ExpectEqual(int, viewdoc.GetViewCell<int>("B", 1), 25);
-    unittest::ExpectEqual(int, viewdoc.GetViewCell<int>("C", 1), 625);
+    ints = viewdoc.GetViewColumn<int>("B");
+    unittest::ExpectEqual(size_t, ints.size(), 4);
+    unittest::ExpectEqual(int, ints.at(0), 9);
+    unittest::ExpectEqual(int, ints.at(3), 81);
 
-    unittest::ExpectEqual(int, viewdoc.GetViewCell<int>("A", "5"), 7);
-    unittest::ExpectEqual(int, viewdoc.GetViewCell<int>("B", "5"), 49);
-    unittest::ExpectEqual(int, viewdoc.GetViewCell<int>("C", "5"), 2401);
-
-    unittest::ExpectEqual(std::string, viewdoc.GetViewCell<std::string>(0, 3), "9");
-    unittest::ExpectEqual(std::string, viewdoc.GetViewCell<std::string>(1, 3), "81");
-    unittest::ExpectEqual(std::string, viewdoc.GetViewCell<std::string>(2, 3), "6561");
+    strs = viewdoc.GetViewColumn<std::string>(2);
+    unittest::ExpectEqual(size_t, strs.size(), 4);
+    unittest::ExpectEqual(std::string, strs.at(1), "625");
+    unittest::ExpectEqual(std::string, strs.at(2), "2401");
 
     /////   Sort
     const rapidcsv::SortParams<int> spA(1, rapidcsv::ToVal<int,1>);
@@ -84,6 +85,7 @@ int main()
     unittest::ExpectEqual(int, viewdoc2.GetViewCell<int>(0, 3), 3);
     unittest::ExpectEqual(int, viewdoc2.GetViewCell<int>(1, 3), 9);
     unittest::ExpectEqual(int, viewdoc2.GetViewCell<int>(2, 3), 81);
+
   }
   catch (const std::exception& ex)
   {

@@ -177,6 +177,7 @@ if(RAPIDCSV_BUILD_TESTS)
   add_unit_test(test090)
 
   add_unit_test(testView001)
+  add_unit_test(testView003)
 
   # perf tests
   add_perf_test(ptest001)
