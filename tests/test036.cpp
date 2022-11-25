@@ -14,7 +14,7 @@ int main()
     "unsigned,65535\n"
     "unsigned long,4294967295\n"
     "unsigned long long,18446744073709551615\n"
-    "float,3.3E38\n"
+    "float,3.31234123134535345E38f\n"
     "double,1.6E308\n"
     "long double,1.6E308\n"
   ;
@@ -35,7 +35,10 @@ int main()
     unittest::ExpectEqual(unsigned long long, doc.GetCell<unsigned long long>(1, 5), 18446744073709551615llu);
 
     float floatval = doc.GetCell<float>(1, 6);
-    unittest::ExpectTrue((floatval > 3.2E38) && (floatval < 3.4E38));
+    float cmpFloatVal = 3.31234123134535345E38f;
+    float diffFloatVal = floatval - cmpFloatVal;
+    std::cout << "test036 :: diffFloatVal=" << diffFloatVal << std::endl;
+    unittest::ExpectTrue((diffFloatVal > -1.0E5f) && (diffFloatVal < 1.0E5f));
 
     double doubleval = doc.GetCell<double>(1, 7);
     unittest::ExpectTrue((doubleval > 1.5E308) && (doubleval < 1.7E308));
