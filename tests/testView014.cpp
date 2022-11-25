@@ -1,12 +1,12 @@
-// testView003.cpp - read column value
+// testView014.cpp - read column values, no row labels
 
 #include <rapidcsv/view.h>
 #include "unittest.h"
 
 bool isFirstCellPositive(const rapidcsv::Document::t_dataRow& dataRow)
 {
-  // NOTE : at index=1 as zero-index is label
-  return ( std::stoi(dataRow.at(1)) ) >= 0;
+  // NOTE : at index=0 as no label
+  return ( std::stoi(dataRow.at(0)) ) >= 0;
 }
 
 
@@ -15,14 +15,14 @@ int main()
   int rv = 0;
 
   std::string csv =
-    "-,A,B,C\n"
-    "1,3,9,81\n"
-    "2,-4,16,256\n"
-    "3,5,25,625\n"
-    "4,-6,36,1296\n"
-    "5,7,49,2401\n"
-    "6,-8,64,4096\n"
-    "7,9,81,6561\n"
+    "A,B,C\n"
+    "3,9,81\n"
+    "-4,16,256\n"
+    "5,25,625\n"
+    "-6,36,1296\n"
+    "7,49,2401\n"
+    "-8,64,4096\n"
+    "9,81,6561\n"
   ;
 
   std::string path = unittest::TempPath();
@@ -33,7 +33,7 @@ int main()
     std::vector<int> ints;
     std::vector<std::string> strs;
 
-    rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0));
+    rapidcsv::Document doc(path);
 
     /////  Filter
     rapidcsv::FilterDocument<isFirstCellPositive> viewdoc(doc);
@@ -54,7 +54,7 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(2), "2401");
 
     /////   Sort
-    const rapidcsv::SortParams<int> spA(1, rapidcsv::ToVal<int,1>);
+    const rapidcsv::SortParams<int> spA(0, rapidcsv::ToVal<int,1>);
     rapidcsv::SortDocument<int> viewdoc1(doc, spA);
 
     ints = viewdoc1.GetViewColumn<int>(0);
@@ -73,7 +73,7 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(2), "256");
 
     ////  Filter + Sort
-    const rapidcsv::SortParams<int> spD(1, rapidcsv::ToVal<int,1>, rapidcsv::e_SortOrder::DESCEND);
+    const rapidcsv::SortParams<int> spD(0, rapidcsv::ToVal<int,1>, rapidcsv::e_SortOrder::DESCEND);
     rapidcsv::FilterSortDocument<isFirstCellPositive, int> viewdoc2(doc, spD);
 
     ints = viewdoc2.GetViewColumn<int>(0);

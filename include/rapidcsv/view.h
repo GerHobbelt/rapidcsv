@@ -193,8 +193,8 @@ namespace rapidcsv
     {
       size_t rowIdx = 0;
       ssize_t viewRowIdx = 0;
-      const ssize_t colIdxStart = static_cast<ssize_t>(_document.GetDataColumnIndex(0));
-      for (auto itRow =  _document.mData.begin() + colIdxStart;
+      const ssize_t rowIdxStart = static_cast<ssize_t>(_document.GetDataRowIndex(0));
+      for (auto itRow =  _document.mData.begin() + rowIdxStart;
                 itRow != _document.mData.end(); ++itRow, ++rowIdx)
       {
         if(evaluateBooleanExpression(*itRow))
@@ -215,9 +215,9 @@ namespace rapidcsv
       RowComparator<Types...> sortPredicate(spArgs...);
       std::map<const RowIndex<Types...> , size_t, RowComparator<Types...> > sortedData(sortPredicate);
       size_t rowIdx = 0;
-      const ssize_t colIdxStart = static_cast<ssize_t>(_document.GetDataColumnIndex(0));
-      for (auto itRow = _document.mData.begin() + colIdxStart;
-                itRow != document.mData.end(); ++itRow, ++rowIdx)
+      const ssize_t rowIdxStart = static_cast<ssize_t>(_document.GetDataRowIndex(0));
+      for (auto itRow =  _document.mData.begin() + rowIdxStart;
+                itRow != _document.mData.end(); ++itRow, ++rowIdx)
       {
         if(evaluateBooleanExpression(*itRow))
         {
