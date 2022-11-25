@@ -302,6 +302,52 @@ namespace rapidcsv
     }
 
     /**
+     * @brief   Get view-row index by name.
+     * @param   pRowName              row label name.
+     * @returns zero-based row index.
+     */
+    size_t GetViewRowIdx(const std::string& pRowName) const
+    {
+      ssize_t rowIdx = _document.GetRowIdx(pRowName);
+      if (rowIdx < 0)
+      {
+        throw std::out_of_range("row not found: " + pRowName);
+      }
+
+      size_t row_idx = static_cast<size_t>(rowIdx);
+      ssize_t viewRowIdx = _mapRowIdx2ViewRowIdx.at(static_cast<size_t>(row_idx));
+      if ( viewRowIdx < 0 )
+      {
+        throw std::out_of_range("row filtered out: " + pRowName);
+      }
+
+      return static_cast<size_t>(viewRowIdx);
+    }
+
+    /**
+     * @brief   Get document-row index by name.
+     * @param   pRowName              row label name.
+     * @returns zero-based row index.
+     */
+    size_t GetDocumentRowIdx(const std::string& pRowName) const
+    {
+      ssize_t rowIdx = _document.GetRowIdx(pRowName);
+      if (rowIdx < 0)
+      {
+        throw std::out_of_range("row not found: " + pRowName);
+      }
+
+      size_t row_idx = static_cast<size_t>(rowIdx);
+      ssize_t viewRowIdx = _mapRowIdx2ViewRowIdx.at(static_cast<size_t>(row_idx));
+      if ( viewRowIdx < 0 )
+      {
+        throw std::out_of_range("row filtered out: " + pRowName);
+      }
+
+      return row_idx;
+    }
+
+    /**
      * @brief   Get row by view-index.
      * @param   pViewRowIdx           zero-based row view-index.
      * @param   pConvertToVal         conversion function (optional argument).
@@ -325,18 +371,9 @@ namespace rapidcsv
     std::vector<T> GetViewRow(const std::string& pRowName,
                               f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
     {
-      ssize_t rowIdx = _document.GetRowIdx(pRowName);
-      if (rowIdx < 0)
-      {
-        throw std::out_of_range("row not found: " + pRowName);
-      }
+      const size_t docRowIdx = GetDocumentRowIdx(pRowName);
 
-      if (_mapRowIdx2ViewRowIdx.at(static_cast<size_t>(rowIdx)) < 0)
-      {
-        throw std::out_of_range("row filtered out: " + pRowName);
-      }
-
-      return _document.GetRow<T,USE_NUMERIC_LOCALE,USE_NAN>(static_cast<size_t>(rowIdx), pConvertToVal);
+      return _document.GetRow<T,USE_NUMERIC_LOCALE,USE_NAN>(docRowIdx, pConvertToVal);
     }
 
     /**
@@ -365,16 +402,7 @@ namespace rapidcsv
     T GetViewCell(const std::string& pColumnName, const std::string& pRowName,
                   f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
     {
-      const ssize_t rowIdx = _document.GetRowIdx(pRowName);
-      if (rowIdx < 0)
-      {
-        throw std::out_of_range("row not found: " + pRowName);
-      }
-
-      if (_mapRowIdx2ViewRowIdx.at(static_cast<size_t>(rowIdx)) < 0)
-      {
-        throw std::out_of_range("row filtered out: " + pRowName);
-      }
+      const size_t docRowIdx = GetDocumentRowIdx(pRowName);
 
       const ssize_t columnIdx = _document.GetColumnIdx(pColumnName);
       if (columnIdx < 0)
@@ -383,7 +411,7 @@ namespace rapidcsv
       }
 
       return _document.GetCell<T,USE_NUMERIC_LOCALE,USE_NAN>(
-                  static_cast<size_t>(columnIdx), static_cast<size_t>(rowIdx), pConvertToVal);
+                  static_cast<size_t>(columnIdx), docRowIdx, pConvertToVal);
     }
 
     /**
@@ -417,18 +445,9 @@ namespace rapidcsv
     T GetViewCell(const size_t pColumnIdx, const std::string& pRowName,
                   f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
     {
-      const ssize_t rowIdx = _document.GetRowIdx(pRowName);
-      if (rowIdx < 0)
-      {
-        throw std::out_of_range("row not found: " + pRowName);
-      }
+      const size_t docRowIdx = GetDocumentRowIdx(pRowName);
 
-      if (_mapRowIdx2ViewRowIdx.at(static_cast<size_t>(rowIdx)) < 0)
-      {
-        throw std::out_of_range("row filtered out: " + pRowName);
-      }
-
-      return _document.GetCell<T,USE_NUMERIC_LOCALE,USE_NAN>(pColumnIdx, static_cast<size_t>(rowIdx), pConvertToVal);
+      return _document.GetCell<T,USE_NUMERIC_LOCALE,USE_NAN>(pColumnIdx, docRowIdx, pConvertToVal);
     }
   
   private:
