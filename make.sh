@@ -16,7 +16,7 @@ exiterr()
 
 # process arguments
 DEPS="0"
-SRC="0"
+INCLUDE="0"
 BUILD="0"
 TESTS="0"
 DOC="0"
@@ -26,8 +26,8 @@ case "${1%/}" in
     DEPS="1"
     ;;
 
-  src)
-    SRC="1"
+  include)
+    INCLUDE="1"
     ;;
 
   build)
@@ -50,7 +50,7 @@ case "${1%/}" in
 
   all)
     DEPS="1"
-    SRC="1"
+    INCLUDE="1"
     BUILD="1"
     TESTS="1"
     DOC="1"
@@ -58,9 +58,9 @@ case "${1%/}" in
     ;;
 
   *)
-    echo "usage: make.sh <deps|src|build|tests|doc|install|all>"
+    echo "usage: make.sh <deps|include|build|tests|doc|install|all>"
     echo "  deps      - install project dependencies"
-    echo "  src       - reformat source code"
+    echo "  include   - reformat source code"
     echo "  build     - perform build"
     echo "  tests     - perform build and run tests"
     echo "  doc       - perform build and generate documentation"
@@ -93,8 +93,8 @@ if [[ "${DEPS}" == "1" ]]; then
   fi
 fi
 
-# src
-if [[ "${SRC}" == "1" ]]; then
+# include
+if [[ "${INCLUDE}" == "1" ]]; then
   if [[ -x "$(command -v uncrustify)" ]]; then
     TMPDIR=$(mktemp -d)
     for SRC in examples/*.cpp; do
@@ -104,10 +104,10 @@ if [[ "${SRC}" == "1" ]]; then
       head -7 ${SRC}         > ${DST}.header  # store header separately (first 7 lines)
     done
     
-    uncrustify -c uncrustify.cfg --replace --no-backup src/rapidcsv.h tests/*.cpp tests/*.h ${TMPDIR}/*.cpp
+    uncrustify -c uncrustify.cfg --replace --no-backup include/rapidcsv/*.h tests/*.cpp tests/*.h ${TMPDIR}/*.cpp
     if [[ "${?}" != "0" ]]; then
       rm -rf ${TMPDIR}
-      echo "src failed, exiting."
+      echo "include failed, exiting."
       exit 1
     fi
 
@@ -158,7 +158,7 @@ fi
 # doc
 if [[ "${DOC}" == "1" ]]; then
   if [[ -x "$(command -v doxygenmd)" ]]; then
-    doxygenmd src doc || exiterr "doc failed, exiting."
+    doxygenmd include doc || exiterr "doc failed, exiting."
   fi
 fi
 
