@@ -101,9 +101,11 @@ namespace rapidcsv
   private:
     const RowComparator<Types...> _nextColumnInfo;
 
-    bool (RowComparator<T,Types...>::*_sortOrder)
+    typedef bool (RowComparator<T,Types...>::*tf_sortOrder)
                         ( const RowIndex<T, Types...>& lhVal,
                           const RowIndex<T, Types...>& rhVal ) const;
+
+    const tf_sortOrder _sortOrder;
 
     bool _ascendingOrder( const RowIndex<T, Types...>& lhVal,
                           const RowIndex<T, Types...>& rhVal ) const
@@ -129,15 +131,11 @@ namespace rapidcsv
     template<typename ... SPtypes>
     RowComparator(const SortParams<T>& pSortParams,
                   const SPtypes&... spArgs)
-       : _nextColumnInfo(spArgs...)
-    {
-      if (e_SortOrder::ASCEND == pSortParams.sortOrder)
-      {
-        _sortOrder = &RowComparator<T,Types...>::_ascendingOrder;
-      } else {
-        _sortOrder = &RowComparator<T,Types...>::_descendingOrder;
-      }
-    }
+       : _nextColumnInfo(spArgs...),
+         _sortOrder( (e_SortOrder::ASCEND == pSortParams.sortOrder) ?
+                        &RowComparator<T,Types...>::_ascendingOrder :
+                        &RowComparator<T,Types...>::_descendingOrder )
+    { }
 
     bool operator()( const RowIndex<T, Types...>& lhVal,
                      const RowIndex<T, Types...>& rhVal ) const
@@ -151,9 +149,11 @@ namespace rapidcsv
   {
   private:
 
-    bool (RowComparator<T>::*_sortOrder)
+    typedef bool (RowComparator<T>::*tf_sortOrder)
                         ( const RowIndex<T>& lhVal,
                           const RowIndex<T>& rhVal ) const;
+
+    const tf_sortOrder _sortOrder;
 
     bool _ascendingOrder( const RowIndex<T>& lhVal,
                           const RowIndex<T>& rhVal ) const
@@ -169,14 +169,10 @@ namespace rapidcsv
 
   public:
     RowComparator(const SortParams<T>& pSortParams)
-    {
-      if (e_SortOrder::ASCEND == pSortParams.sortOrder)
-      {
-        _sortOrder = &RowComparator<T>::_ascendingOrder;
-      } else {
-        _sortOrder = &RowComparator<T>::_descendingOrder;
-      }
-    }
+       : _sortOrder( (e_SortOrder::ASCEND == pSortParams.sortOrder) ?
+                        &RowComparator<T>::_ascendingOrder :
+                        &RowComparator<T>::_descendingOrder )
+    { }
 
     bool operator()( const RowIndex<T>& lhVal, const RowIndex<T>& rhVal ) const
     {
