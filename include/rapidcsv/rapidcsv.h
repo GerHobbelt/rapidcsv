@@ -12,7 +12,7 @@
  * ***********************************************************************************
  *
  * URL:      https://github.com/d99kris/rapidcsv
- * Version:  8.67
+ * Version:  8.68
  *
  * Copyright (C) 2017-2022 Kristofer Berggren
  * All rights reserved.
@@ -226,6 +226,9 @@ namespace rapidcsv
       , mLabelParams(pLabelParams)
       , mSeparatorParams(pSeparatorParams)
       , mLineReaderParams(pLineReaderParams)
+      , mData()
+      , mColumnNames()
+      , mRowNames()
     {
       if (!mPath.empty())
       {
@@ -248,6 +251,9 @@ namespace rapidcsv
       , mLabelParams(pLabelParams)
       , mSeparatorParams(pSeparatorParams)
       , mLineReaderParams(pLineReaderParams)
+      , mData()
+      , mColumnNames()
+      , mRowNames()
     {
       ReadCsv(pStream);
     }
