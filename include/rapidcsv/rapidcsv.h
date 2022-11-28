@@ -1025,7 +1025,7 @@ namespace rapidcsv
      * @brief   Get row names
      * @returns vector of row names.
      */
-    std::vector<std::string> GetRowNames()
+    std::vector<std::string> GetRowNames() const
     {
       std::vector<std::string> rownames;
       if (mLabelParams.mRowNameIdx >= 0)
@@ -1333,7 +1333,7 @@ namespace rapidcsv
       return pColumnIdx + static_cast<size_t>(mLabelParams.mRowNameIdx + 1);
     }
 
-    std::string Trim(const std::string& pStr)
+    std::string Trim(const std::string& pStr) const
     {
       if (mSeparatorParams.mTrim)
       {
@@ -1353,7 +1353,7 @@ namespace rapidcsv
       }
     }
 
-    std::string Unquote(const std::string& pStr)
+    std::string Unquote(const std::string& pStr) const
     {
       if (mSeparatorParams.mAutoQuote && (pStr.size() >= 2) &&
           (pStr.front() == mSeparatorParams.mQuoteChar) &&

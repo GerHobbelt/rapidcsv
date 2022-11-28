@@ -63,9 +63,13 @@ has been eliminated by shifting-ahead the starting iterator of the for-loop.
 ### Code changes if anyone wants to upgrade from the [upstream repo](https://github.com/d99kris/rapidcsv)
 Where `struct ConverterParams` is passed as a parameter to `class Document` constructor, delete this parameter.
 
-Instead, for all Getter functions of `Document` objects, pass template parameters `<typename T, USE_NUMERIC_LOCALE, USE_NAN>`
+Instead, for all Getter functions of `Document` objects, use template parameters ...
 
-and for all Setter functions of `Document` objects, pass as template parameter for `<typename T, USE_NUMERIC_LOCALE>`.
+`<typename T, USE_NUMERIC_LOCALE, USE_NAN>`
+
+and for all Setter functions of `Document` objects, use template parameters ...
+
+`<typename T, USE_NUMERIC_LOCALE>`.
 
 
 If any converter functions i.e ...
