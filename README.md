@@ -1,14 +1,14 @@
-Rapidcsv
-========
+Rapidcsv (FilterSort)
+=====================
 
 | **Linux** | **Mac** | **Windows** |
 |-----------|---------|-------------|
-| [![Linux](https://github.com/panchaBhuta/rapidcsv_CT/workflows/Linux/badge.svg)](https://github.com/panchaBhuta/rapidcsv_CT/actions?query=workflow%3ALinux) | [![macOS](https://github.com/panchaBhuta/rapidcsv_CT/workflows/macOS/badge.svg)](https://github.com/panchaBhuta/rapidcsv_CT/actions?query=workflow%3AmacOS) | [![Windows](https://github.com/panchaBhuta/rapidcsv_CT/workflows/Windows/badge.svg)](https://github.com/panchaBhuta/rapidcsv_CT/actions?query=workflow%3AWindows) |
+| [![Linux](https://github.com/panchaBhuta/rapidcsv_FilterSort/workflows/Linux/badge.svg)](https://github.com/panchaBhuta/rapidcsv_FilterSort/actions?query=workflow%3ALinux) | [![macOS](https://github.com/panchaBhuta/rapidcsv_FilterSort/workflows/macOS/badge.svg)](https://github.com/panchaBhuta/rapidcsv_FilterSort/actions?query=workflow%3AmacOS) | [![Windows](https://github.com/panchaBhuta/rapidcsv_FilterSort/workflows/Windows/badge.svg)](https://github.com/panchaBhuta/rapidcsv_FilterSort/actions?query=workflow%3AWindows) |
 
 Rapidcsv is an easy-to-use C++ CSV parser library. It supports C++11 (and
 later), is header-only and comes with a basic test suite.
 
-The [library on upstream repo](https://github.com/d99kris/rapidcsv) was showcased in the book
+The [library of upstream repo](https://github.com/d99kris/rapidcsv) was showcased in the book
 [C++20 for Programmers](https://deitel.com/c-plus-plus-20-for-programmers/).
 
 Differences with the [upstream repo](https://github.com/d99kris/rapidcsv)
@@ -39,11 +39,9 @@ std::string ConverterToStr<T,USE_NUMERIC_LOCALE=0>::ToStr(const T & pVal)
 ...uses template-specialization based on type.
 
 ### Removed `struct ConverterParams`
-`struct ConverterParams` functionality is provided through template parameters
+Use template parameters `int USE_NUMERIC_LOCALE, int USE_NAN` and static-function
 
-`int USE_NUMERIC_LOCALE, int USE_NAN` 
-
-and static-function `T struct NaNaccess<T,USE_NAN=1>::getNaN()`.
+`T struct NaNaccess<T,USE_NAN=1>::getNaN()` instead of `struct ConverterParams`.
 
 When `USE_NUMERIC_LOCALE=0` would trigger conversions using string-stream. This is default for `ConverterToStr`
 as string-stream preserves the decimal portion of floating-point-numbers. Using numeric-local functions
@@ -87,6 +85,15 @@ static std::string ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr(const T & pVal)
 ```
 
 As unsupported types will result in compilation error, exception for `class no_converter` needs to be removed from your code.
+
+### View rows using Filter and Sort on columns
+Filter on rows using template class `FilterDocument`. Similar to SQL `WHERE`.
+
+Sort rows using template class `SortDocument`. Similar to SQL `ORDER BY`.
+
+Both filter and sort is provided by template class `FilterSortDocument`.
+
+For usage examples refer [tests/testView*](tests/testView001.cpp)
 
 Example Usage
 =============
@@ -132,10 +139,15 @@ been tested on:
 
 Installation
 ============
-Simply copy
-[include/rapidcsv/rapidcsv.h](https://raw.githubusercontent.com/panchaBhuta/rapidcsv_CT/blob/master/include/rapidcsv/rapidcsv.h)
-[include/rapidcsv/converter.h](https://raw.githubusercontent.com/panchaBhuta/rapidcsv_CT/blob/master/include/rapidcsv/converter.h)
-to your project/include directory and include it. 
+Simply copy ...
+
+[include/rapidcsv/rapidcsv.h](https://raw.githubusercontent.com/panchaBhuta/rapidcsv_FilterSort/blob/master/include/rapidcsv/rapidcsv.h)
+
+[include/rapidcsv/converter.h](https://raw.githubusercontent.com/panchaBhuta/rapidcsv_FilterSort/blob/master/include/rapidcsv/converter.h)
+
+[include/rapidcsv/view.h](https://raw.githubusercontent.com/panchaBhuta/rapidcsv_FilterSort/blob/master/include/rapidcsv/converter.h)
+
+... to your project/include/rapidcsv/ directory and include it. 
 
 More Examples
 =============
@@ -326,7 +338,7 @@ Global Custom Data Type Conversion
 One may override conversion routines (or add new ones) by implementing ToVal()
 and/or ToStr(). Below is an example overriding int conversion, to instead provide
 two decimal fixed-point numbers. Also see 
-[tests/test035.cpp](https://github.com/panchaBhuta/rapidcsv_CT/blob/master/tests/test035.cpp)
+[tests/test035.cpp](https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/master/tests/test035.cpp)
 for a test overriding ToVal() and ToStr().
 
 [ex008.cpp](examples/ex008.cpp) content:
@@ -364,7 +376,7 @@ Custom Data Type Conversion Per Call
 It is also possible to override conversions on a per-call basis, enabling more
 flexibility. This is illustrated in the following example. Additional conversion
 override usage can be found in the test 
-[tests/test063.cpp](https://github.com/panchaBhuta/rapidcsv_CT/blob/master/tests/test063.cpp)
+[tests/test063.cpp](https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/master/tests/test063.cpp)
 
 [ex009.cpp](examples/ex009.cpp) content:
 ```cpp
@@ -606,7 +618,7 @@ Rapidcsv uses locale-dependent conversion functions when parsing float-type valu
 by default ( `T ConverterToVal<T,USE_NUMERIC_LOCALE=1,0>::ToVal(const std::string & pStr)` ). 
 It is possible to configure rapidcsv to use locale independent
 parsing by setting template-parameter `USE_NUMERIC_LOCALE=0` in `doc.GetCell<float, 0, 0>`, see for example
-[tests/test087.cpp](https://github.com/panchaBhuta/rapidcsv_CT/blob/master/tests/test087.cpp)
+[tests/test087.cpp](https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/master/tests/test087.cpp)
 
 Rapidcsv uses string-stream when converting any type values to string
 by default ( `std::string ConverterToStr<T,USE_NUMERIC_LOCALE=0>::ToStr(const T & pVal)` ). 
@@ -653,12 +665,12 @@ There are many CSV parsers for C++, for example:
 License
 =======
 Rapidcsv is distributed under the BSD 3-Clause license. See
-[LICENSE](https://github.com/panchaBhuta/rapidcsv_CT/blob/master/LICENSE) file.
+[LICENSE](https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/master/LICENSE) file.
 
 Contributions
 =============
 Bugs, PRs, etc are welcome on the GitHub project page
-https://github.com/panchaBhuta/rapidcsv_CT/tree/master
+https://github.com/panchaBhuta/rapidcsv_FilterSort/tree/master
 
 Keywords
 ========

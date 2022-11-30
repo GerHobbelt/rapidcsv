@@ -190,6 +190,8 @@ if(RAPIDCSV_BUILD_TESTS)
   add_unit_test(testView070)
   add_unit_test(testView071)
 
+  add_unit_test(testViewB001)
+
   # perf tests
   add_perf_test(ptest001)
   add_perf_test(ptest002)
