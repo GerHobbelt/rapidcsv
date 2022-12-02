@@ -6,7 +6,7 @@
 bool isFirstCellPositive(const rapidcsv::Document::t_dataRow& dataRow)
 {
   // NOTE : at index=0 as zero-index is label
-  return ( std::stoi(dataRow.at(0)) ) >= 0;
+  return (std::stoi(dataRow.at(0))) >= 0;
 }
 
 
@@ -45,11 +45,11 @@ int main()
 
     ExpectExceptionMsg(viewdoc.GetViewRow<int>("1"), std::out_of_range, "row not found: 1");
     /*
-    unittest::ExpectEqual(size_t, ints.size(), 3);
-    unittest::ExpectEqual(int, ints.at(0), 3);
-    unittest::ExpectEqual(int, ints.at(1), 9);
-    unittest::ExpectEqual(int, ints.at(2), 81);
-    */
+       unittest::ExpectEqual(size_t, ints.size(), 3);
+       unittest::ExpectEqual(int, ints.at(0), 3);
+       unittest::ExpectEqual(int, ints.at(1), 9);
+       unittest::ExpectEqual(int, ints.at(2), 81);
+     */
 
     strs = viewdoc.GetViewRow<std::string>(0);
     unittest::ExpectEqual(size_t, strs.size(), 3);
@@ -57,10 +57,10 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(1), "9");
     unittest::ExpectEqual(std::string, strs.at(2), "81");
 
-    //ExpectExceptionMsg(viewdoc.GetViewRow<int>("2"), std::out_of_range, "row filtered out: 2");
+    // ExpectExceptionMsg(viewdoc.GetViewRow<int>("2"), std::out_of_range, "row filtered out: 2");
 
     /////   Sort
-    const rapidcsv::SortParams<int> spA(0, rapidcsv::ToVal<int,1>);
+    const rapidcsv::SortParams<int> spA(0, rapidcsv::ToVal<int, 1>);
     rapidcsv::SortDocument<int> viewdoc1(doc, spA);
 
     ints = viewdoc1.GetViewRow<int>(1);
@@ -71,11 +71,11 @@ int main()
 
     ExpectExceptionMsg(viewdoc1.GetViewRow<int>("1"), std::out_of_range, "row not found: 1");
     /*
-    unittest::ExpectEqual(size_t, ints.size(), 3);
-    unittest::ExpectEqual(int, ints.at(0), 3);
-    unittest::ExpectEqual(int, ints.at(1), 9);
-    unittest::ExpectEqual(int, ints.at(2), 81);
-    */
+       unittest::ExpectEqual(size_t, ints.size(), 3);
+       unittest::ExpectEqual(int, ints.at(0), 3);
+       unittest::ExpectEqual(int, ints.at(1), 9);
+       unittest::ExpectEqual(int, ints.at(2), 81);
+     */
 
     strs = viewdoc1.GetViewRow<std::string>(0);
     unittest::ExpectEqual(size_t, strs.size(), 3);
@@ -84,7 +84,7 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(2), "4096");
 
     ////  Filter + Sort
-    const rapidcsv::SortParams<int> spD(0, rapidcsv::ToVal<int,1>, rapidcsv::e_SortOrder::DESCEND);
+    const rapidcsv::SortParams<int> spD(0, rapidcsv::ToVal<int, 1>, rapidcsv::e_SortOrder::DESCEND);
     rapidcsv::FilterSortDocument<isFirstCellPositive, int> viewdoc2(doc, spD);
 
     ints = viewdoc2.GetViewRow<int>(1);
@@ -95,11 +95,11 @@ int main()
 
     ExpectExceptionMsg(viewdoc2.GetViewRow<int>("1"), std::out_of_range, "row not found: 1");
     /*
-    unittest::ExpectEqual(size_t, ints.size(), 3);
-    unittest::ExpectEqual(int, ints.at(0), 3);
-    unittest::ExpectEqual(int, ints.at(1), 9);
-    unittest::ExpectEqual(int, ints.at(2), 81);
-    */
+       unittest::ExpectEqual(size_t, ints.size(), 3);
+       unittest::ExpectEqual(int, ints.at(0), 3);
+       unittest::ExpectEqual(int, ints.at(1), 9);
+       unittest::ExpectEqual(int, ints.at(2), 81);
+     */
 
     strs = viewdoc2.GetViewRow<std::string>(0);
     unittest::ExpectEqual(size_t, strs.size(), 3);
@@ -107,7 +107,7 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(1), "81");
     unittest::ExpectEqual(std::string, strs.at(2), "6561");
 
-    //ExpectExceptionMsg(viewdoc.GetViewRow<int>("2"), std::out_of_range, "row filtered out: 2");
+    // ExpectExceptionMsg(viewdoc.GetViewRow<int>("2"), std::out_of_range, "row filtered out: 2");
 
   }
   catch (const std::exception& ex)

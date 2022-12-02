@@ -50,8 +50,8 @@ int main()
       rapidcsv::SeparatorParams separatorParams;
       rapidcsv::Document doc(path, labelParams, separatorParams);
       // Note: 'ExceptEqual' is a macro-function; comma in "<float, 0, 0>" messes up the call.
-      //       Using macro-variable 'COMMA' is a workaround "<float COMMA 0 COMMA 0>".
-      //  doc.GetCell<float COMMA 0 COMMA 0>  ->  doc.GetCell<float, USE_NUMERIC_LOCALE=0, 0> : do not honor numeric locale
+      // Using macro-variable 'COMMA' is a workaround "<float COMMA 0 COMMA 0>".
+      // doc.GetCell<float COMMA 0 COMMA 0>  ->  doc.GetCell<float, USE_NUMERIC_LOCALE=0, 0> : do not honor numeric locale
       unittest::ExpectEqual(float, doc.GetCell<float COMMA 0 COMMA 0>("A", "2"), 0.1f);
       unittest::ExpectEqual(float, doc.GetCell<float COMMA 0 COMMA 0>("B", "2"), 0.01f);
       unittest::ExpectEqual(float, doc.GetCell<float COMMA 0 COMMA 0>("C", "2"), 0.001f);

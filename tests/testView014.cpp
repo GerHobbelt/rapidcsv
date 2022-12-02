@@ -6,7 +6,7 @@
 bool isFirstCellPositive(const rapidcsv::Document::t_dataRow& dataRow)
 {
   // NOTE : at index=0 as no label
-  return ( std::stoi(dataRow.at(0)) ) >= 0;
+  return (std::stoi(dataRow.at(0))) >= 0;
 }
 
 
@@ -54,7 +54,7 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(2), "2401");
 
     /////   Sort
-    const rapidcsv::SortParams<int> spA(0, rapidcsv::ToVal<int,1>);
+    const rapidcsv::SortParams<int> spA(0, rapidcsv::ToVal<int, 1>);
     rapidcsv::SortDocument<int> viewdoc1(doc, spA);
 
     ints = viewdoc1.GetViewColumn<int>(0);
@@ -73,7 +73,7 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(2), "256");
 
     ////  Filter + Sort
-    const rapidcsv::SortParams<int> spD(0, rapidcsv::ToVal<int,1>, rapidcsv::e_SortOrder::DESCEND);
+    const rapidcsv::SortParams<int> spD(0, rapidcsv::ToVal<int, 1>, rapidcsv::e_SortOrder::DESCEND);
     rapidcsv::FilterSortDocument<isFirstCellPositive, int> viewdoc2(doc, spD);
 
     ints = viewdoc2.GetViewColumn<int>(0);

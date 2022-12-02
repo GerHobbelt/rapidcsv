@@ -198,7 +198,7 @@ namespace rapidcsv
     bool mSkipEmptyLines;
   };
 
-//  class SortParams;
+// class SortParams;
 
   /**
    * @brief     Class representing a CSV document.
@@ -208,7 +208,7 @@ namespace rapidcsv
   public:
 
     using t_dataRow = std::vector<std::string>;
-    typedef bool (*f_EvalBoolExpr)(const t_dataRow& dataRow);
+    typedef bool (* f_EvalBoolExpr)(const t_dataRow& dataRow);
 
     /**
      * @brief   Constructor
@@ -359,14 +359,15 @@ namespace rapidcsv
      * @param   pConvertToVal         conversion function (optional argument).
      * @returns vector of column data.
      */
-    template<typename T, int USE_NUMERIC_LOCALE=1, int USE_NAN=0>
+    template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     std::vector<T> GetColumn(const size_t pColumnIdx,
-                             f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
+                             f_ConvFuncToVal<T> pConvertToVal =
+                               ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const size_t dataColumnIdx = GetDataColumnIndex(pColumnIdx);
       std::vector<T> column;
       size_t rowIdx = 0;
-      for (auto itRow = mData.begin()+static_cast<ssize_t>(GetDataRowIndex(0));
+      for (auto itRow = mData.begin() + static_cast<ssize_t>(GetDataRowIndex(0));
            itRow != mData.end(); ++itRow, ++rowIdx)
       {
         if (dataColumnIdx < itRow->size())
@@ -374,7 +375,9 @@ namespace rapidcsv
           const std::string& cellStrVal = itRow->at(dataColumnIdx);
           T val = pConvertToVal(cellStrVal);
           column.push_back(val);
-        } else {
+        }
+        else
+        {
           const std::string errStr = "Document::GetColumn() # requested column index " +
             std::to_string(pColumnIdx) + " >= " +
             std::to_string(itRow->size() - GetDataColumnIndex(0)) +
@@ -391,16 +394,17 @@ namespace rapidcsv
      * @param   pConvertToVal         conversion function (optional argument).
      * @returns vector of column data.
      */
-    template<typename T, int USE_NUMERIC_LOCALE=1, int USE_NAN=0>
+    template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     std::vector<T> GetColumn(const std::string& pColumnName,
-                             f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
+                             f_ConvFuncToVal<T> pConvertToVal =
+                               ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const ssize_t columnIdx = GetColumnIdx(pColumnName);
       if (columnIdx < 0)
       {
         throw std::out_of_range("column not found: " + pColumnName);
       }
-      return GetColumn<T,USE_NUMERIC_LOCALE,USE_NAN>(static_cast<size_t>(columnIdx), pConvertToVal);
+      return GetColumn<T, USE_NUMERIC_LOCALE, USE_NAN>(static_cast<size_t>(columnIdx), pConvertToVal);
     }
 
     /**
@@ -409,9 +413,9 @@ namespace rapidcsv
      * @param   pColumn               vector of column data.
      * @param   pConvertToStr         conversion function (optional argument).
      */
-    template<typename T, int USE_NUMERIC_LOCALE=0>
+    template<typename T, int USE_NUMERIC_LOCALE = 0>
     void SetColumn(const size_t pColumnIdx, const std::vector<T>& pColumn,
-                   f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+                   f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       const size_t dataColumnIdx = GetDataColumnIndex(pColumnIdx);
 
@@ -443,16 +447,16 @@ namespace rapidcsv
      * @param   pColumn               vector of column data.
      * @param   pConvertToStr         conversion function (optional argument).
      */
-    template<typename T, int USE_NUMERIC_LOCALE=0>
+    template<typename T, int USE_NUMERIC_LOCALE = 0>
     void SetColumn(const std::string& pColumnName, const std::vector<T>& pColumn,
-                   f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+                   f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       const ssize_t columnIdx = GetColumnIdx(pColumnName);
       if (columnIdx < 0)
       {
         throw std::out_of_range("column not found: " + pColumnName);
       }
-      SetColumn<T,USE_NUMERIC_LOCALE>(static_cast<size_t>(columnIdx), pColumn, pConvertToStr);
+      SetColumn<T, USE_NUMERIC_LOCALE>(static_cast<size_t>(columnIdx), pColumn, pConvertToStr);
     }
 
     /**
@@ -492,10 +496,10 @@ namespace rapidcsv
      * @param   pColumnName           column label name (optional argument).
      * @param   pConvertToStr         conversion function (optional argument).
      */
-    template<typename T, int USE_NUMERIC_LOCALE=0>
+    template<typename T, int USE_NUMERIC_LOCALE = 0>
     void InsertColumn(const size_t pColumnIdx, const std::vector<T>& pColumn = std::vector<T>(),
                       const std::string& pColumnName = std::string(),
-                      f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+                      f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       const size_t dataColumnIdx = GetDataColumnIndex(pColumnIdx);
 
@@ -544,7 +548,7 @@ namespace rapidcsv
     {
       const size_t firstRowSize = ((mData.size() > 0) ? mData.at(0).size() : 0);
       const size_t firstDataColumnIndex = GetDataColumnIndex(0);
-      return ((firstRowSize>firstDataColumnIndex) ? (firstRowSize-firstDataColumnIndex) : 0);
+      return (firstRowSize > firstDataColumnIndex) ? (firstRowSize - firstDataColumnIndex) : 0;
     }
 
     /**
@@ -570,9 +574,10 @@ namespace rapidcsv
      * @param   pConvertToVal         conversion function (optional argument).
      * @returns vector of row data.
      */
-    template<typename T, int USE_NUMERIC_LOCALE=1, int USE_NAN=0>
+    template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     std::vector<T> GetRow(const size_t pRowIdx,
-                          f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
+                          f_ConvFuncToVal<T> pConvertToVal =
+                            ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const size_t dataRowIdx = GetDataRowIndex(pRowIdx);
       std::vector<T> row;
@@ -591,16 +596,17 @@ namespace rapidcsv
      * @param   pConvertToVal         conversion function (optional argument).
      * @returns vector of row data.
      */
-    template<typename T, int USE_NUMERIC_LOCALE=1, int USE_NAN=0>
+    template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     std::vector<T> GetRow(const std::string& pRowName,
-                          f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
+                          f_ConvFuncToVal<T> pConvertToVal =
+                            ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       ssize_t rowIdx = GetRowIdx(pRowName);
       if (rowIdx < 0)
       {
         throw std::out_of_range("row not found: " + pRowName);
       }
-      return GetRow<T,USE_NUMERIC_LOCALE,USE_NAN>(static_cast<size_t>(rowIdx), pConvertToVal);
+      return GetRow<T, USE_NUMERIC_LOCALE, USE_NAN>(static_cast<size_t>(rowIdx), pConvertToVal);
     }
 
     /**
@@ -609,9 +615,9 @@ namespace rapidcsv
      * @param   pRow                  vector of row data.
      * @param   pConvertToStr         conversion function (optional argument).
      */
-    template<typename T, int USE_NUMERIC_LOCALE=0>
+    template<typename T, int USE_NUMERIC_LOCALE = 0>
     void SetRow(const size_t pRowIdx, const std::vector<T>& pRow,
-                f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+                f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       const size_t dataRowIdx = GetDataRowIndex(pRowIdx);
 
@@ -643,16 +649,16 @@ namespace rapidcsv
      * @param   pRow                  vector of row data.
      * @param   pConvertToStr         conversion function (optional argument).
      */
-    template<typename T, int USE_NUMERIC_LOCALE=0>
+    template<typename T, int USE_NUMERIC_LOCALE = 0>
     void SetRow(const std::string& pRowName, const std::vector<T>& pRow,
-                f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+                f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       ssize_t rowIdx = GetRowIdx(pRowName);
       if (rowIdx < 0)
       {
         throw std::out_of_range("row not found: " + pRowName);
       }
-      return SetRow<T,USE_NUMERIC_LOCALE>(static_cast<size_t>(rowIdx), pRow, pConvertToStr);
+      return SetRow<T, USE_NUMERIC_LOCALE>(static_cast<size_t>(rowIdx), pRow, pConvertToStr);
     }
 
     /**
@@ -688,10 +694,10 @@ namespace rapidcsv
      * @param   pRowName              row label name (optional argument).
      * @param   pConvertToStr         conversion function (optional argument).
      */
-    template<typename T, int USE_NUMERIC_LOCALE=0>
+    template<typename T, int USE_NUMERIC_LOCALE = 0>
     void InsertRow(const size_t pRowIdx, const std::vector<T>& pRow = std::vector<T>(),
                    const std::string& pRowName = std::string(),
-                   f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+                   f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       const size_t rowIdx = GetDataRowIndex(pRowIdx);
 
@@ -735,7 +741,7 @@ namespace rapidcsv
     {
       const size_t dataRowSize = mData.size();
       const size_t firstDataRowIndex = GetDataRowIndex(0);
-      return (dataRowSize>firstDataRowIndex) ? (dataRowSize-firstDataRowIndex) : 0;
+      return (dataRowSize > firstDataRowIndex) ? (dataRowSize - firstDataRowIndex) : 0;
     }
 
     /**
@@ -745,9 +751,9 @@ namespace rapidcsv
      * @param   pConvertToVal         conversion function (optional argument).
      * @returns cell data.
      */
-    template<typename T, int USE_NUMERIC_LOCALE=1, int USE_NAN=0>
+    template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     T GetCell(const size_t pColumnIdx, const size_t pRowIdx,
-              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
+              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const size_t dataColumnIdx = GetDataColumnIndex(pColumnIdx);
       const size_t dataRowIdx = GetDataRowIndex(pRowIdx);
@@ -763,9 +769,9 @@ namespace rapidcsv
      * @param   pConvertToVal         conversion function (optional argument).
      * @returns cell data.
      */
-    template<typename T, int USE_NUMERIC_LOCALE=1, int USE_NAN=0>
+    template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     T GetCell(const std::string& pColumnName, const std::string& pRowName,
-              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
+              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const ssize_t columnIdx = GetColumnIdx(pColumnName);
       if (columnIdx < 0)
@@ -779,8 +785,8 @@ namespace rapidcsv
         throw std::out_of_range("row not found: " + pRowName);
       }
 
-      return GetCell<T,USE_NUMERIC_LOCALE,USE_NAN>(static_cast<size_t>(columnIdx),
-                                                   static_cast<size_t>(rowIdx), pConvertToVal);
+      return GetCell<T, USE_NUMERIC_LOCALE, USE_NAN>(static_cast<size_t>(columnIdx),
+                                                     static_cast<size_t>(rowIdx), pConvertToVal);
     }
 
     /**
@@ -790,9 +796,9 @@ namespace rapidcsv
      * @param   pConvertToVal         conversion function (optional argument).
      * @returns cell data.
      */
-    template<typename T, int USE_NUMERIC_LOCALE=1, int USE_NAN=0>
+    template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     T GetCell(const std::string& pColumnName, const size_t pRowIdx,
-              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
+              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const ssize_t columnIdx = GetColumnIdx(pColumnName);
       if (columnIdx < 0)
@@ -800,7 +806,7 @@ namespace rapidcsv
         throw std::out_of_range("column not found: " + pColumnName);
       }
 
-      return GetCell<T,USE_NUMERIC_LOCALE,USE_NAN>(static_cast<size_t>(columnIdx), pRowIdx, pConvertToVal);
+      return GetCell<T, USE_NUMERIC_LOCALE, USE_NAN>(static_cast<size_t>(columnIdx), pRowIdx, pConvertToVal);
     }
 
     /**
@@ -810,9 +816,9 @@ namespace rapidcsv
      * @param   pConvertToVal         conversion function (optional argument).
      * @returns cell data.
      */
-    template<typename T, int USE_NUMERIC_LOCALE=1, int USE_NAN=0>
+    template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     T GetCell(const size_t pColumnIdx, const std::string& pRowName,
-              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal) const
+              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const ssize_t rowIdx = GetRowIdx(pRowName);
       if (rowIdx < 0)
@@ -820,7 +826,7 @@ namespace rapidcsv
         throw std::out_of_range("row not found: " + pRowName);
       }
 
-      return GetCell<T,USE_NUMERIC_LOCALE,USE_NAN>(pColumnIdx, static_cast<size_t>(rowIdx), pConvertToVal);
+      return GetCell<T, USE_NUMERIC_LOCALE, USE_NAN>(pColumnIdx, static_cast<size_t>(rowIdx), pConvertToVal);
     }
 
     /**
@@ -830,9 +836,9 @@ namespace rapidcsv
      * @param   pCell                 cell data.
      * @param   pConvertToStr         conversion function (optional argument).
      */
-    template<typename T, int USE_NUMERIC_LOCALE=0>
+    template<typename T, int USE_NUMERIC_LOCALE = 0>
     void SetCell(const size_t pColumnIdx, const size_t pRowIdx, const T& pCell,
-                 f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+                 f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       const size_t dataColumnIdx = GetDataColumnIndex(pColumnIdx);
       const size_t dataRowIdx = GetDataRowIndex(pRowIdx);
@@ -862,9 +868,9 @@ namespace rapidcsv
      * @param   pCell                 cell data.
      * @param   pConvertToStr         conversion function (optional argument).
      */
-    template<typename T, int USE_NUMERIC_LOCALE=0>
+    template<typename T, int USE_NUMERIC_LOCALE = 0>
     void SetCell(const std::string& pColumnName, const std::string& pRowName, const T& pCell,
-                 f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+                 f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       const ssize_t columnIdx = GetColumnIdx(pColumnName);
       if (columnIdx < 0)
@@ -878,7 +884,7 @@ namespace rapidcsv
         throw std::out_of_range("row not found: " + pRowName);
       }
 
-      SetCell<T,USE_NUMERIC_LOCALE>(static_cast<size_t>(columnIdx), static_cast<size_t>(rowIdx), pCell, pConvertToStr);
+      SetCell<T, USE_NUMERIC_LOCALE>(static_cast<size_t>(columnIdx), static_cast<size_t>(rowIdx), pCell, pConvertToStr);
     }
 
     /**
@@ -888,9 +894,9 @@ namespace rapidcsv
      * @param   pCell                 cell data.
      * @param   pConvertToStr         conversion function (optional argument).
      */
-    template<typename T, int USE_NUMERIC_LOCALE=0>
+    template<typename T, int USE_NUMERIC_LOCALE = 0>
     void SetCell(const std::string& pColumnName, const size_t pRowIdx, const T& pCell,
-                 f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+                 f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       const ssize_t columnIdx = GetColumnIdx(pColumnName);
       if (columnIdx < 0)
@@ -898,7 +904,7 @@ namespace rapidcsv
         throw std::out_of_range("column not found: " + pColumnName);
       }
 
-      SetCell<T,USE_NUMERIC_LOCALE>(static_cast<size_t>(columnIdx), pRowIdx, pCell, pConvertToStr);
+      SetCell<T, USE_NUMERIC_LOCALE>(static_cast<size_t>(columnIdx), pRowIdx, pCell, pConvertToStr);
     }
 
     /**
@@ -908,9 +914,9 @@ namespace rapidcsv
      * @param   pCell                 cell data.
      * @param   pConvertToStr         conversion function (optional argument).
      */
-    template<typename T, int USE_NUMERIC_LOCALE=0>
+    template<typename T, int USE_NUMERIC_LOCALE = 0>
     void SetCell(const size_t pColumnIdx, const std::string& pRowName, const T& pCell,
-                 f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+                 f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       const ssize_t rowIdx = GetRowIdx(pRowName);
       if (rowIdx < 0)
@@ -918,7 +924,7 @@ namespace rapidcsv
         throw std::out_of_range("row not found: " + pRowName);
       }
 
-      SetCell<T,USE_NUMERIC_LOCALE>(pColumnIdx, static_cast<size_t>(rowIdx), pCell, pConvertToStr);
+      SetCell<T, USE_NUMERIC_LOCALE>(pColumnIdx, static_cast<size_t>(rowIdx), pCell, pConvertToStr);
     }
 
     /**
@@ -976,7 +982,7 @@ namespace rapidcsv
       if (mLabelParams.mColumnNameIdx >= 0)
       {
         return std::vector<std::string>(mData.at(static_cast<size_t>(mLabelParams.mColumnNameIdx)).begin() +
-                                                 static_cast<ssize_t>(GetDataColumnIndex(0)),
+                                        static_cast<ssize_t>(GetDataColumnIndex(0)),
                                         mData.at(static_cast<size_t>(mLabelParams.mColumnNameIdx)).end());
       }
 

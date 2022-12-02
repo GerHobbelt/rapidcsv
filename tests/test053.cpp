@@ -29,7 +29,7 @@ int main()
 
     doc1.SetCell<double>("A", "1", 1.2e10);
     doc1.SetCell<double>("B", "1", 2.00E-07);
-    //std::cout << "doc1.GetCell<double>(\"B\", \"1\") = " << std::setprecision(10) << doc1.GetCell<double>("B", "1") << std::endl;
+    // std::cout << "doc1.GetCell<double>(\"B\", \"1\") = " << std::setprecision(10) << doc1.GetCell<double>("B", "1") << std::endl;
     doc1.SetCell<double>("C", "1", 1e100);
 
     doc1.Save();
