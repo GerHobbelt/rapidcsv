@@ -1,7 +1,6 @@
 # Project
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
-project(rapidcsv VERSION 1.0 LANGUAGES CXX)
-#set (CMAKE_CXX_STANDARD 11)
+project(rapidcsv VERSION 2.0.08.68 LANGUAGES CXX)
 set (CMAKE_CXX_STANDARD 20)
 #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 if(MSVC)
@@ -229,8 +228,8 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
           DESTINATION include/rapidcsv/)
 
   # Uninstall
-  add_custom_target(uninstall COMMAND "${CMAKE_COMMAND}" -E remove "${CMAKE_INSTALL_PREFIX}/include/rapidcsv"
-)
+  add_custom_target(uninstall COMMAND "${CMAKE_COMMAND}" -E remove "${CMAKE_INSTALL_PREFIX}/include/rapidcsv")
+
 else()
   message(STATUS "Install/uninstall targets disabled.")
 endif()

@@ -1,10 +1,8 @@
 /*
  * rapidcsv.h
  *
- * URL:      https://github.com/panchaBhuta/rapidcsv_CT
  * URL:      https://github.com/panchaBhuta/rapidcsv_FilterSort
  * Version:  2.0.fs-8.68
- * Version:  2.0.ct-8.68
  *
  * Copyright (C) 2022-2022 Gautam Dhar
  * All rights reserved.

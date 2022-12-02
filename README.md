@@ -459,7 +459,7 @@ If only data conversions is needed, then just include [rapidcsv/rapidcsv.h](incl
 This is illustrated in the following example, where data conversion precision is checked
 by implementing a complete conversion cycle i.e    data -> string -> data
 
-[ex010.cpp](examples/ex010.cpp) content:
+[exConv001.cpp](examples/exConv001.cpp) content:
 ```cpp
     #include <iostream>
     #include <vector>
@@ -655,6 +655,10 @@ its Markdown API documentation:
 Rapidcsv uses Uncrustify to ensure consistent code formatting:
 
     uncrustify -c uncrustify.cfg --no-backup include/rapidcsv/rapidcsv.h
+
+Rapidcsv can be installed using the following command:
+
+    ./install.sh '/path/to/install/dir/'
 
 Alternatives
 ============
