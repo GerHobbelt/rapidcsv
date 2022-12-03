@@ -1,5 +1,5 @@
 # Project
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
 project(rapidcsv VERSION 2.0.08.68 LANGUAGES CXX)
 set (CMAKE_CXX_STANDARD 20)
 #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")

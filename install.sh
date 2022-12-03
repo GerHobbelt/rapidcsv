@@ -17,8 +17,9 @@ if [ ! -d ${BUILD_DIR} ]; then
   ./make.sh tests
 fi
 
-pushd ${BUILD_DIR}
 [ -d ${INSTALL_DIR}/${NAME} ] && rm -rf ${INSTALL_DIR}/${NAME}
-make DESTDIR=${INSTALL_DIR} install
-popd
+#pushd ${BUILD_DIR}
+#make DESTDIR=${INSTALL_DIR} install
+#popd
+cmake --install ./${BUILD_DIR} --prefix ${INSTALL_DIR}/${NAME}
 
