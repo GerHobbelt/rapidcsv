@@ -8,7 +8,7 @@ Rapidcsv (FilterSort)
 Rapidcsv is an easy-to-use C++ CSV parser library. It supports C++11 (and
 later), is header-only and comes with a basic test suite.
 
-The [library of upstream repo](https://github.com/d99kris/rapidcsv) was showcased in the book
+The [library of upstream repo](https://github.com/d99kris/rapidcsv) was  in featured book
 [C++20 for Programmers](https://deitel.com/c-plus-plus-20-for-programmers/).
 
 Differences with the [upstream repo](https://github.com/d99kris/rapidcsv)
@@ -102,28 +102,28 @@ vector of floats.
 
 [colhdr.csv](examples/colhdr.csv) content:
 ```
-    Open,High,Low,Close,Volume,Adj Close
-    64.529999,64.800003,64.139999,64.620003,21705200,64.620003
-    64.419998,64.730003,64.190002,64.620003,20235200,64.620003
-    64.330002,64.389999,64.050003,64.360001,19259700,64.360001
-    64.610001,64.949997,64.449997,64.489998,19384900,64.489998
-    64.470001,64.690002,64.300003,64.620003,21234600,64.620003
+Open,High,Low,Close,Volume,Adj Close
+64.529999,64.800003,64.139999,64.620003,21705200,64.620003
+64.419998,64.730003,64.190002,64.620003,20235200,64.620003
+64.330002,64.389999,64.050003,64.360001,19259700,64.360001
+64.610001,64.949997,64.449997,64.489998,19384900,64.489998
+64.470001,64.690002,64.300003,64.620003,21234600,64.620003
 ```
 
 [ex001.cpp](examples/ex001.cpp) content:
 ```cpp
-    #include <iostream>
-    #include <vector>
+#include <iostream>
+#include <vector>
 
-    #include <rapidcsv/rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 
-    int main()
-    {
-      rapidcsv::Document doc("examples/colhdr.csv");
+int main()
+{
+  rapidcsv::Document doc("examples/colhdr.csv");
 
-      std::vector<float> col = doc.GetColumn<float>("Close");
-      std::cout << "Read " << col.size() << " values." << std::endl;
-    }
+  std::vector<float> col = doc.GetColumn<float>("Close");
+  std::cout << "Read " << col.size() << " values." << std::endl;
+}
 ```
 
 Refer to section [More Examples](#more-examples) below for more examples.
@@ -147,7 +147,10 @@ Simply copy ...
 
 [include/rapidcsv/view.h](https://raw.githubusercontent.com/panchaBhuta/rapidcsv_FilterSort/blob/master/include/rapidcsv/converter.h)
 
-... to your project/include/rapidcsv/ directory and include it. 
+... to your project/include/rapidcsv/ directory and include it. OR alternatively you can call script ...
+
+`./install.sh </dir-path/to/install/>`
+
 
 More Examples
 =============
@@ -157,7 +160,7 @@ directory and can be executed directly under Linux and macOS. Example running
 ex001.cpp:
 
 ```
-    ./examples/ex001.cpp
+./examples/ex001.cpp
 ```
 
 
@@ -171,86 +174,86 @@ as row headers one needs to use LabelParams and set pRowNameIdx to 0.
 ### Column and Row Headers
 [colrowhdr.csv](examples/colrowhdr.csv) content:
 ```
-    Date,Open,High,Low,Close,Volume,Adj Close
-    2017-02-24,64.529999,64.800003,64.139999,64.620003,21705200,64.620003
-    2017-02-23,64.419998,64.730003,64.190002,64.620003,20235200,64.620003
-    2017-02-22,64.330002,64.389999,64.050003,64.360001,19259700,64.360001
-    2017-02-21,64.610001,64.949997,64.449997,64.489998,19384900,64.489998
-    2017-02-17,64.470001,64.690002,64.300003,64.620003,21234600,64.620003
+Date,Open,High,Low,Close,Volume,Adj Close
+2017-02-24,64.529999,64.800003,64.139999,64.620003,21705200,64.620003
+2017-02-23,64.419998,64.730003,64.190002,64.620003,20235200,64.620003
+2017-02-22,64.330002,64.389999,64.050003,64.360001,19259700,64.360001
+2017-02-21,64.610001,64.949997,64.449997,64.489998,19384900,64.489998
+2017-02-17,64.470001,64.690002,64.300003,64.620003,21234600,64.620003
 ```
 
 [ex002.cpp](examples/ex002.cpp) content:
 ```cpp
-    #include <iostream>
-    #include <vector>
+#include <iostream>
+#include <vector>
 
-    #include <rapidcsv/rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 
-    int main()
-    {
-      rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(0, 0));
+int main()
+{
+  rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(0, 0));
 
-      std::vector<float> close = doc.GetRow<float>("2017-02-22");
-      std::cout << "Read " << close.size() << " values." << std::endl;
+  std::vector<float> close = doc.GetRow<float>("2017-02-22");
+  std::cout << "Read " << close.size() << " values." << std::endl;
 
-      long long volume = doc.GetCell<long long>("Volume", "2017-02-22");
-      std::cout << "Volume " << volume << " on 2017-02-22." << std::endl;
-    }
+  long long volume = doc.GetCell<long long>("Volume", "2017-02-22");
+  std::cout << "Volume " << volume << " on 2017-02-22." << std::endl;
+}
 ```
 
 ### Row Headers Only
 [rowhdr.csv](examples/rowhdr.csv) content:
 ```
-    2017-02-24,64.529999,64.800003,64.139999,64.620003,21705200,64.620003
-    2017-02-23,64.419998,64.730003,64.190002,64.620003,20235200,64.620003
-    2017-02-22,64.330002,64.389999,64.050003,64.360001,19259700,64.360001
-    2017-02-21,64.610001,64.949997,64.449997,64.489998,19384900,64.489998
-    2017-02-17,64.470001,64.690002,64.300003,64.620003,21234600,64.620003
+2017-02-24,64.529999,64.800003,64.139999,64.620003,21705200,64.620003
+2017-02-23,64.419998,64.730003,64.190002,64.620003,20235200,64.620003
+2017-02-22,64.330002,64.389999,64.050003,64.360001,19259700,64.360001
+2017-02-21,64.610001,64.949997,64.449997,64.489998,19384900,64.489998
+2017-02-17,64.470001,64.690002,64.300003,64.620003,21234600,64.620003
 ```
 
 [ex003.cpp](examples/ex003.cpp) content:
 ```cpp
-    #include <iostream>
-    #include <vector>
+#include <iostream>
+#include <vector>
 
-    #include <rapidcsv/rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 
-    int main()
-    {
-      rapidcsv::Document doc("examples/rowhdr.csv", rapidcsv::LabelParams(-1, 0));
+int main()
+{
+  rapidcsv::Document doc("examples/rowhdr.csv", rapidcsv::LabelParams(-1, 0));
 
-      std::vector<std::string> row = doc.GetRow<std::string>("2017-02-22");
-      std::cout << "Read " << row.size() << " values." << std::endl;
-    }
+  std::vector<std::string> row = doc.GetRow<std::string>("2017-02-22");
+  std::cout << "Read " << row.size() << " values." << std::endl;
+}
 ```
 
 ### No Headers
 [nohdr.csv](examples/nohdr.csv) content:
 ```
-    64.529999,64.800003,64.139999,64.620003,21705200,64.620003
-    64.419998,64.730003,64.190002,64.620003,20235200,64.620003
-    64.330002,64.389999,64.050003,64.360001,19259700,64.360001
-    64.610001,64.949997,64.449997,64.489998,19384900,64.489998
-    64.470001,64.690002,64.300003,64.620003,21234600,64.620003
+64.529999,64.800003,64.139999,64.620003,21705200,64.620003
+64.419998,64.730003,64.190002,64.620003,20235200,64.620003
+64.330002,64.389999,64.050003,64.360001,19259700,64.360001
+64.610001,64.949997,64.449997,64.489998,19384900,64.489998
+64.470001,64.690002,64.300003,64.620003,21234600,64.620003
 ```
 
 [ex004.cpp](examples/ex004.cpp) content:
 ```cpp
-    #include <iostream>
-    #include <vector>
+#include <iostream>
+#include <vector>
 
-    #include <rapidcsv/rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 
-    int main()
-    {
-      rapidcsv::Document doc("examples/nohdr.csv", rapidcsv::LabelParams(-1, -1));
+int main()
+{
+  rapidcsv::Document doc("examples/nohdr.csv", rapidcsv::LabelParams(-1, -1));
 
-      std::vector<float> close = doc.GetColumn<float>(5);
-      std::cout << "Read " << close.size() << " values." << std::endl;
+  std::vector<float> close = doc.GetColumn<float>(5);
+  std::cout << "Read " << close.size() << " values." << std::endl;
 
-      long long volume = doc.GetCell<long long>(4, 2);
-      std::cout << "Volume " << volume << " on 2017-02-22." << std::endl;
-    }
+  long long volume = doc.GetCell<long long>(4, 2);
+  std::cout << "Volume " << volume << " on 2017-02-22." << std::endl;
+}
 ```
 
 Reading a File with Custom Separator
@@ -261,32 +264,32 @@ semi-colon as separator.
 
 [semi.csv](examples/semi.csv) content:
 ```
-    Date;Open;High;Low;Close;Volume;Adj Close
-    2017-02-24;64.529999;64.800003;64.139999;64.620003;21705200;64.620003
-    2017-02-23;64.419998;64.730003;64.190002;64.620003;20235200;64.620003
-    2017-02-22;64.330002;64.389999;64.050003;64.360001;19259700;64.360001
-    2017-02-21;64.610001;64.949997;64.449997;64.489998;19384900;64.489998
-    2017-02-17;64.470001;64.690002;64.300003;64.620003;21234600;64.620003
+Date;Open;High;Low;Close;Volume;Adj Close
+2017-02-24;64.529999;64.800003;64.139999;64.620003;21705200;64.620003
+2017-02-23;64.419998;64.730003;64.190002;64.620003;20235200;64.620003
+2017-02-22;64.330002;64.389999;64.050003;64.360001;19259700;64.360001
+2017-02-21;64.610001;64.949997;64.449997;64.489998;19384900;64.489998
+2017-02-17;64.470001;64.690002;64.300003;64.620003;21234600;64.620003
 ```
 
 [ex005.cpp](examples/ex005.cpp) content:
 ```cpp
-    #include <iostream>
-    #include <vector>
+#include <iostream>
+#include <vector>
 
-    #include <rapidcsv/rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 
-    int main()
-    {
-      rapidcsv::Document doc("examples/semi.csv", rapidcsv::LabelParams(0, 0),
-                             rapidcsv::SeparatorParams(';'));
+int main()
+{
+  rapidcsv::Document doc("examples/semi.csv", rapidcsv::LabelParams(0, 0),
+                          rapidcsv::SeparatorParams(';'));
 
-      std::vector<float> close = doc.GetColumn<float>("Close");
-      std::cout << "Read " << close.size() << " values." << std::endl;
+  std::vector<float> close = doc.GetColumn<float>("Close");
+  std::cout << "Read " << close.size() << " values." << std::endl;
 
-      long long volume = doc.GetCell<long long>("Volume", "2017-02-22");
-      std::cout << "Volume " << volume << " on 2017-02-22." << std::endl;
-    }
+  long long volume = doc.GetCell<long long>("Volume", "2017-02-22");
+  std::cout << "Volume " << volume << " on 2017-02-22." << std::endl;
+}
 ```
 
 Supported Get/Set Data Types
@@ -299,37 +302,37 @@ as a character. The following example illustrates the supported data types.
 
 [colrowhdr.csv](examples/colrowhdr.csv) content:
 ```
-    Date,Open,High,Low,Close,Volume,Adj Close
-    2017-02-24,64.529999,64.800003,64.139999,64.620003,21705200,64.620003
-    2017-02-23,64.419998,64.730003,64.190002,64.620003,20235200,64.620003
-    2017-02-22,64.330002,64.389999,64.050003,64.360001,19259700,64.360001
-    2017-02-21,64.610001,64.949997,64.449997,64.489998,19384900,64.489998
-    2017-02-17,64.470001,64.690002,64.300003,64.620003,21234600,64.620003
+Date,Open,High,Low,Close,Volume,Adj Close
+2017-02-24,64.529999,64.800003,64.139999,64.620003,21705200,64.620003
+2017-02-23,64.419998,64.730003,64.190002,64.620003,20235200,64.620003
+2017-02-22,64.330002,64.389999,64.050003,64.360001,19259700,64.360001
+2017-02-21,64.610001,64.949997,64.449997,64.489998,19384900,64.489998
+2017-02-17,64.470001,64.690002,64.300003,64.620003,21234600,64.620003
 ```
 
 [ex006.cpp](examples/ex006.cpp) content:
 ```cpp
-    #include <iostream>
-    #include <vector>
+#include <iostream>
+#include <vector>
 
-    #include <rapidcsv/rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 
-    int main()
-    {
-      rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(0, 0));
+int main()
+{
+  rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(0, 0));
 
-      std::cout << doc.GetCell<std::string>("Volume", "2017-02-22") << std::endl;
-      std::cout << doc.GetCell<int>("Volume", "2017-02-22") << std::endl;
-      std::cout << doc.GetCell<long>("Volume", "2017-02-22") << std::endl;
-      std::cout << doc.GetCell<long long>("Volume", "2017-02-22") << std::endl;
-      std::cout << doc.GetCell<unsigned>("Volume", "2017-02-22") << std::endl;
-      std::cout << doc.GetCell<unsigned long>("Volume", "2017-02-22") << std::endl;
-      std::cout << doc.GetCell<unsigned long long>("Volume", "2017-02-22") << std::endl;
-      std::cout << doc.GetCell<float>("Volume", "2017-02-22") << std::endl;
-      std::cout << doc.GetCell<double>("Volume", "2017-02-22") << std::endl;
-      std::cout << doc.GetCell<long double>("Volume", "2017-02-22") << std::endl;
-      std::cout << doc.GetCell<char>("Volume", "2017-02-22") << std::endl;
-    }
+  std::cout << doc.GetCell<std::string>("Volume", "2017-02-22") << std::endl;
+  std::cout << doc.GetCell<int>("Volume", "2017-02-22") << std::endl;
+  std::cout << doc.GetCell<long>("Volume", "2017-02-22") << std::endl;
+  std::cout << doc.GetCell<long long>("Volume", "2017-02-22") << std::endl;
+  std::cout << doc.GetCell<unsigned>("Volume", "2017-02-22") << std::endl;
+  std::cout << doc.GetCell<unsigned long>("Volume", "2017-02-22") << std::endl;
+  std::cout << doc.GetCell<unsigned long long>("Volume", "2017-02-22") << std::endl;
+  std::cout << doc.GetCell<float>("Volume", "2017-02-22") << std::endl;
+  std::cout << doc.GetCell<double>("Volume", "2017-02-22") << std::endl;
+  std::cout << doc.GetCell<long double>("Volume", "2017-02-22") << std::endl;
+  std::cout << doc.GetCell<char>("Volume", "2017-02-22") << std::endl;
+}
 
 ```
 
@@ -337,38 +340,38 @@ Global Custom Data Type Conversion
 ----------------------------------
 One may override conversion routines (or add new ones) by implementing ToVal()
 and/or ToStr(). Below is an example overriding int conversion, to instead provide
-two decimal fixed-point numbers. Also see 
+two decimal fixed-point numbers. Also see
 [tests/test035.cpp](https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/master/tests/test035.cpp)
 for a test overriding ToVal() and ToStr().
 
 [ex008.cpp](examples/ex008.cpp) content:
 ```cpp
-    #include <iostream>
-    #include <vector>
-    #include <cmath>
+#include <iostream>
+#include <vector>
+#include <cmath>
 
-    #include <rapidcsv/rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 
-    namespace rapidcsv
+namespace rapidcsv
+{
+  template<>
+  struct ConverterToVal<int,1,0>
+  {
+    static int ToVal(const std::string& pStr)
     {
-      template<>
-      struct ConverterToVal<int,1,0>
-      {
-        static int ToVal(const std::string& pStr)
-        {
-          return static_cast<int>(roundf(100.0f * std::stof(pStr)));
-        }
-      };
+      return static_cast<int>(roundf(100.0f * std::stof(pStr)));
     }
+  };
+}
 
-    int main()
-    {
-      rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(0, 0));
+int main()
+{
+  rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(0, 0));
 
-      std::vector<int> close = doc.GetColumn<int>("Close");
-      std::cout << "close[0]  = " << close[0] << std::endl;
-      std::cout << "close[1]  = " << close[1] << std::endl;
-    }
+  std::vector<int> close = doc.GetColumn<int>("Close");
+  std::cout << "close[0]  = " << close[0] << std::endl;
+  std::cout << "close[1]  = " << close[1] << std::endl;
+}
 ```
 
 Custom Data Type Conversion Per Call
@@ -380,41 +383,41 @@ override usage can be found in the test
 
 [ex009.cpp](examples/ex009.cpp) content:
 ```cpp
-    #include <iostream>
-    #include <vector>
-    #include <cmath>
+#include <iostream>
+#include <vector>
+#include <cmath>
 
-    #include <rapidcsv/rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 
-    int ConvFixPoint(const std::string& pStr)
-    {
-      return static_cast<int>(roundf(100.0f * std::stof(pStr)));
-    }
+int ConvFixPoint(const std::string& pStr)
+{
+  return static_cast<int>(roundf(100.0f * std::stof(pStr)));
+}
 
-    struct MyStruct
-    {
-      int val = 0;
-    };
+struct MyStruct
+{
+  int val = 0;
+};
 
-    MyStruct ConvMyStruct(const std::string& pStr)
-    {
-      MyStruct ms;
-      ms.val = static_cast<int>(roundf(100.0f * std::stof(pStr)));
-      return ms;
-    }
+MyStruct ConvMyStruct(const std::string& pStr)
+{
+  MyStruct ms;
+  ms.val = static_cast<int>(roundf(100.0f * std::stof(pStr)));
+  return ms;
+}
 
-    int main()
-    {
-      rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(0, 0));
+int main()
+{
+  rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(0, 0));
 
-      std::cout << "regular         = " << doc.GetCell<int>("Close", "2017-02-21") << "\n";
-      std::cout << "fixpointfunc    = " << doc.GetCell<int>("Close", "2017-02-21", ConvFixPoint) << "\n";
+  std::cout << "regular         = " << doc.GetCell<int>("Close", "2017-02-21") << "\n";
+  std::cout << "fixpointfunc    = " << doc.GetCell<int>("Close", "2017-02-21", ConvFixPoint) << "\n";
 
-      auto convFixLambda = [](const std::string& pStr) { return static_cast<int>(roundf(100.0f * stof(pStr))); };
-      std::cout << "fixpointlambda  = " << doc.GetCell<int>("Close", "2017-02-21", convFixLambda) << "\n";
+  auto convFixLambda = [](const std::string& pStr) { return static_cast<int>(roundf(100.0f * stof(pStr))); };
+  std::cout << "fixpointlambda  = " << doc.GetCell<int>("Close", "2017-02-21", convFixLambda) << "\n";
 
-      std::cout << "mystruct        = " << doc.GetCell<MyStruct>("Close", "2017-02-21", ConvMyStruct).val << "\n";
-    }
+  std::cout << "mystruct        = " << doc.GetCell<MyStruct>("Close", "2017-02-21", ConvMyStruct).val << "\n";
+}
 ```
 
 Reading CSV Data from a Stream or String
@@ -426,31 +429,31 @@ functionality. Here is a simple example reading CSV data from a string:
 
 [ex007.cpp](examples/ex007.cpp) content:
 ```cpp
-    #include <iostream>
-    #include <vector>
+#include <iostream>
+#include <vector>
 
-    #include <rapidcsv/rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 
-    int main()
-    {
-      const std::string& csv =
-        "Date,Open,High,Low,Close,Volume,Adj Close\n"
-        "2017-02-24,64.529999,64.800003,64.139999,64.620003,21705200,64.620003\n"
-        "2017-02-23,64.419998,64.730003,64.190002,64.620003,20235200,64.620003\n"
-        "2017-02-22,64.330002,64.389999,64.050003,64.360001,19259700,64.360001\n"
-        "2017-02-21,64.610001,64.949997,64.449997,64.489998,19384900,64.489998\n"
-        "2017-02-17,64.470001,64.690002,64.300003,64.620003,21234600,64.620003\n"
-        ;
+int main()
+{
+  const std::string& csv =
+    "Date,Open,High,Low,Close,Volume,Adj Close\n"
+    "2017-02-24,64.529999,64.800003,64.139999,64.620003,21705200,64.620003\n"
+    "2017-02-23,64.419998,64.730003,64.190002,64.620003,20235200,64.620003\n"
+    "2017-02-22,64.330002,64.389999,64.050003,64.360001,19259700,64.360001\n"
+    "2017-02-21,64.610001,64.949997,64.449997,64.489998,19384900,64.489998\n"
+    "2017-02-17,64.470001,64.690002,64.300003,64.620003,21234600,64.620003\n"
+    ;
 
-      std::stringstream sstream(csv);
-      rapidcsv::Document doc(sstream, rapidcsv::LabelParams(0, 0));
+  std::stringstream sstream(csv);
+  rapidcsv::Document doc(sstream, rapidcsv::LabelParams(0, 0));
 
-      std::vector<float> close = doc.GetColumn<float>("Close");
-      std::cout << "Read " << close.size() << " values." << std::endl;
+  std::vector<float> close = doc.GetColumn<float>("Close");
+  std::cout << "Read " << close.size() << " values." << std::endl;
 
-      long long volume = doc.GetCell<long long>("Volume", "2017-02-22");
-      std::cout << "Volume " << volume << " on 2017-02-22." << std::endl;
-    }
+  long long volume = doc.GetCell<long long>("Volume", "2017-02-22");
+  std::cout << "Volume " << volume << " on 2017-02-22." << std::endl;
+}
 ```
 
 Data Conversion Precision
@@ -461,71 +464,71 @@ by implementing a complete conversion cycle i.e    data -> string -> data
 
 [exConv001.cpp](examples/exConv001.cpp) content:
 ```cpp
-    #include <iostream>
-    #include <vector>
-    #include <iomanip>
-    #include <cmath>
+#include <iostream>
+#include <vector>
+#include <iomanip>
+#include <cmath>
 
-    #include <rapidcsv/converter.h>
+#include <rapidcsv/converter.h>
 
-    namespace rapidcsv
+namespace rapidcsv
+{
+  template<>
+  struct ConverterToVal<int,2,0>
+  {
+    static int ToVal(const std::string& pStr)
     {
-      template<>
-      struct ConverterToVal<int,2,0>
-      {
-        static int ToVal(const std::string& pStr)
-        {
-          return static_cast<int>(roundf(100.0f * std::stof(pStr)));
-        }
-      };
-
-      template<typename T>
-      struct ConverterToStr<T,2>
-      {
-        static std::string ToStr(const typename
-                                 std::enable_if<std::is_floating_point<T>::value, T>::type & val)
-        {
-          std::ostringstream out;
-          out.precision( std::numeric_limits<T>::digits10 + 1 );
-          out << std::fixed << val;
-          return out.str();
-        }
-      };
+      return static_cast<int>(roundf(100.0f * std::stof(pStr)));
     }
+  };
 
-    template<typename T>
-    void testType(const std::string& typeData, const T& orgT)
+  template<typename T>
+  struct ConverterToStr<T,2>
+  {
+    static std::string ToStr(const typename
+                             std::enable_if<std::is_floating_point<T>::value, T>::type & val)
     {
-      const std::string strT = rapidcsv::ConverterToStr<T>::ToStr(orgT);
-      const T convT = rapidcsv::ConverterToVal<T>::ToVal(strT);
-
-      std::cout << std::setprecision(25) << "org" << typeData << " = " << orgT << " ; str"
-                << typeData << " = " << strT << " ; conv" << typeData << " = " << convT << std::endl; }
-
-    int main()
-    {
-
-      testType<int>("Int", -100);
-      testType<long>("Long", -10000000);
-      testType<long long>("LongLong", -10000000000);
-      testType<unsigned>("Unsigned", 100);
-      testType<unsigned long>("UnsignedLong", 10000000);
-      testType<unsigned long long>("UnsignedLongLong", 10000000000);
-      testType<float>("Float", 313.1234567890123456789012345F);
-      testType<double>("Double", 3462424.1234567890123456789012345);
-      testType<long double>("LongDouble", 23453.1234567890123456789012345L);
-      testType<char>("Char", 'G');
-
-      std::cout << "using specialization" << std::endl;
-
-      const long double orgLongDouble = 100.1234567890123456789012345L;
-      const std::string strLongDouble = rapidcsv::ConverterToStr<long double,2>::ToStr(orgLongDouble);
-      const int convInt = rapidcsv::ConverterToVal<int,2,0>::ToVal(strLongDouble);
-
-      std::cout << "orgLongDouble = " << orgLongDouble << " ; strLongDouble = "
-                << strLongDouble << " ; convInt = " << convInt << std::endl;
-
+      std::ostringstream out;
+      out.precision( std::numeric_limits<T>::digits10 + 1 );
+      out << std::fixed << val;
+      return out.str();
     }
+  };
+}
+
+template<typename T>
+void testType(const std::string& typeData, const T& orgT)
+{
+  const std::string strT = rapidcsv::ConverterToStr<T>::ToStr(orgT);
+  const T convT = rapidcsv::ConverterToVal<T>::ToVal(strT);
+
+  std::cout << std::setprecision(25) << "org" << typeData << " = " << orgT << " ; str"
+            << typeData << " = " << strT << " ; conv" << typeData << " = " << convT << std::endl; }
+
+int main()
+{
+
+  testType<int>("Int", -100);
+  testType<long>("Long", -10000000);
+  testType<long long>("LongLong", -10000000000);
+  testType<unsigned>("Unsigned", 100);
+  testType<unsigned long>("UnsignedLong", 10000000);
+  testType<unsigned long long>("UnsignedLongLong", 10000000000);
+  testType<float>("Float", 313.1234567890123456789012345F);
+  testType<double>("Double", 3462424.1234567890123456789012345);
+  testType<long double>("LongDouble", 23453.1234567890123456789012345L);
+  testType<char>("Char", 'G');
+
+  std::cout << "using specialization" << std::endl;
+
+  const long double orgLongDouble = 100.1234567890123456789012345L;
+  const std::string strLongDouble = rapidcsv::ConverterToStr<long double,2>::ToStr(orgLongDouble);
+  const int convInt = rapidcsv::ConverterToVal<int,2,0>::ToVal(strLongDouble);
+
+  std::cout << "orgLongDouble = " << orgLongDouble << " ; strLongDouble = "
+            << strLongDouble << " ; convInt = " << convInt << std::endl;
+
+}
 ```
 
 Reading a File with Invalid Numbers (e.g. Empty Cells) as Numeric Data
@@ -542,11 +545,10 @@ refer `struct NaNaccess<T,1>`) and by default it's `std::numeric_limits<T>::sign
 for float-point types, and 0 for integer types. Example:
 
 ```cpp
-    rapidcsv::Document doc("file.csv", rapidcsv::LabelParams(),
-                           rapidcsv::SeparatorParams());
-    ...
-    int cellVAl = doc.GetCell("colName", rowIdx, rapidcsv::ConverterToVal<int,1,1>::ToVal);
-```
+rapidcsv::Document doc("file.csv", rapidcsv::LabelParams(),
+                       rapidcsv::SeparatorParams());
+...
+int cellVAl = doc.GetCell("colName", rowIdx, rapidcsv::ConverterToVal<int,1,1>::ToVal);
 
 Check if a Column Exists
 ------------------------
@@ -555,10 +557,10 @@ the column and row names. To check whether a particular column name exists
 one can for example do:
 
 ```cpp
-    rapidcsv::Document doc("file.csv");
-    std::vector<std::string> columnNames = doc.GetColumnNames();
-    bool columnExists =
-      (std::find(columnNames.begin(), columnNames.end(), "A") != columnNames.end());
+rapidcsv::Document doc("file.csv");
+std::vector<std::string> columnNames = doc.GetColumnNames();
+bool columnExists =
+  (std::find(columnNames.begin(), columnNames.end(), "A") != columnNames.end());
 ```
 
 Handling Quoted Cells
@@ -568,12 +570,12 @@ By default rapidcsv automatically dequotes quoted cells (i.e. removes the encaps
 passing `pAutoQuote = false` in `SeparatorParams`, example:
 
 ```cpp
-    rapidcsv::Document doc("file.csv", rapidcsv::LabelParams(),
-                           rapidcsv::SeparatorParams(',' /* pSeparator */, 
-                                                     false /* pTrim */, 
-                                                     rapidcsv::sPlatformHasCR /* pHasCR */,
-                                                     false /* pQuotedLinebreaks */, 
-                                                     false /* pAutoQuote */));
+rapidcsv::Document doc("file.csv", rapidcsv::LabelParams(),
+                       rapidcsv::SeparatorParams(',' /* pSeparator */,
+                                                 false /* pTrim */,
+                                                 rapidcsv::sPlatformHasCR /* pHasCR */,
+                                                 false /* pQuotedLinebreaks */,
+                                                 false /* pAutoQuote */));
 ```
 
 Skipping Empty and Comment Lines
@@ -582,19 +584,17 @@ Rapidcsv reads all lines by default, but may be called to ignore comment lines
 starting with a specific character, example:
 
 ```cpp
-    rapidcsv::Document doc("file.csv", rapidcsv::LabelParams(), rapidcsv::SeparatorParams(),
-                           rapidcsv::LineReaderParams(true /* pSkipCommentLines */,
-                                                      '#' /* pCommentPrefix */));
-```
+rapidcsv::Document doc("file.csv", rapidcsv::LabelParams(), rapidcsv::SeparatorParams(),
+                       rapidcsv::LineReaderParams(true /* pSkipCommentLines */,
+                                                  '#' /* pCommentPrefix */));
 
 Using LineReaderParams it is also possible to skip empty lines, example:
 
 ```cpp
-    rapidcsv::Document doc("file.csv", rapidcsv::LabelParams(), rapidcsv::SeparatorParams(),
-                           rapidcsv::LineReaderParams(false /* pSkipCommentLines */,
-                                                      '#' /* pCommentPrefix */,
-                                                      true /* pSkipEmptyLines */));
-```
+rapidcsv::Document doc("file.csv", rapidcsv::LabelParams(), rapidcsv::SeparatorParams(),
+                       rapidcsv::LineReaderParams(false /* pSkipCommentLines */,
+                                                  '#' /* pCommentPrefix */,
+                                                  true /* pSkipEmptyLines */));
 
 UTF-16 and UTF-8
 ----------------
