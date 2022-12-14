@@ -58,7 +58,7 @@ a run-time exception.
 Inside some of the for-loops in upstream-repo, Conditional branching based on result of `std::distance(...)`
 has been eliminated by shifting-ahead the starting iterator of the for-loop.
 
-### Code changes if anyone wants to upgrade from the [upstream repo](https://github.com/d99kris/rapidcsv)
+### Breaking changes from the [upstream repo](https://github.com/d99kris/rapidcsv)
 Where `struct ConverterParams` is passed as a parameter to `class Document` constructor, delete this parameter.
 
 Instead, for all Getter functions of `Document` objects, use template parameters ...
@@ -587,6 +587,7 @@ starting with a specific character, example:
 rapidcsv::Document doc("file.csv", rapidcsv::LabelParams(), rapidcsv::SeparatorParams(),
                        rapidcsv::LineReaderParams(true /* pSkipCommentLines */,
                                                   '#' /* pCommentPrefix */));
+```
 
 Using LineReaderParams it is also possible to skip empty lines, example:
 
@@ -595,6 +596,7 @@ rapidcsv::Document doc("file.csv", rapidcsv::LabelParams(), rapidcsv::SeparatorP
                        rapidcsv::LineReaderParams(false /* pSkipCommentLines */,
                                                   '#' /* pCommentPrefix */,
                                                   true /* pSkipEmptyLines */));
+```
 
 UTF-16 and UTF-8
 ----------------

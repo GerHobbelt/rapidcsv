@@ -228,7 +228,7 @@ namespace rapidcsv
     {
       size_t rowIdx = 0;
       ssize_t viewRowIdx = 0;
-      const ssize_t rowIdxStart = static_cast<ssize_t>(_document.GetDataRowIndex(0));
+      const ssize_t rowIdxStart = static_cast<ssize_t>(_document.GetDataRowIndex(0).dataIdx);
       for (auto itRow = _document.mData.begin() + rowIdxStart;
            itRow != _document.mData.end(); ++itRow, ++rowIdx)
       {
@@ -252,7 +252,7 @@ namespace rapidcsv
       RowComparator<Types...> sortPredicate(spArgs...);
       std::map<const RowIndex<Types...>, size_t, RowComparator<Types...>> sortedData(sortPredicate);
       size_t rowIdx = 0;
-      const ssize_t rowIdxStart = static_cast<ssize_t>(_document.GetDataRowIndex(0));
+      const ssize_t rowIdxStart = static_cast<ssize_t>(_document.GetDataRowIndex(0).dataIdx);
       for (auto itRow = _document.mData.begin() + rowIdxStart;
            itRow != _document.mData.end(); ++itRow, ++rowIdx)
       {
@@ -297,8 +297,8 @@ namespace rapidcsv
                                  f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T, USE_NUMERIC_LOCALE,
                                                                                    USE_NAN>::ToVal) const
     {
-      const size_t dataColumnIdx = _document.GetDataColumnIndex(pColumnIdx);
-      const size_t firstRowIdx = _document.GetDataRowIndex(0);
+      const size_t dataColumnIdx = _document.GetDataColumnIndex(pColumnIdx).dataIdx;
+      const size_t firstRowIdx = _document.GetDataRowIndex(0).dataIdx;
       std::vector<T> column;
       for (auto itViewRowIdx = _mapViewRowIdx2RowIdx.begin();
            itViewRowIdx != _mapViewRowIdx2RowIdx.end(); ++itViewRowIdx)
@@ -315,7 +315,7 @@ namespace rapidcsv
         {
           const std::string errStr = "ViewDocument::GetViewColumn() # requested column index " +
             std::to_string(pColumnIdx) + " >= " +
-            std::to_string(row.size() - _document.GetDataColumnIndex(0)) +
+            std::to_string(row.size() - _document.GetDataColumnIndex(0).dataIdx) +
             " (number of columns on row index " + std::to_string(rowIdx) + ")";
           throw std::out_of_range(errStr);
         }
