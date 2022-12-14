@@ -5,10 +5,10 @@ Rapidcsv (FilterSort)
 |-----------|---------|-------------|
 | [![Linux](https://github.com/panchaBhuta/rapidcsv_FilterSort/workflows/Linux/badge.svg)](https://github.com/panchaBhuta/rapidcsv_FilterSort/actions?query=workflow%3ALinux) | [![macOS](https://github.com/panchaBhuta/rapidcsv_FilterSort/workflows/macOS/badge.svg)](https://github.com/panchaBhuta/rapidcsv_FilterSort/actions?query=workflow%3AmacOS) | [![Windows](https://github.com/panchaBhuta/rapidcsv_FilterSort/workflows/Windows/badge.svg)](https://github.com/panchaBhuta/rapidcsv_FilterSort/actions?query=workflow%3AWindows) |
 
-Rapidcsv is an easy-to-use C++ CSV parser library. It supports C++11 (and
+Rapidcsv is an easy-to-use C++ CSV parser library. It supports C++20 (and
 later), is header-only and comes with a basic test suite.
 
-The [library of upstream repo](https://github.com/d99kris/rapidcsv) was  in featured book
+The [library of upstream repo](https://github.com/d99kris/rapidcsv) was featured in book
 [C++20 for Programmers](https://deitel.com/c-plus-plus-20-for-programmers/).
 
 Differences with the [upstream repo](https://github.com/d99kris/rapidcsv)
@@ -61,12 +61,9 @@ has been eliminated by shifting-ahead the starting iterator of the for-loop.
 ### Breaking changes from the [upstream repo](https://github.com/d99kris/rapidcsv)
 Where `struct ConverterParams` is passed as a parameter to `class Document` constructor, delete this parameter.
 
-Instead, for all Getter functions of `Document` objects, use template parameters ...
-
-`<typename T, USE_NUMERIC_LOCALE, USE_NAN>`
-
-and for all Setter functions of `Document` objects, use template parameters ...
-
+Instead, for all Getter functions of `Document` objects, use template parameters ...  
+`<typename T, USE_NUMERIC_LOCALE, USE_NAN>`  
+and for all Setter functions of `Document` objects, use template parameters ...  
 `<typename T, USE_NUMERIC_LOCALE>`.
 
 
@@ -87,13 +84,11 @@ static std::string ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr(const T & pVal)
 As unsupported types will result in compilation error, exception for `class no_converter` needs to be removed from your code.
 
 ### View rows using Filter and Sort on columns
-Filter on rows using template class `FilterDocument`. Similar to SQL `WHERE`.
-
-Sort rows using template class `SortDocument`. Similar to SQL `ORDER BY`.
-
+Filter on rows using template class `FilterDocument`. Similar to SQL `WHERE`.  
+Sort rows using template class `SortDocument`. Similar to SQL `ORDER BY`.  
 Both filter and sort is provided by template class `FilterSortDocument`.
 
-For usage examples refer [tests/testView*](tests/testView001.cpp)
+For usage examples refer any of [tests/testView*.cpp](tests/testView001.cpp)
 
 Example Usage
 =============
@@ -141,14 +136,11 @@ Installation
 ============
 Simply copy ...
 
-[include/rapidcsv/rapidcsv.h](https://raw.githubusercontent.com/panchaBhuta/rapidcsv_FilterSort/blob/master/include/rapidcsv/rapidcsv.h)
-
-[include/rapidcsv/converter.h](https://raw.githubusercontent.com/panchaBhuta/rapidcsv_FilterSort/blob/master/include/rapidcsv/converter.h)
-
+[include/rapidcsv/rapidcsv.h](https://raw.githubusercontent.com/panchaBhuta/rapidcsv_FilterSort/blob/master/include/rapidcsv/rapidcsv.h)  
+[include/rapidcsv/converter.h](https://raw.githubusercontent.com/panchaBhuta/rapidcsv_FilterSort/blob/master/include/rapidcsv/converter.h)  
 [include/rapidcsv/view.h](https://raw.githubusercontent.com/panchaBhuta/rapidcsv_FilterSort/blob/master/include/rapidcsv/converter.h)
 
-... to your project/include/rapidcsv/ directory and include it. OR alternatively you can call script ...
-
+... to your project/include/rapidcsv/ directory and include it. OR alternatively you can call script ...  
 `./install.sh </dir-path/to/install/>`
 
 
@@ -539,8 +531,8 @@ conversion routines' exceptions to the calling application.
 
 The reason for this is to ensure data correctness. If one wants to be able
 to read data with invalid numbers as numeric data types, one can set
-template param `USE_NAN=1` to configure the converter to default to a 'NAN' value.
-The value is configurable (by Specialized Class implementation of struct NaNaccess\<T,USE_NAN\>,
+template param `USE_NAN=1` to configure the converter to default to a 'NAN' value.  
+This value is configurable (by Specialized Class implementation of struct NaNaccess\<T,USE_NAN\>,
 refer `struct NaNaccess<T,1>`) and by default it's `std::numeric_limits<T>::signaling_NaN()` 
 for float-point types, and 0 for integer types. Example:
 
@@ -549,6 +541,7 @@ rapidcsv::Document doc("file.csv", rapidcsv::LabelParams(),
                        rapidcsv::SeparatorParams());
 ...
 int cellVAl = doc.GetCell("colName", rowIdx, rapidcsv::ConverterToVal<int,1,1>::ToVal);
+```
 
 Check if a Column Exists
 ------------------------
