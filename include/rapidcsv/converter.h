@@ -20,6 +20,7 @@
 #include <sstream>
 #include <type_traits>
 
+#include <chrono>
 
 namespace rapidcsv
 {
@@ -54,14 +55,13 @@ namespace rapidcsv
      * @returns                       output T data-type
      */
     static
-    typename std::enable_if<0 != USE_NAN, T>::type ToVal(const std::string& pStr)
+    typename std::enable_if<0 != USE_NAN, T>::type
+             ToVal(const std::string& pStr)
     {
       try
       {
         return ConverterToVal<T, USE_NUMERIC_LOCALE, 0>::ToVal(pStr);
-      }
-      catch (...)
-      {
+      } catch (...) {
         return idNaN<T, USE_NAN>;
       }
     }
@@ -79,8 +79,8 @@ namespace rapidcsv
      * @returns                       output T data-type
      */
     inline static
-    typename std::enable_if<!std::is_same<T, std::string>::value && (0 != USE_NUMERIC_LOCALE), T>::type ToVal(
-      const std::string& pStr)
+    typename std::enable_if<!std::is_same<T, std::string>::value && (0 != USE_NUMERIC_LOCALE), T>::type
+             ToVal(const std::string& pStr)
     {
       return rapidcsv::ToVal<T, USE_NUMERIC_LOCALE>(pStr);
     }
@@ -99,7 +99,8 @@ namespace rapidcsv
      * @returns                       output T data-type
      */
     static
-    typename std::enable_if<!std::is_same<T, std::string>::value, T>::type ToVal(const std::string& pStr)
+    typename std::enable_if<!std::is_same<T, std::string>::value, T>::type
+             ToVal(const std::string& pStr)
     {
       T val;
       std::istringstream iss(pStr);
@@ -114,6 +115,20 @@ namespace rapidcsv
       return val;
     }
   };
+
+  std::chrono::year_month_day
+  ToYMD(const std::string& pStr, std::string::value_type* fmt)
+  {
+    std::chrono::year_month_day ymd;
+    std::istringstream iss(pStr);
+    std::chrono::from_stream(iss, fmt, ymd);
+    return ymd;
+  }
+
+  auto createToYMDfunction(std::string::value_type* fmt)
+  {
+    return std::bind(ToYMD,std::placeholders::_1,fmt);
+  }
 
   /**
    * @brief     Specialized implementation handling string to string conversion.
@@ -222,7 +237,8 @@ namespace rapidcsv
      */
     static
     typename std::enable_if<!std::is_same<T, std::string>::value &&
-                            !std::is_same<T, char>::value, std::string>::type ToStr(const T& pVal)
+                            !std::is_same<T, char>::value, std::string>::type
+             ToStr(const T& pVal)
     {
       std::ostringstream oss;
       oss << pVal;
@@ -251,8 +267,9 @@ namespace rapidcsv
      */
     inline static
     // refer  ::  https://stackoverflow.com/questions/11055923/stdenable-if-parameter-vs-template-parameter/11056146#11056146
-    typename std::enable_if<std::is_integral<T>::value && (!std::is_same<T, char>::value), std::string>::type ToStr(
-      const T& pVal)
+    typename std::enable_if<std::is_integral<T>::value &&
+                            (!std::is_same<T, char>::value), std::string>::type
+             ToStr( const T& pVal)
     {
       // refer :: https://en.cppreference.com/w/cpp/string/basic_string/to_string
       return std::to_string(pVal);
@@ -271,8 +288,9 @@ namespace rapidcsv
      * @returns                       string
      */
     inline static
-    typename std::enable_if<std::is_floating_point<T>::value && (!std::is_same<T, char>::value),
-                            std::string>::type ToStr(const T& pVal)
+    typename std::enable_if<std::is_floating_point<T>::value &&
+                           (!std::is_same<T, char>::value), std::string>::type
+             ToStr(const T& pVal)
     {
       /*
          WARNING :: With floating point types std::to_string may yield unexpected results as the number

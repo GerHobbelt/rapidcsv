@@ -23,6 +23,7 @@ int main()
     "5,7,49,2401\n"
     "6,7,64,4096\n"
     "7,7,81,6561\n"
+    "8,-1,2,3\n"
   ;
 
   std::string path = unittest::TempPath();
@@ -35,7 +36,7 @@ int main()
     /////   Sort
     const rapidcsv::SortParams<int> spA(1, rapidcsv::ToVal<int, 1>);
     const rapidcsv::SortParams<int> spD(2, rapidcsv::ToVal<int, 1>, rapidcsv::e_SortOrder::DESCEND);
-    rapidcsv::SortDocument<int, int> viewdoc1(doc, spA, spD);
+    rapidcsv::FilterSortDocument<isFirstCellPositive, int, int> viewdoc1(doc, spA, spD);
 
     unittest::ExpectEqual(int, viewdoc1.GetViewRowCount(), 7);
 
@@ -54,9 +55,7 @@ int main()
     unittest::ExpectEqual(std::string, viewdoc1.GetViewCell<std::string>(0, 6), "7");
     unittest::ExpectEqual(std::string, viewdoc1.GetViewCell<std::string>(1, 6), "49");
     unittest::ExpectEqual(std::string, viewdoc1.GetViewCell<std::string>(2, 6), "2401");
-  }
-  catch (const std::exception& ex)
-  {
+  } catch (const std::exception& ex) {
     std::cout << ex.what() << std::endl;
     rv = 1;
   }

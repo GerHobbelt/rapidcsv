@@ -607,6 +607,11 @@ Rapidcsv may be included in a CMake project using FetchContent. Refer to the
 [CMake FetchContent Example Project](examples/cmake-fetchcontent) and in
 particular its [CMakeLists.txt](examples/cmake-fetchcontent/CMakeLists.txt).
 
+CMake ExternalProject_Add
+-------------------------
+Rapidcsv may be included in a CMake project using ExternalProject_Add. Refer [here]
+(https://github.com/panchaBhuta/cmakeExampleExternalProjectAdd)
+
 Locale Independent Parsing
 --------------------------
 Rapidcsv uses locale-dependent conversion functions when parsing float-type values from string
@@ -673,5 +678,5 @@ https://github.com/panchaBhuta/rapidcsv_FilterSort/tree/master
 
 Keywords
 ========
-c++, c++11, csv parser, comma separated values, single header library.
+c++, c++20, csv parser, comma separated values, single header library.
 

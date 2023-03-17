@@ -42,8 +42,7 @@ namespace rapidcsv
       rawDataColumnIndex(RAW_DATA_COLUMN_INDEX),
       convFuncToVal(pConvFuncToVal),
       sortOrder(SORT_ORDER)
-    {
-    }
+    {}
 
     T getValue(const Document::t_dataRow& row) const
     {
@@ -64,9 +63,8 @@ namespace rapidcsv
              const SortParams<T>& pSortParams,
              const SPtypes & ... spArgs)
       : value(pSortParams.getValue(row)),
-      nextIndex(row, spArgs...)
-    {
-    }
+        nextIndex(row, spArgs...)
+    {}
 
     bool operator < (const RowIndex<T, Types...>& other) const
     {
@@ -106,8 +104,7 @@ namespace rapidcsv
     RowIndex(const Document::t_dataRow& row,
              const SortParams<T>& pSortParams)
       : value(pSortParams.getValue(row))
-    {
-    }
+    {}
 
     inline bool operator < (const RowIndex<T>& other) const
     {
@@ -128,7 +125,7 @@ namespace rapidcsv
 
     typedef bool (RowComparator<T, Types...>::* tf_sortOrder)
       (const RowIndex<T, Types...>& lhVal,
-      const RowIndex<T, Types...>& rhVal) const;
+       const RowIndex<T, Types...>& rhVal) const;
 
     const tf_sortOrder _sortOrder;
 
@@ -169,11 +166,10 @@ namespace rapidcsv
     RowComparator(const SortParams<T>& pSortParams,
                   const SPtypes & ... spArgs)
       : _nextColumnInfo(spArgs...),
-      _sortOrder((e_SortOrder::ASCEND == pSortParams.sortOrder) ?
+        _sortOrder((e_SortOrder::ASCEND == pSortParams.sortOrder) ?
                  &RowComparator<T, Types...>::_ascendingOrder :
                  &RowComparator<T, Types...>::_descendingOrder)
-    {
-    }
+    {}
 
     bool operator () (const RowIndex<T, Types...>& lhVal,
                       const RowIndex<T, Types...>& rhVal) const
@@ -189,7 +185,7 @@ namespace rapidcsv
 
     typedef bool (RowComparator<T>::* tf_sortOrder)
       (const RowIndex<T>& lhVal,
-      const RowIndex<T>& rhVal) const;
+       const RowIndex<T>& rhVal) const;
 
     const tf_sortOrder _sortOrder;
 
@@ -210,8 +206,7 @@ namespace rapidcsv
       : _sortOrder((e_SortOrder::ASCEND == pSortParams.sortOrder) ?
                    &RowComparator<T>::_ascendingOrder :
                    &RowComparator<T>::_descendingOrder)
-    {
-    }
+    {}
 
     bool operator () (const RowIndex<T>& lhVal, const RowIndex<T>& rhVal) const
     {
@@ -237,9 +232,7 @@ namespace rapidcsv
           _mapViewRowIdx2RowIdx.push_back(rowIdx);
           _mapRowIdx2ViewRowIdx.push_back(viewRowIdx);
           ++viewRowIdx;
-        }
-        else
-        {
+        } else {
           _mapRowIdx2ViewRowIdx.push_back(-10);
         }
       }
@@ -294,8 +287,8 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     std::vector<T> GetViewColumn(const size_t pColumnIdx,
-                                 f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T, USE_NUMERIC_LOCALE,
-                                                                                   USE_NAN>::ToVal) const
+                                 f_ConvFuncToVal<T> pConvertToVal
+                                     = ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const size_t dataColumnIdx = _document.GetDataColumnIndex(pColumnIdx).dataIdx;
       const size_t firstRowIdx = _document.GetDataRowIndex(0).dataIdx;
@@ -310,9 +303,7 @@ namespace rapidcsv
           const std::string& cellStrVal = row.at(dataColumnIdx);
           T val = pConvertToVal(cellStrVal);
           column.push_back(val);
-        }
-        else
-        {
+        } else {
           const std::string errStr = "ViewDocument::GetViewColumn() # requested column index " +
             std::to_string(pColumnIdx) + " >= " +
             std::to_string(row.size() - _document.GetDataColumnIndex(0).dataIdx) +
@@ -415,7 +406,6 @@ namespace rapidcsv
                                 ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const size_t docRowIdx = GetDocumentRowIdx(pRowName);
-
       return _document.GetRow<T, USE_NUMERIC_LOCALE, USE_NAN>(docRowIdx, pConvertToVal);
     }
 
@@ -454,7 +444,7 @@ namespace rapidcsv
       }
 
       return _document.GetCell<T, USE_NUMERIC_LOCALE, USE_NAN>(
-        static_cast<size_t>(columnIdx), docRowIdx, pConvertToVal);
+              static_cast<size_t>(columnIdx), docRowIdx, pConvertToVal);
     }
 
     /**
@@ -466,7 +456,8 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     T GetViewCell(const std::string& pColumnName, const size_t pViewRowIdx,
-                  f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
+                  f_ConvFuncToVal<T> pConvertToVal
+                        = ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const ssize_t columnIdx = _document.GetColumnIdx(pColumnName);
       if (columnIdx < 0)
@@ -486,10 +477,10 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     T GetViewCell(const size_t pColumnIdx, const std::string& pRowName,
-                  f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
+                  f_ConvFuncToVal<T> pConvertToVal
+                        = ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const size_t docRowIdx = GetDocumentRowIdx(pRowName);
-
       return _document.GetCell<T, USE_NUMERIC_LOCALE, USE_NAN>(pColumnIdx, docRowIdx, pConvertToVal);
     }
 
@@ -506,15 +497,11 @@ namespace rapidcsv
   public:
     explicit FilterDocument(const Document& document)
       : ViewDocument<evaluateBooleanExpression, Types...>(document)
-    {
-    }
+    {}
   };
 
 
-  constexpr bool selectAll(const Document::t_dataRow&)
-  {
-    return true;
-  }
+  constexpr bool selectAll(const Document::t_dataRow&) { return true; }
   template<typename... Types>
   class SortDocument : public ViewDocument<selectAll, Types...>
   {
@@ -522,8 +509,7 @@ namespace rapidcsv
     template<typename... SPtypes>
     explicit SortDocument(const Document& document, const SPtypes & ... spArgs)
       : ViewDocument<selectAll, Types...>(document, spArgs...)
-    {
-    }
+    {}
   };
 
 
@@ -534,7 +520,6 @@ namespace rapidcsv
     template<typename... SPtypes>
     explicit FilterSortDocument(const Document& document, const SPtypes & ... spArgs)
       : ViewDocument<evaluateBooleanExpression, Types...>(document, spArgs...)
-    {
-    }
+    {}
   };
 }

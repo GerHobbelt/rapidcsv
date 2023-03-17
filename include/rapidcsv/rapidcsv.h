@@ -125,8 +125,7 @@ namespace rapidcsv
       , mQuotedLinebreaks(pQuotedLinebreaks)
       , mAutoQuote(pAutoQuote)
       , mQuoteChar(pQuoteChar)
-    {
-    }
+    {}
 
     /**
      * @brief   specifies the column separator.
@@ -179,8 +178,7 @@ namespace rapidcsv
       : mSkipCommentLines(pSkipCommentLines)
       , mCommentPrefix(pCommentPrefix)
       , mSkipEmptyLines(pSkipEmptyLines)
-    {
-    }
+    {}
 
     /**
      * @brief   specifies whether to skip lines prefixed with mCommentPrefix.
