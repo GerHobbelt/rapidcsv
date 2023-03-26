@@ -166,9 +166,9 @@ namespace rapidcsv
     RowComparator(const SortParams<T>& pSortParams,
                   const SPtypes & ... spArgs)
       : _nextColumnInfo(spArgs...),
-        _sortOrder((e_SortOrder::ASCEND == pSortParams.sortOrder) ?
-                 &RowComparator<T, Types...>::_ascendingOrder :
-                 &RowComparator<T, Types...>::_descendingOrder)
+        _sortOrder(  (e_SortOrder::ASCEND == pSortParams.sortOrder) ?
+                     &RowComparator<T, Types...>::_ascendingOrder :
+                     &RowComparator<T, Types...>::_descendingOrder  )
     {}
 
     bool operator () (const RowIndex<T, Types...>& lhVal,

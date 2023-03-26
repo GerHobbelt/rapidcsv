@@ -126,10 +126,9 @@ The [tests](tests/) directory also contains many simple usage examples.
 
 Supported Platforms
 ===================
-Rapidcsv is implemented using C++11 with the intention of being portable. It's
-been tested on:
+Rapidcsv is implemented using C++20 with the intention of being portable. It's been tested on:
+- Ubuntu 22.04 LTS
 - macOS Big Sur 11.0
-- Ubuntu 20.04 LTS
 - Windows 10 / Visual Studio 2019
 
 Installation
