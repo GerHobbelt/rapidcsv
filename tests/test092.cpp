@@ -1,4 +1,4 @@
-// test087.cpp - numeric c locale
+// test092.cpp - numeric c++ locale
 
 #include <clocale>
 #include <rapidcsv/rapidcsv.h>
@@ -8,10 +8,15 @@ int main()
 {
   int rv = 0;
 
-  std::string loc = "de_DE.UTF-8"; // uses comma (,) as decimal separator
-  if (std::setlocale(LC_ALL, loc.c_str()) == nullptr)
+  std::string loc = "de_DE"; // uses comma (,) as decimal separator
+  try
   {
-    std::cout << "locale " << loc << " not available, skipping test.\n";
+    std::locale::global(std::locale(loc));
+  }
+  catch (const std::exception& ex)
+  {
+    std::cout << "locale " << loc << " not available (" << ex.what()
+              << "), skipping test.\n";
     // pass test for systems without locale present. for ci testing, make.sh
     // ensures that the necessary locale is installed.
     return 0;
@@ -49,12 +54,9 @@ int main()
       rapidcsv::LabelParams labelParams(0, 0);
       rapidcsv::SeparatorParams separatorParams;
       rapidcsv::Document doc(path, labelParams, separatorParams);
-      // Note: 'ExceptEqual' is a macro-function; comma in "<float, 0, 0>" messes up the call.
-      // Using macro-variable 'COMMA' is a workaround "<float COMMA 0 COMMA 0>".
-      // doc.GetCell<float COMMA 0 COMMA 0>  ->  doc.GetCell<float, USE_NUMERIC_LOCALE=0, 0> : do not honor numeric locale
-      unittest::ExpectEqual(float, doc.GetCell<float COMMA 0 COMMA 0>("A", "2"), 0.1f);
-      unittest::ExpectEqual(float, doc.GetCell<float COMMA 0 COMMA 0>("B", "2"), 0.01f);
-      unittest::ExpectEqual(float, doc.GetCell<float COMMA 0 COMMA 0>("C", "2"), 0.001f);
+      unittest::ExpectEqual(float, doc.GetCell<float COMMA 0>("A", "2"), 0.1f);
+      unittest::ExpectEqual(float, doc.GetCell<float COMMA 0>("B", "2"), 0.01f);
+      unittest::ExpectEqual(float, doc.GetCell<float COMMA 0>("C", "2"), 0.001f);
     }
   }
   catch (const std::exception& ex)

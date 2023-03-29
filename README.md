@@ -126,9 +126,16 @@ The [tests](tests/) directory also contains many simple usage examples.
 
 Supported Platforms
 ===================
+<<<<<<< HEAD
 Rapidcsv is implemented using C++20 with the intention of being portable. It's been tested on:
 - Ubuntu 22.04 LTS
 - macOS Big Sur 11.0
+=======
+Rapidcsv is implemented using C++11 with the intention of being portable. It's
+been tested on:
+- macOS Ventura 13.0
+- Ubuntu 22.04 LTS
+>>>>>>> d99kris_master
 - Windows 10 / Visual Studio 2019
 
 Installation
@@ -142,6 +149,10 @@ Simply copy ...
 ... to your project/include/rapidcsv/ directory and include it. OR alternatively you can call script ...  
 `./install.sh </dir-path/to/install/>`
 
+
+Rapidcsv is also available via
+[vcpkg](https://vcpkg.io/en/packages.html) and
+[conan](https://conan.io/center/rapidcsv) package managers.
 
 More Examples
 =============
@@ -494,7 +505,8 @@ void testType(const std::string& typeData, const T& orgT)
   const T convT = rapidcsv::ConverterToVal<T>::ToVal(strT);
 
   std::cout << std::setprecision(25) << "org" << typeData << " = " << orgT << " ; str"
-            << typeData << " = " << strT << " ; conv" << typeData << " = " << convT << std::endl; }
+            << typeData << " = " << strT << " ; conv" << typeData << " = " << convT << std::endl;
+}
 
 int main()
 {

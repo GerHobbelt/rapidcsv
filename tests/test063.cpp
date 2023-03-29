@@ -63,6 +63,15 @@ int main()
 
     unittest::ExpectEqual(int, doc.GetColumn<Struct>(0, ToStruct).at(0).val, 100);
     unittest::ExpectEqual(int, doc.GetColumn<Struct>("B", ToStruct).at(0).val, 1000);
+
+    /*
+     * all sytem types are supported by default. 
+     * any type conversion errors are caught at compile time.
+    // Missing custom conversion function
+    ExpectException(doc.GetColumn<bool>(0), rapidcsv::no_converter);
+    ExpectExceptionMsg(doc.GetColumn<bool>(0), rapidcsv::no_converter,
+                       "unsupported conversion datatype");
+    */
   }
   catch (const std::exception& ex)
   {

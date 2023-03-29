@@ -2,12 +2,12 @@
  * converter.h
  *
  * URL:      https://github.com/panchaBhuta/rapidcsv_FilterSort
- * Version:  2.0.fs-8.68
+ * Version:  2.0.fs-8.75
  *
- * Copyright (C) 2022-2022 Gautam Dhar
+ * Copyright (C) 2022-2023 Gautam Dhar
  * All rights reserved.
  *
- * rapidcsv_CT is distributed under the BSD 3-Clause license, see LICENSE for details.
+ * rapidcsv_FilterSort is distributed under the BSD 3-Clause license, see LICENSE for details.
  *
  */
 
@@ -19,6 +19,7 @@
 #include <string>
 #include <sstream>
 #include <type_traits>
+#include <iomanip>
 
 //#include <chrono>
 
@@ -107,6 +108,11 @@ namespace rapidcsv
     {
       T val;
       std::istringstream iss(pStr);
+      if(  std::is_same<T, float>::value  ||
+           std::is_same<T, double>::value ||
+           std::is_same<T, long double>::value ) {
+        iss.imbue(std::locale::classic());
+      }
       iss >> val;
       if (iss.fail() || iss.bad() || !iss.eof())
       {
@@ -226,17 +232,28 @@ namespace rapidcsv
   template<typename T>
   using f_ConvFuncToStr = std::function<std::string(const T & pVal)>;
 
-  template<typename T, int USE_NUMERIC_LOCALE>
+  template<typename T, int USE_NUMERIC_LOCALE, int decimalPrecision>
   inline std::string ToStr(const T& pVal);
 
+  template<typename T>
+  constexpr int getDecimalPrecision()
+  {
+    return (   std::is_same<T, float>::value  ? 9  :
+            (  std::is_same<T, double>::value ? 17 :
+             ( std::is_same<T, long double>::value ? 25 :
+               -1 ) ) );
+  }
 
   /**
    * @brief     Class providing conversion from numerical datatypes to strings.
    *            Use specialization for custom datatype conversions.
    */
-  template<typename T, int USE_NUMERIC_LOCALE = 0>
+  template<typename T, int USE_NUMERIC_LOCALE=0,
+           const int DECIMAL_PRECISION=-1>   // default value triggers a call to getDecimalPrecision<T>()
   struct ConverterToStr
   {
+    constexpr static int decimalPrecision = (DECIMAL_PRECISION<0) ? getDecimalPrecision<T>() : DECIMAL_PRECISION;
+
     /**
      * @brief   Converts a numerical value to string.
      * @param   pVal                  numerical value
@@ -246,15 +263,22 @@ namespace rapidcsv
     typename std::enable_if<(!std::is_same<T, std::string>::value) &&
                                    (!std::is_same<T, char>::value),
                             std::string>::type
-             ToStr(const T& pVal)
+    ToStr(const T& pVal)
     {
       std::ostringstream oss;
-      oss << pVal;
+      if(     std::is_same<T, float>::value  ||
+              std::is_same<T, double>::value ||
+              std::is_same<T, long double>::value) {
+        oss << std::defaultfloat << std::setprecision(decimalPrecision) << pVal;
+      } else {
+        oss << pVal;
+      }
+
       if (oss.fail() || oss.bad()) // || !oss.eof())
       {
         std::string errMsg("Error: in function ConverterToStr<T,USE_NUMERIC_LOCALE="
-                           + std::to_string(
-                             USE_NUMERIC_LOCALE) + ">::ToStr(...) -> ostringstream: no conversion for template type");
+                           + std::to_string(USE_NUMERIC_LOCALE) + ", DECIMAL_PRECISION=" + std::to_string(DECIMAL_PRECISION)
+                           + ">::ToStr(...) -> ostringstream: no conversion for template type");
         throw std::invalid_argument(errMsg);
       }
       return oss.str();

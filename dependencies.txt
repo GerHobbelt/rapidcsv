@@ -1,0 +1,44 @@
+sudo apt install curl
+sudo apt-get install libcurl4-openssl-dev 
+
+Dependencies
+============
+cmake_minimum_required(VERSION 3.24 FATAL_ERROR). Default cmake version is less than 3.24, hence uninstall default version and install the latest version. Refer the [cmake installation steps here](https://askubuntu.com/questions/355565/how-do-i-install-the-latest-version-of-cmake-from-the-command-line). These steps works are for Ubuntu-22.
+
+```bash
+sudo apt remove --purge --auto-remove cmake
+
+sudo apt update
+sudo apt install build-essential libtool autoconf unzip wget
+
+version=3.26
+build=0
+## don't modify from here
+mkdir ~/temp
+cd ~/temp
+wget https://cmake.org/files/v$version/cmake-$version.$build.tar.gz
+tar -xzvf cmake-$version.$build.tar.gz
+cd cmake-$version.$build/
+
+./bootstrap
+make -j$(nproc)
+sudo make install
+
+cmake --version
+```
+
+Merge Conflicting Files
+=======================
+https://stackoverflow.com/questions/22215651/why-doesnt-git-diff-show-anything-for-unmerged-paths
+REFER:::   git ls-files -s  somefile.txt
+
+$ git ls-files -s include/rapidcsv/rapidcsv.h
+100644 c98a6372f811ec5db5cdd08f4339ea92e6d81396 1	include/rapidcsv/rapidcsv.h   >>> save as include/rapidcsv/rapidcsv_commonAncestor.h
+100644 571cbcee55b2f91dc9a11c7c0f3b1b3abb9402fd 2	include/rapidcsv/rapidcsv.h   >>> save as include/rapidcsv/rapidcsv_myHEAD.h
+100644 a08ae20cd5b78b81ba49f3470e8fa11bfb2143c9 3	include/rapidcsv/rapidcsv.h   >>> save as include/rapidcsv/rapidcsv_theirHEAD.h
+
+cp include/rapidcsv/rapidcsv.h include/rapidcsv/rapidcsv_gitAutoMerge.h
+cp include/rapidcsv/rapidcsv.h include/rapidcsv/rapidcsv_manualMerge.h
+
+
+open in meld 3 way compare to manually merge :::  rapidcsv_commonAncestor.h : rapidcsv_theirHEAD.h : rapidcsv_manualMerge.h

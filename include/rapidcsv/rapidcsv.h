@@ -2,19 +2,19 @@
  * rapidcsv.h
  *
  * URL:      https://github.com/panchaBhuta/rapidcsv_FilterSort
- * Version:  2.0.fs-8.68
+ * Version:  2.0.fs-8.75
  *
- * Copyright (C) 2022-2022 Gautam Dhar
+ * Copyright (C) 2022-2023 Gautam Dhar
  * All rights reserved.
- * rapidcsv_CT is distributed under the BSD 3-Clause license, see LICENSE for details.
+ * rapidcsv_FilterSort is distributed under the BSD 3-Clause license, see LICENSE for details.
  *
  *
  * ***********************************************************************************
  *
  * URL:      https://github.com/d99kris/rapidcsv
- * Version:  8.68
+ * Version:  8.75
  *
- * Copyright (C) 2017-2022 Kristofer Berggren
+ * Copyright (C) 2017-2023 Kristofer Berggren
  * All rights reserved.
  *
  * rapidcsv is distributed under the BSD 3-Clause license, see LICENSE for details.
@@ -51,6 +51,7 @@ namespace rapidcsv
 #else
   static const bool sPlatformHasCR = false;
 #endif
+  static const std::vector<char> s_Utf8BOM = { '\xef', '\xbb', '\xbf' };
 
 
   /**
@@ -318,7 +319,7 @@ namespace rapidcsv
      * @brief   Write Document data to stream.
      * @param   pStream               specifies a binary output stream to write the data to.
      */
-    void Save(std::ostream& pStream)
+    void Save(std::ostream& pStream) const
     {
       WriteCsv(pStream);
     }
@@ -336,6 +337,7 @@ namespace rapidcsv
       mIsUtf16 = false;
       mIsLE = false;
 #endif
+      mHasUtf8BOM = false;
     }
 
     /**
@@ -368,7 +370,7 @@ namespace rapidcsv
     {
       const size_t dataColumnIdx = GetDataColumnIndex(pColumnIdx).dataIdx;
       std::vector<T> column;
-      size_t rowIdx = 0;
+      size_t rowIdx = GetDataRowIndex(0).dataIdx;
       for (auto itRow = mData.begin() + static_cast<ssize_t>(GetDataRowIndex(0).dataIdx);
            itRow != mData.end(); ++itRow, ++rowIdx)
       {
@@ -383,7 +385,7 @@ namespace rapidcsv
           const std::string errStr = "Document::GetColumn() # requested column index " +
             std::to_string(pColumnIdx) + " >= " +
             std::to_string(itRow->size() - GetDataColumnIndex(0).dataIdx) +
-            " (number of columns on row index " + std::to_string(rowIdx) + ")";
+            " (number of columns on row index " + std::to_string(rowIdx-GetDataColumnIndex(0).dataIdx) + ")";
           throw std::out_of_range(errStr);
         }
       }
@@ -430,16 +432,16 @@ namespace rapidcsv
 
       if ((dataColumnIdx + 1) > GetDataColumnCount())
       {
-        for (auto itRow = mData.begin(); itRow != mData.end(); ++itRow)
+        for (auto itRow = mData.begin(); itRow != mData.end(); ++itRow) // + static_cast<ssize_t>(GetDataRowIndex(0).dataIdx)
         {
           itRow->resize(GetDataColumnIndex(dataColumnIdx + 1).dataIdx);
         }
       }
 
       size_t rowIdx = GetDataRowIndex(0).dataIdx;
-      for (auto itRow = pColumn.begin(); itRow != pColumn.end(); ++itRow, ++rowIdx)
+      for (auto itCell = pColumn.begin(); itCell != pColumn.end(); ++itCell, ++rowIdx)
       {
-        mData.at(rowIdx).at(dataColumnIdx) = pConvertToStr(*itRow);
+        mData.at(rowIdx).at(dataColumnIdx) = pConvertToStr(*itCell);
       }
     }
 
@@ -468,7 +470,7 @@ namespace rapidcsv
     void RemoveColumn(const size_t pColumnIdx)
     {
       const ssize_t dataColumnIdx = static_cast<ssize_t>(GetDataColumnIndex(pColumnIdx).dataIdx);
-      for (auto itRow = mData.begin(); itRow != mData.end(); ++itRow)
+      for (auto itRow = mData.begin(); itRow != mData.end(); ++itRow)  // + static_cast<ssize_t>(GetDataRowIndex(0).dataIdx)
       {
         itRow->erase(itRow->begin() + dataColumnIdx);
       }
@@ -514,9 +516,9 @@ namespace rapidcsv
       {
         column.resize(GetDataRowIndex(pColumn.size()).dataIdx);
         size_t rowIdx = GetDataRowIndex(0).dataIdx;
-        for (auto itRow = pColumn.begin(); itRow != pColumn.end(); ++itRow, ++rowIdx)
+        for (auto itCell = pColumn.begin(); itCell != pColumn.end(); ++itCell, ++rowIdx)
         {
-          column.at(rowIdx) = pConvertToStr(*itRow);
+          column.at(rowIdx) = pConvertToStr(*itCell);
         }
       }
 
@@ -533,6 +535,7 @@ namespace rapidcsv
       {
         itRow->insert(itRow->begin() + static_cast<ssize_t>(dataColumnIdx), column.at(rowIdx));
       }
+
 
       if (!pColumnName.empty())
       {
@@ -632,7 +635,7 @@ namespace rapidcsv
 
       if (pRow.size() > GetDataColumnCount())
       {
-        for (auto itRow = mData.begin(); itRow != mData.end(); ++itRow)
+        for (auto itRow = mData.begin(); itRow != mData.end(); ++itRow)  // + static_cast<ssize_t>(GetDataRowIndex(0).dataIdx)
         {
           itRow->resize(GetDataColumnIndex(pRow.size()).dataIdx);
         }
@@ -854,7 +857,7 @@ namespace rapidcsv
 
       if ((dataColumnIdx + 1) > GetDataColumnCount())
       {
-        for (auto itRow = mData.begin(); itRow != mData.end(); ++itRow)
+        for (auto itRow = mData.begin(); itRow != mData.end(); ++itRow)  // + static_cast<ssize_t>(GetDataRowIndex(0).dataIdx)
         {
           itRow->resize(dataColumnIdx + 1);
         }
@@ -934,7 +937,7 @@ namespace rapidcsv
      * @param   pColumnIdx            zero-based column index.
      * @returns column name.
      */
-    std::string GetColumnName(const size_t pColumnIdx)
+    std::string GetColumnName(const size_t pColumnIdx) const
     {
       const size_t dataColumnIdx = GetDataColumnIndex(pColumnIdx).dataIdx;
       if (mLabelParams.mColumnNameIdx < 0)
@@ -979,7 +982,7 @@ namespace rapidcsv
      * @brief   Get column names
      * @returns vector of column names.
      */
-    std::vector<std::string> GetColumnNames()
+    std::vector<std::string> GetColumnNames() const
     {
       if (mLabelParams.mColumnNameIdx >= 0)
       {
@@ -996,7 +999,7 @@ namespace rapidcsv
      * @param   pRowIdx               zero-based column index.
      * @returns row name.
      */
-    std::string GetRowName(const size_t pRowIdx)
+    std::string GetRowName(const size_t pRowIdx) const
     {
       const size_t dataRowIdx = GetDataRowIndex(pRowIdx).dataIdx;
       if (mLabelParams.mRowNameIdx < 0)
@@ -1044,8 +1047,7 @@ namespace rapidcsv
       std::vector<std::string> rownames;
       if (mLabelParams.mRowNameIdx >= 0)
       {
-        const ssize_t rowIdx = static_cast<ssize_t>(GetDataRowIndex(0).dataIdx);
-        for (auto itRow = mData.begin() + rowIdx; itRow != mData.end(); ++itRow)
+        for (auto itRow = mData.begin() + static_cast<ssize_t>(GetDataRowIndex(0).dataIdx); itRow != mData.end(); ++itRow)
         {
           rownames.push_back(itRow->at(static_cast<size_t>(mLabelParams.mRowNameIdx)));
         }
@@ -1114,8 +1116,8 @@ namespace rapidcsv
         {
           std::vector<char> bom3b(3, '\0');
           pStream.read(bom3b.data(), 3);
-          static const std::vector<char> bomU8 = { '\xef', '\xbb', '\xbf' };
-          if (bom3b != bomU8)
+
+          if (bom3b != s_Utf8BOM)
           {
             // file does not start with a UTF-8 Byte order mark
             pStream.seekg(0, std::ios::beg);
@@ -1124,6 +1126,7 @@ namespace rapidcsv
           {
             // file did start with a UTF-8 Byte order mark, simply skip it
             length -= 3;
+            mHasUtf8BOM = true;
           }
         }
 
@@ -1282,6 +1285,11 @@ namespace rapidcsv
         std::ofstream stream;
         stream.exceptions(std::ofstream::failbit | std::ofstream::badbit);
         stream.open(mPath, std::ios::binary | std::ios::trunc);
+        if (mHasUtf8BOM)
+        {
+          stream.write(s_Utf8BOM.data(), 3);
+        }
+
         WriteCsv(stream);
       }
     }
@@ -1324,7 +1332,8 @@ namespace rapidcsv
 
     inline size_t GetDataColumnCount() const
     {
-      return (mData.size() > 0) ? mData.at(0).size() : 0;
+      const size_t firstDataRow = static_cast<size_t>((mLabelParams.mColumnNameIdx >= 0) ? mLabelParams.mColumnNameIdx : 0);
+      return (mData.size() > firstDataRow) ? mData.at(firstDataRow).size() : 0;
     }
 
     /**
@@ -1459,6 +1468,7 @@ namespace rapidcsv
     bool mIsUtf16 = false;
     bool mIsLE = false;
 #endif
+    bool mHasUtf8BOM = false;
 
 
     template<Document::f_EvalBoolExpr evaluateBooleanExpression, typename... Types>
