@@ -1,8 +1,52 @@
 # Project
 cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
-project(rapidcsv VERSION 2.0.08.68 LANGUAGES CXX)
+project(rapidcsv VERSION 2.01.08.75 LANGUAGES CXX)
 set (CMAKE_CXX_STANDARD 20)
 #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+
+
+try_compile(USE_CHRONO_LIB
+            SOURCES  "${CMAKE_SOURCE_DIR}/tests/checkChrono.cpp"
+            CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
+            COMPILE_DEFINITIONS "-DUSE_CHRONO=1"
+            CXX_STANDARD "${CMAKE_CXX_STANDARD}"
+            CXX_STANDARD_REQUIRED True
+            )
+
+if(USE_CHRONO_LIB)
+  message(STATUS "Using date-time-lib : <chrono>")
+  add_definitions(-DUSE_CHRONO=1)
+else()
+  message(STATUS "Using date-time-lib : <date/date.h>")
+  add_definitions(-DUSE_CHRONO=0)
+
+    include( FetchContent )
+    FetchContent_Declare( date
+      GIT_REPOSITORY https://github.com/HowardHinnant/date.git
+      GIT_TAG        v3.0.1  # adjust tag/branch/commit as needed
+    )
+    FetchContent_MakeAvailable(date)
+
+    #FetchContent_GetProperties(date)
+    #if(NOT date_POPULATED)
+    #  FetchContent_Populate(date)
+
+    #  add_subdirectory(${date_SOURCE_DIR} ${date_BINARY_DIR} EXCLUDE_FROM_ALL)
+    #endif()
+endif()
+#[==============================================[
+#]==============================================]
+
+
+
+
+
+
+
+
+
+
+
 if(MSVC)
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
     string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -32,6 +76,29 @@ endif()
 # Library
 add_library(rapidcsv INTERFACE)
 target_include_directories(rapidcsv INTERFACE include)
+
+
+# Install / Uninstall targets for standalone rapidcsv build
+#if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+  message(STATUS "Install/uninstall targets enabled.")
+
+  # Install
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/rapidcsv.h
+                ${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/converter.h
+                ${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/view.h
+          DESTINATION include/rapidcsv/)
+  export(TARGETS rapidcsv FILE cmake/rapidcsvTargets.cmake)
+
+
+  # Uninstall
+  add_custom_target(uninstall COMMAND "${CMAKE_COMMAND}" -E remove "${CMAKE_INSTALL_PREFIX}/include/rapidcsv")
+
+#else()
+#  message(STATUS "Install/uninstall targets disabled.")
+#endif()
+
+
+
 
 # Ccache
 find_program(CCACHE_PROGRAM ccache)
@@ -66,7 +133,7 @@ if(RAPIDCSV_BUILD_TESTS)
       FILE(GLOB sources tests/${testname}*.cpp)
       add_executable(${testname} ${sources})
       add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/${testname}")
-      target_link_libraries(${testname} PUBLIC rapidcsv)
+      target_link_libraries(${testname} PUBLIC rapidcsv date)
     endif()
   endmacro(add_perf_test)
 
@@ -76,7 +143,7 @@ if(RAPIDCSV_BUILD_TESTS)
       FILE(GLOB sources tests/${testname}*.cpp)
       add_executable(${testname} ${sources})
       add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/${testname}")
-      target_link_libraries(${testname} PUBLIC rapidcsv)
+      target_link_libraries(${testname} PUBLIC rapidcsv date)
     endif()
   endmacro(add_unit_test)
 
@@ -205,7 +272,7 @@ if(RAPIDCSV_BUILD_TESTS)
   macro(add_example testname)
     if(CMAKE_BUILD_TYPE MATCHES "Debug")
       add_executable(${testname} examples/${testname}.cpp)
-      target_link_libraries(${testname} PUBLIC rapidcsv)
+      target_link_libraries(${testname} PUBLIC rapidcsv date)
     endif()
   endmacro(add_example)
 
@@ -220,21 +287,4 @@ if(RAPIDCSV_BUILD_TESTS)
   add_example(ex009 examples/ex009.cpp)
   add_example(exConv001 examples/exConv001.cpp)
 
-endif()
-
-# Install / Uninstall targets for standalone rapidcsv build
-if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
-  message(STATUS "Install/uninstall targets enabled.")
-
-  # Install
-  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/rapidcsv.h
-                ${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/converter.h
-                ${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/view.h
-          DESTINATION include/rapidcsv/)
-
-  # Uninstall
-  add_custom_target(uninstall COMMAND "${CMAKE_COMMAND}" -E remove "${CMAKE_INSTALL_PREFIX}/include/rapidcsv")
-
-else()
-  message(STATUS "Install/uninstall targets disabled.")
 endif()

@@ -2,7 +2,7 @@
  * converter.h
  *
  * URL:      https://github.com/panchaBhuta/rapidcsv_FilterSort
- * Version:  2.01.fs-8.75
+ * Version:  v2.01.fs-8.75
  *
  * Copyright (C) 2022-2023 Gautam Dhar
  * All rights reserved.
@@ -18,13 +18,24 @@
 #include <limits>
 #include <string>
 #include <sstream>
-#include <type_traits>
 #include <iomanip>
 
-//#include <chrono>
+
+#if  USE_CHRONO == 1
+  #include <chrono>
+#else
+  #include <date/date.h>
+#endif
+
 
 namespace rapidcsv
 {
+#if  USE_CHRONO == 1
+  namespace datelib = std::chrono;
+#else
+  namespace datelib = date;
+#endif
+
 
   template<typename T>
   using f_ConvFuncToVal = std::function<T(const std::string & pStr)>;
@@ -108,9 +119,10 @@ namespace rapidcsv
     {
       T val;
       std::istringstream iss(pStr);
-      if(  std::is_same<T, float>::value  ||
-           std::is_same<T, double>::value ||
-           std::is_same<T, long double>::value ) {
+      if constexpr (  std::is_same<T, float>::value  ||
+                      std::is_same<T, double>::value ||
+                      std::is_same<T, long double>::value )
+      {
         iss.imbue(std::locale::classic());
       }
       iss >> val;
@@ -126,6 +138,11 @@ namespace rapidcsv
   };
 
 /*
+  template<int USE_NUMERIC_LOCALE, int USE_NAN>
+  struct ConverterToVal<datelib::year_month_day, USE_NUMERIC_LOCALE, USE_NAN>
+  {
+  };
+
   static
   std::chrono::year_month_day
              ToYMD(const std::string& pStr, std::string::value_type* fmt)
@@ -232,7 +249,7 @@ namespace rapidcsv
   template<typename T>
   using f_ConvFuncToStr = std::function<std::string(const T & pVal)>;
 
-  template<typename T, int USE_NUMERIC_LOCALE, int decimalPrecision>
+  template<typename T, int USE_NUMERIC_LOCALE>
   inline std::string ToStr(const T& pVal);
 
   template<typename T>
@@ -266,9 +283,10 @@ namespace rapidcsv
     ToStr(const T& pVal)
     {
       std::ostringstream oss;
-      if(     std::is_same<T, float>::value  ||
-              std::is_same<T, double>::value ||
-              std::is_same<T, long double>::value) {
+      if constexpr(    std::is_same<T, float>::value  ||
+                       std::is_same<T, double>::value ||
+                       std::is_same<T, long double>::value)
+      {
         oss << std::defaultfloat << std::setprecision(decimalPrecision) << pVal;
       } else {
         oss << pVal;

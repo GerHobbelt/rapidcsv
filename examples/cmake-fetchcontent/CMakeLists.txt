@@ -1,12 +1,12 @@
-cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
 project(cmake-fetchcontent)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
 
 include(FetchContent)
 FetchContent_Declare(
   rapidcsv
-  GIT_REPOSITORY "https://github.com/d99kris/rapidcsv.git"
-  GIT_TAG        "v8.50"
+  GIT_REPOSITORY "https://github.com/panchaBhuta/rapidcsv_FilterSort.git"
+  GIT_TAG        "v2.01.fs-8.75"
 )
 FetchContent_MakeAvailable(rapidcsv)
 
