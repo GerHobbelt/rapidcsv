@@ -11,39 +11,33 @@ try_compile(USE_CHRONO_LIB
             COMPILE_DEFINITIONS "-DUSE_CHRONO=1"
             CXX_STANDARD "${CMAKE_CXX_STANDARD}"
             CXX_STANDARD_REQUIRED True
-            )
+           )
 
 if(USE_CHRONO_LIB)
   message(STATUS "Using date-time-lib : <chrono>")
   add_definitions(-DUSE_CHRONO=1)
+  unset(DATELIB)
 else()
   message(STATUS "Using date-time-lib : <date/date.h>")
   add_definitions(-DUSE_CHRONO=0)
+  set(DATELIB date)
 
-    include( FetchContent )
-    FetchContent_Declare( date
+  include( FetchContent )
+  FetchContent_Declare( ${DATELIB}
       GIT_REPOSITORY https://github.com/HowardHinnant/date.git
       GIT_TAG        v3.0.1  # adjust tag/branch/commit as needed
     )
-    FetchContent_MakeAvailable(date)
+  FetchContent_MakeAvailable(${DATELIB})
 
-    #FetchContent_GetProperties(date)
-    #if(NOT date_POPULATED)
-    #  FetchContent_Populate(date)
+  #FetchContent_GetProperties(${DATELIB})
+  #if(NOT ${DATELIB}_POPULATED)
+  #  FetchContent_Populate(${DATELIB})
 
-    #  add_subdirectory(${date_SOURCE_DIR} ${date_BINARY_DIR} EXCLUDE_FROM_ALL)
-    #endif()
+  #  add_subdirectory(${${DATELIB}_SOURCE_DIR} ${${DATELIB}_BINARY_DIR} EXCLUDE_FROM_ALL)
+  #endif()
 endif()
 #[==============================================[
 #]==============================================]
-
-
-
-
-
-
-
-
 
 
 
@@ -133,11 +127,7 @@ if(RAPIDCSV_BUILD_TESTS)
       FILE(GLOB sources tests/${testname}*.cpp)
       add_executable(${testname} ${sources})
       add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/${testname}")
-      if(USE_CHRONO_LIB)
-        target_link_libraries(${testname} PUBLIC rapidcsv)
-      else()
-        target_link_libraries(${testname} PUBLIC rapidcsv date)
-      endif()
+      target_link_libraries(${testname} PUBLIC rapidcsv ${DATELIB})
     endif()
   endmacro(add_perf_test)
 
@@ -147,11 +137,7 @@ if(RAPIDCSV_BUILD_TESTS)
       FILE(GLOB sources tests/${testname}*.cpp)
       add_executable(${testname} ${sources})
       add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/${testname}")
-      if(USE_CHRONO_LIB)
-        target_link_libraries(${testname} PUBLIC rapidcsv)
-      else()
-        target_link_libraries(${testname} PUBLIC rapidcsv date)
-      endif()
+      target_link_libraries(${testname} PUBLIC rapidcsv ${DATELIB})
     endif()
   endmacro(add_unit_test)
 
@@ -280,11 +266,7 @@ if(RAPIDCSV_BUILD_TESTS)
   macro(add_example testname)
     if(CMAKE_BUILD_TYPE MATCHES "Debug")
       add_executable(${testname} examples/${testname}.cpp)
-      if(USE_CHRONO_LIB)
-        target_link_libraries(${testname} PUBLIC rapidcsv)
-      else()
-        target_link_libraries(${testname} PUBLIC rapidcsv date)
-      endif()
+      target_link_libraries(${testname} PUBLIC rapidcsv ${DATELIB})
     endif()
   endmacro(add_example)
 

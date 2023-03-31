@@ -366,7 +366,7 @@ namespace rapidcsv
     template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     std::vector<T> GetColumn(const size_t pColumnIdx,
                              f_ConvFuncToVal<T> pConvertToVal =
-                               ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
+                               ConvertFromStr<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const size_t dataColumnIdx = GetDataColumnIndex(pColumnIdx).dataIdx;
       std::vector<T> column;
@@ -401,7 +401,7 @@ namespace rapidcsv
     template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     std::vector<T> GetColumn(const std::string& pColumnName,
                              f_ConvFuncToVal<T> pConvertToVal =
-                               ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
+                               ConvertFromStr<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const ssize_t columnIdx = GetColumnIdx(pColumnName);
       if (columnIdx < 0)
@@ -419,7 +419,7 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE = 0>
     void SetColumn(const size_t pColumnIdx, const std::vector<T>& pColumn,
-                   f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
+                   f_ConvFuncToStr<T> pConvertToStr = ConvertFromVal<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       const size_t dataColumnIdx = GetDataColumnIndex(pColumnIdx).dataIdx;
 
@@ -453,7 +453,7 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE = 0>
     void SetColumn(const std::string& pColumnName, const std::vector<T>& pColumn,
-                   f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
+                   f_ConvFuncToStr<T> pConvertToStr = ConvertFromVal<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       const ssize_t columnIdx = GetColumnIdx(pColumnName);
       if (columnIdx < 0)
@@ -503,7 +503,7 @@ namespace rapidcsv
     template<typename T, int USE_NUMERIC_LOCALE = 0>
     void InsertColumn(const size_t pColumnIdx, const std::vector<T>& pColumn = std::vector<T>(),
                       const std::string& pColumnName = std::string(),
-                      f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
+                      f_ConvFuncToStr<T> pConvertToStr = ConvertFromVal<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       const size_t dataColumnIdx = GetDataColumnIndex(pColumnIdx).dataIdx;
 
@@ -582,7 +582,7 @@ namespace rapidcsv
     template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     std::vector<T> GetRow(const size_t pRowIdx,
                           f_ConvFuncToVal<T> pConvertToVal =
-                            ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
+                            ConvertFromStr<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const size_t dataRowIdx = GetDataRowIndex(pRowIdx).dataIdx;
       std::vector<T> row;
@@ -604,7 +604,7 @@ namespace rapidcsv
     template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     std::vector<T> GetRow(const std::string& pRowName,
                           f_ConvFuncToVal<T> pConvertToVal =
-                            ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
+                            ConvertFromStr<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       ssize_t rowIdx = GetRowIdx(pRowName);
       if (rowIdx < 0)
@@ -622,7 +622,7 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE = 0>
     void SetRow(const size_t pRowIdx, const std::vector<T>& pRow,
-                f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
+                f_ConvFuncToStr<T> pConvertToStr = ConvertFromVal<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       const size_t dataRowIdx = GetDataRowIndex(pRowIdx).dataIdx;
 
@@ -656,7 +656,7 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE = 0>
     void SetRow(const std::string& pRowName, const std::vector<T>& pRow,
-                f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
+                f_ConvFuncToStr<T> pConvertToStr = ConvertFromVal<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       ssize_t rowIdx = GetRowIdx(pRowName);
       if (rowIdx < 0)
@@ -702,7 +702,7 @@ namespace rapidcsv
     template<typename T, int USE_NUMERIC_LOCALE = 0>
     void InsertRow(const size_t pRowIdx, const std::vector<T>& pRow = std::vector<T>(),
                    const std::string& pRowName = std::string(),
-                   f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
+                   f_ConvFuncToStr<T> pConvertToStr = ConvertFromVal<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       const size_t rowIdx = GetDataRowIndex(pRowIdx).dataIdx;
 
@@ -758,7 +758,7 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     T GetCell(const size_t pColumnIdx, const size_t pRowIdx,
-              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
+              f_ConvFuncToVal<T> pConvertToVal = ConvertFromStr<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const size_t dataColumnIdx = GetDataColumnIndex(pColumnIdx).dataIdx;
       const size_t dataRowIdx = GetDataRowIndex(pRowIdx).dataIdx;
@@ -776,7 +776,7 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     T GetCell(const std::string& pColumnName, const std::string& pRowName,
-              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
+              f_ConvFuncToVal<T> pConvertToVal = ConvertFromStr<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const ssize_t columnIdx = GetColumnIdx(pColumnName);
       if (columnIdx < 0)
@@ -803,7 +803,7 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     T GetCell(const std::string& pColumnName, const size_t pRowIdx,
-              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
+              f_ConvFuncToVal<T> pConvertToVal = ConvertFromStr<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const ssize_t columnIdx = GetColumnIdx(pColumnName);
       if (columnIdx < 0)
@@ -823,7 +823,7 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     T GetCell(const size_t pColumnIdx, const std::string& pRowName,
-              f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
+              f_ConvFuncToVal<T> pConvertToVal = ConvertFromStr<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const ssize_t rowIdx = GetRowIdx(pRowName);
       if (rowIdx < 0)
@@ -843,7 +843,7 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE = 0>
     void SetCell(const size_t pColumnIdx, const size_t pRowIdx, const T& pCell,
-                 f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
+                 f_ConvFuncToStr<T> pConvertToStr = ConvertFromVal<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       const size_t dataColumnIdx = GetDataColumnIndex(pColumnIdx).dataIdx;
       const size_t dataRowIdx = GetDataRowIndex(pRowIdx).dataIdx;
@@ -875,7 +875,7 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE = 0>
     void SetCell(const std::string& pColumnName, const std::string& pRowName, const T& pCell,
-                 f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
+                 f_ConvFuncToStr<T> pConvertToStr = ConvertFromVal<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       const ssize_t columnIdx = GetColumnIdx(pColumnName);
       if (columnIdx < 0)
@@ -901,7 +901,7 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE = 0>
     void SetCell(const std::string& pColumnName, const size_t pRowIdx, const T& pCell,
-                 f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
+                 f_ConvFuncToStr<T> pConvertToStr = ConvertFromVal<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       const ssize_t columnIdx = GetColumnIdx(pColumnName);
       if (columnIdx < 0)
@@ -921,7 +921,7 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE = 0>
     void SetCell(const size_t pColumnIdx, const std::string& pRowName, const T& pCell,
-                 f_ConvFuncToStr<T> pConvertToStr = ConverterToStr<T, USE_NUMERIC_LOCALE>::ToStr)
+                 f_ConvFuncToStr<T> pConvertToStr = ConvertFromVal<T, USE_NUMERIC_LOCALE>::ToStr)
     {
       const ssize_t rowIdx = GetRowIdx(pRowName);
       if (rowIdx < 0)

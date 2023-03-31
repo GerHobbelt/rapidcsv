@@ -2,7 +2,7 @@
  * converter.h
  *
  * URL:      https://github.com/panchaBhuta/rapidcsv_FilterSort
- * Version:  v2.01.fs-8.75
+ * Version:  2.01.fs-8.75
  *
  * Copyright (C) 2022-2023 Gautam Dhar
  * All rights reserved.
@@ -27,7 +27,12 @@
   #include <date/date.h>
 #endif
 
-
+/*
+ *  NUMERIC_LOCALE : Number locales are specific settings for the 1000 separators and decimals.
+ *                   Some countries use 1.000,00. Others switch the dot and the comma for 1,000.00.
+ *                   Same goes for dates as there are different conventions on how to display
+ *                   the day, the month, the year.
+ */
 namespace rapidcsv
 {
 #if  USE_CHRONO == 1
@@ -58,7 +63,7 @@ namespace rapidcsv
    *            Use specialization for custom datatype conversions.
    */
   template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
-  struct ConverterToVal
+  struct ConvertFromStr
   {
     /**
      * @brief   Converts string holding a numerical value to numerical datatype representation.
@@ -68,11 +73,11 @@ namespace rapidcsv
      */
     static
     typename std::enable_if<0 != USE_NAN, T>::type
-             ToVal(const std::string& pStr)
+    ToVal(const std::string& pStr)
     {
       try
       {
-        return ConverterToVal<T, USE_NUMERIC_LOCALE, 0>::ToVal(pStr);
+        return ConvertFromStr<T, USE_NUMERIC_LOCALE, 0>::ToVal(pStr);
       } catch (...) {
         return idNaN<T, USE_NAN>;
       }
@@ -83,7 +88,7 @@ namespace rapidcsv
    * @brief     Specialized implementation where a Not-A-Number error is propagated to its callee.
    */
   template<typename T, int USE_NUMERIC_LOCALE>
-  struct ConverterToVal<T, USE_NUMERIC_LOCALE, 0>
+  struct ConvertFromStr<T, USE_NUMERIC_LOCALE, 0>
   {
     /**
      * @brief   Converts string holding a numerical value to numerical datatype representation.
@@ -94,7 +99,7 @@ namespace rapidcsv
     typename std::enable_if<(!std::is_same<T, std::string>::value) &&
                                    (0 != USE_NUMERIC_LOCALE),
                              T>::type
-             ToVal(const std::string& pStr)
+    ToVal(const std::string& pStr)
     {
       return rapidcsv::ToVal<T, USE_NUMERIC_LOCALE>(pStr);
     }
@@ -105,7 +110,7 @@ namespace rapidcsv
    *            On Not-A-Number error is thrown.
    */
   template<typename T>
-  struct ConverterToVal<T, 0, 0>
+  struct ConvertFromStr<T, 0, 0>
   {
     /**
      * @brief   Converts string holding a numerical value to numerical datatype representation.
@@ -115,7 +120,7 @@ namespace rapidcsv
     static
     typename std::enable_if<!std::is_same<T, std::string>::value,
                             T>::type
-             ToVal(const std::string& pStr)
+    ToVal(const std::string& pStr)
     {
       T val;
       std::istringstream iss(pStr);
@@ -129,7 +134,7 @@ namespace rapidcsv
       if (iss.fail() || iss.bad() || !iss.eof())
       {
         std::string errMsg(
-          "Error: in function ConverterToVal<T,USE_NUMERIC_LOCALE=0,USE_NAN=0>::ToVal(...) -> istringstream: no conversion for '");
+          "Error: in function ConvertFromStr<T,USE_NUMERIC_LOCALE=0,USE_NAN=0>::ToVal(...) -> istringstream: no conversion for '");
         errMsg = errMsg + pStr + "'";
         throw std::invalid_argument(errMsg);
       }
@@ -137,26 +142,25 @@ namespace rapidcsv
     }
   };
 
-/*
-  template<int USE_NUMERIC_LOCALE, int USE_NAN>
-  struct ConverterToVal<datelib::year_month_day, USE_NUMERIC_LOCALE, USE_NAN>
+  template<>
+  struct ConvertFromStr<datelib::year_month_day, 0, 0>
   {
+    static
+    datelib::year_month_day
+    ToYMD(const std::string& pStr, std::string::value_type* fmt)
+    {
+      datelib::year_month_day ymd;
+      std::istringstream iss(pStr);
+      datelib::from_stream(iss, fmt, ymd);
+      return ymd;
+    }
   };
 
-  static
-  std::chrono::year_month_day
-             ToYMD(const std::string& pStr, std::string::value_type* fmt)
-  {
-    std::chrono::year_month_day ymd;
-    std::istringstream iss(pStr);
-    std::chrono::from_stream(iss, fmt, ymd);
-    return ymd;
-  }
-
+/*
   static
   auto createToYMDfunction(std::string::value_type* fmt)
   {
-    return std::bind(ConverterToVal<T,0,0>::ToYMD,std::placeholders::_1,fmt);
+    return std::bind(ConvertFromStr<T,0,0>::ToYMD,std::placeholders::_1,fmt);
   }
 */
 
@@ -164,7 +168,7 @@ namespace rapidcsv
    * @brief     Specialized implementation handling string to string conversion.
    */
   template<int USE_NUMERIC_LOCALE>
-  struct ConverterToVal<std::string, USE_NUMERIC_LOCALE, 0>
+  struct ConvertFromStr<std::string, USE_NUMERIC_LOCALE, 0>
   {
     /**
      * @brief     Specialized implementation handling string to string conversion.
@@ -267,7 +271,7 @@ namespace rapidcsv
    */
   template<typename T, int USE_NUMERIC_LOCALE=0,
            const int DECIMAL_PRECISION=-1>   // default value triggers a call to getDecimalPrecision<T>()
-  struct ConverterToStr
+  struct ConvertFromVal
   {
     constexpr static int decimalPrecision = (DECIMAL_PRECISION<0) ? getDecimalPrecision<T>() : DECIMAL_PRECISION;
 
@@ -294,7 +298,7 @@ namespace rapidcsv
 
       if (oss.fail() || oss.bad()) // || !oss.eof())
       {
-        std::string errMsg("Error: in function ConverterToStr<T,USE_NUMERIC_LOCALE="
+        std::string errMsg("Error: in function ConvertFromVal<T,USE_NUMERIC_LOCALE="
                            + std::to_string(USE_NUMERIC_LOCALE) + ", DECIMAL_PRECISION=" + std::to_string(DECIMAL_PRECISION)
                            + ">::ToStr(...) -> ostringstream: no conversion for template type");
         throw std::invalid_argument(errMsg);
@@ -308,7 +312,7 @@ namespace rapidcsv
    */
   // for types refer :: https://en.cppreference.com/w/cpp/language/type
   template<typename T>
-  struct ConverterToStr<T, 1>
+  struct ConvertFromVal<T, 1>
   {
     /**
      * @brief   Converts numerical value to string using system numeric-local function.
@@ -320,7 +324,7 @@ namespace rapidcsv
     typename std::enable_if<std::is_integral<T>::value &&
                                    (!std::is_same<T, char>::value),
                             std::string>::type
-             ToStr( const T& pVal)
+    ToStr( const T& pVal)
     {
       // refer :: https://en.cppreference.com/w/cpp/string/basic_string/to_string
       return std::to_string(pVal);
@@ -331,7 +335,7 @@ namespace rapidcsv
    * @brief     Specialized implementation using Numeric-Local conversions.
    */
   template<typename T>
-  struct ConverterToStr<T, -1>
+  struct ConvertFromVal<T, -1>
   {
     /**
      * @brief   Converts floating point numbers to string using system numeric-local function.
@@ -342,7 +346,7 @@ namespace rapidcsv
     typename std::enable_if<std::is_floating_point<T>::value &&
                                     (!std::is_same<T, char>::value),
                             std::string>::type
-             ToStr(const T& pVal)
+    ToStr(const T& pVal)
     {
       /*
          WARNING :: With floating point types std::to_string may yield unexpected results as the number
@@ -375,7 +379,7 @@ namespace rapidcsv
    * @brief     Specialized implementation handling char to string conversion.
    */
   template<int USE_NUMERIC_LOCALE>
-  struct ConverterToStr<char, USE_NUMERIC_LOCALE>
+  struct ConvertFromVal<char, USE_NUMERIC_LOCALE>
   {
     /**
      * @brief     Specialized implementation handling string to string conversion.
@@ -392,7 +396,7 @@ namespace rapidcsv
    * @brief     Specialized implementation handling string to string conversion.
    */
   template<int USE_NUMERIC_LOCALE>
-  struct ConverterToStr<std::string, USE_NUMERIC_LOCALE>
+  struct ConvertFromVal<std::string, USE_NUMERIC_LOCALE>
   {
     /**
      * @brief     Specialized implementation handling string to string conversion.

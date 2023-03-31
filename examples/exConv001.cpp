@@ -15,7 +15,7 @@ exit ${RV}
 namespace rapidcsv
 {
   template<>
-  struct ConverterToVal<int,2,0>
+  struct ConvertFromStr<int,2,0>
   {
     static int ToVal(const std::string& pStr)
     {
@@ -24,7 +24,7 @@ namespace rapidcsv
   };
 
   template<typename T>
-  struct ConverterToStr<T,2>
+  struct ConvertFromVal<T,2>
   {
     static std::string ToStr(const typename
                              std::enable_if<std::is_floating_point<T>::value, T>::type & val)
@@ -40,8 +40,8 @@ namespace rapidcsv
 template<typename T>
 void testType(const std::string& typeData, const T& orgT)
 {
-  const std::string strT = rapidcsv::ConverterToStr<T>::ToStr(orgT);
-  const T convT = rapidcsv::ConverterToVal<T>::ToVal(strT);
+  const std::string strT = rapidcsv::ConvertFromVal<T>::ToStr(orgT);
+  const T convT = rapidcsv::ConvertFromStr<T>::ToVal(strT);
 
   std::cout << std::setprecision(25) << "org" << typeData << " = " << orgT << " ; str"
             << typeData << " = " << strT << " ; conv" << typeData << " = " << convT << std::endl;
@@ -65,8 +65,8 @@ int main()
   std::cout << "using specialization" << std::endl;
 
   const long double orgLongDouble = 100.1234567890123456789012345L;
-  const std::string strLongDouble = rapidcsv::ConverterToStr<long double,2>::ToStr(orgLongDouble);
-  const int convInt = rapidcsv::ConverterToVal<int,2,0>::ToVal(strLongDouble);
+  const std::string strLongDouble = rapidcsv::ConvertFromVal<long double,2>::ToStr(orgLongDouble);
+  const int convInt = rapidcsv::ConvertFromStr<int,2,0>::ToVal(strLongDouble);
 
   std::cout << "orgLongDouble = " << orgLongDouble << " ; strLongDouble = "
             << strLongDouble << " ; convInt = " << convInt << std::endl;

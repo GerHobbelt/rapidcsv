@@ -14,7 +14,7 @@ exit ${RV}
 namespace rapidcsv
 {
   template<>
-  struct ConverterToVal<int,1,0>
+  struct ConvertFromStr<int,1,0>
   {
     static int ToVal(const std::string& pStr)
     {

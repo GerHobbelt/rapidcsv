@@ -288,7 +288,7 @@ namespace rapidcsv
     template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     std::vector<T> GetViewColumn(const size_t pColumnIdx,
                                  f_ConvFuncToVal<T> pConvertToVal
-                                     = ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
+                                     = ConvertFromStr<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const size_t dataColumnIdx = _document.GetDataColumnIndex(pColumnIdx).dataIdx;
       const size_t firstRowIdx = _document.GetDataRowIndex(0).dataIdx;
@@ -322,7 +322,7 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     std::vector<T> GetViewColumn(const std::string& pColumnName,
-                                 f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T, USE_NUMERIC_LOCALE,
+                                 f_ConvFuncToVal<T> pConvertToVal = ConvertFromStr<T, USE_NUMERIC_LOCALE,
                                                                                    USE_NAN>::ToVal) const
     {
       const ssize_t columnIdx = _document.GetColumnIdx(pColumnName);
@@ -388,7 +388,7 @@ namespace rapidcsv
     template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     std::vector<T> GetViewRow(const size_t pViewRowIdx,
                               f_ConvFuncToVal<T> pConvertToVal =
-                                ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
+                                ConvertFromStr<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const size_t rowIdx = _mapViewRowIdx2RowIdx.at(pViewRowIdx);
       return _document.GetRow<T, USE_NUMERIC_LOCALE, USE_NAN>(rowIdx, pConvertToVal);
@@ -403,7 +403,7 @@ namespace rapidcsv
     template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     std::vector<T> GetViewRow(const std::string& pRowName,
                               f_ConvFuncToVal<T> pConvertToVal =
-                                ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
+                                ConvertFromStr<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const size_t docRowIdx = GetDocumentRowIdx(pRowName);
       return _document.GetRow<T, USE_NUMERIC_LOCALE, USE_NAN>(docRowIdx, pConvertToVal);
@@ -418,7 +418,7 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     T GetViewCell(const size_t pColumnIdx, const size_t pViewRowIdx,
-                  f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
+                  f_ConvFuncToVal<T> pConvertToVal = ConvertFromStr<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const size_t rowIdx = _mapViewRowIdx2RowIdx.at(pViewRowIdx);
       return _document.GetCell<T, USE_NUMERIC_LOCALE, USE_NAN>(pColumnIdx, rowIdx, pConvertToVal);
@@ -433,7 +433,7 @@ namespace rapidcsv
      */
     template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     T GetViewCell(const std::string& pColumnName, const std::string& pRowName,
-                  f_ConvFuncToVal<T> pConvertToVal = ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
+                  f_ConvFuncToVal<T> pConvertToVal = ConvertFromStr<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const size_t docRowIdx = GetDocumentRowIdx(pRowName);
 
@@ -457,7 +457,7 @@ namespace rapidcsv
     template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     T GetViewCell(const std::string& pColumnName, const size_t pViewRowIdx,
                   f_ConvFuncToVal<T> pConvertToVal
-                        = ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
+                        = ConvertFromStr<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const ssize_t columnIdx = _document.GetColumnIdx(pColumnName);
       if (columnIdx < 0)
@@ -478,7 +478,7 @@ namespace rapidcsv
     template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
     T GetViewCell(const size_t pColumnIdx, const std::string& pRowName,
                   f_ConvFuncToVal<T> pConvertToVal
-                        = ConverterToVal<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
+                        = ConvertFromStr<T, USE_NUMERIC_LOCALE, USE_NAN>::ToVal) const
     {
       const size_t docRowIdx = GetDocumentRowIdx(pRowName);
       return _document.GetCell<T, USE_NUMERIC_LOCALE, USE_NAN>(pColumnIdx, docRowIdx, pConvertToVal);
