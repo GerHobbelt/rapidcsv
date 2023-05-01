@@ -33,10 +33,18 @@ int main()
   rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(0, 0));
 
   std::cout << "regular         = " << doc.GetCell<int>("Close", "2017-02-21") << "\n";
-  std::cout << "fixpointfunc    = " << doc.GetCell<int>("Close", "2017-02-21", ConvFixPoint) << "\n";
+  std::cout << "fixpointfunc    = " << doc.GetCell<int, &ConvFixPoint>("Close", "2017-02-21") << "\n";
 
-  auto convFixLambda = [](const std::string& pStr) { return static_cast<int>(roundf(100.0f * stof(pStr))); };
-  std::cout << "fixpointlambda  = " << doc.GetCell<int>("Close", "2017-02-21", convFixLambda) << "\n";
+  /*
+    Lambda-expressions are not allowed in unevaluated expressions, template arguments,
+    alias declarations, typedef declarations, and anywhere in a function
+    (or function template) declaration except the function body and the function's default
+    arguments.  -- (until C++20)  -- perhaps when bumping up to C++2Z, the below 2 lines
+    can be uncommented
+  */
+  // TODO C++2Z check if it complies
+  //auto convFixLambda = [](const std::string& pStr) { return static_cast<int>(roundf(100.0f * stof(pStr))); };
+  //std::cout << "fixpointlambda  = " << doc.GetCell<int, convFixLambda>("Close", "2017-02-21") << "\n";
 
-  std::cout << "mystruct        = " << doc.GetCell<MyStruct>("Close", "2017-02-21", ConvMyStruct).val << "\n";
+  std::cout << "mystruct        = " << doc.GetCell<MyStruct, &ConvMyStruct>("Close", "2017-02-21").val << "\n";
 }

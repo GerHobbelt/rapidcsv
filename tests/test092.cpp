@@ -54,9 +54,9 @@ int main()
       rapidcsv::LabelParams labelParams(0, 0);
       rapidcsv::SeparatorParams separatorParams;
       rapidcsv::Document doc(path, labelParams, separatorParams);
-      unittest::ExpectEqual(float, doc.GetCell<float COMMA 0>("A", "2"), 0.1f);
-      unittest::ExpectEqual(float, doc.GetCell<float COMMA 0>("B", "2"), 0.01f);
-      unittest::ExpectEqual(float, doc.GetCell<float COMMA 0>("C", "2"), 0.001f);
+      unittest::ExpectEqual(float, doc.GetCell<float COMMA &rapidcsv::ConvertFromStr<float COMMA rapidcsv::S2T_Format_StreamAsIs>::ToVal>("A", "2"), 0.1f);
+      unittest::ExpectEqual(float, doc.GetCell<float COMMA &rapidcsv::ConvertFromStr<float COMMA rapidcsv::S2T_Format_StreamAsIs>::ToVal>("B", "2"), 0.01f);
+      unittest::ExpectEqual(float, doc.GetCell<float COMMA &rapidcsv::ConvertFromStr<float COMMA rapidcsv::S2T_Format_StreamAsIs>::ToVal>("C", "2"), 0.001f);
     }
   }
   catch (const std::exception& ex)

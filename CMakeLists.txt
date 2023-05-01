@@ -142,6 +142,7 @@ if(RAPIDCSV_BUILD_TESTS)
   endmacro(add_unit_test)
 
   # Unit tests
+  add_unit_test(testTemplateInstantiation)
   add_unit_test(test001)
   add_unit_test(test002)
   add_unit_test(test003)
@@ -178,6 +179,26 @@ if(RAPIDCSV_BUILD_TESTS)
   add_unit_test(test034)
   add_unit_test(test035)
   add_unit_test(test036)
+  #[========================================[
+    if(CMAKE_BUILD_TYPE MATCHES "Debug")
+      if(USE_CHRONO_LIB)
+        # as FetchContent is included previously for (!USE_CHRONO_LIB)
+        include( FetchContent )
+      endif()
+      set(BIGFLOAT bigfloat)
+      FetchContent_Declare( ${BIGFLOAT}
+          GIT_REPOSITORY https://github.com/Mariotti94/BigFloat.git
+          GIT_TAG        4d2867c  # adjust tag/branch/commit as needed
+        )
+      FetchContent_MakeAvailable(${BIGFLOAT}) # as the BigFloat does not support CMake
+
+      FILE(GLOB sources tests/test036*.cpp ${CMAKE_BINARY_DIR}/_deps/${BIGFLOAT}-src/BigFloat.*)
+      add_executable(test036 ${sources})
+      add_test(NAME test036 COMMAND "${PROJECT_BINARY_DIR}/test036")
+      target_include_directories(test036 PRIVATE ${CMAKE_BINARY_DIR}/_deps/${BIGFLOAT}-src/ )
+      target_link_libraries(test036 PUBLIC rapidcsv ${DATELIB})
+    endif()
+  #]========================================]
   add_unit_test(test037)
   add_unit_test(test038)
   add_unit_test(test039)

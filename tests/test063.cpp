@@ -41,28 +41,28 @@ int main()
     rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0));
 
     // ToVal
-    unittest::ExpectEqual(int, doc.GetCell<int>(0, 0, ToVal), 100);
-    unittest::ExpectEqual(int, doc.GetCell<int>(1, "1", ToVal), 1000);
-    unittest::ExpectEqual(int, doc.GetCell<int>("A", 0, ToVal), 100);
-    unittest::ExpectEqual(int, doc.GetCell<int>("B", "1", ToVal), 1000);
+    unittest::ExpectEqual(int, doc.GetCell<int COMMA ToVal>(0, 0), 100);
+    unittest::ExpectEqual(int, doc.GetCell<int COMMA ToVal>(1, "1"), 1000);
+    unittest::ExpectEqual(int, doc.GetCell<int COMMA ToVal>("A", 0), 100);
+    unittest::ExpectEqual(int, doc.GetCell<int COMMA ToVal>("B", "1"), 1000);
 
-    unittest::ExpectEqual(int, doc.GetRow<int>(0, ToVal).at(0), 100);
-    unittest::ExpectEqual(int, doc.GetRow<int>("2", ToVal).at(0), 10);
+    unittest::ExpectEqual(int, doc.GetRow<int COMMA ToVal>(0).at(0), 100);
+    unittest::ExpectEqual(int, doc.GetRow<int COMMA ToVal>("2").at(0), 10);
 
-    unittest::ExpectEqual(int, doc.GetColumn<int>(0, ToVal).at(0), 100);
-    unittest::ExpectEqual(int, doc.GetColumn<int>("B", ToVal).at(0), 1000);
+    unittest::ExpectEqual(int, doc.GetColumn<int COMMA ToVal>(0).at(0), 100);
+    unittest::ExpectEqual(int, doc.GetColumn<int COMMA ToVal>("B").at(0), 1000);
 
     // ToStruct
-    unittest::ExpectEqual(int, doc.GetCell<Struct>(0, 0, ToStruct).val, 100);
-    unittest::ExpectEqual(int, doc.GetCell<Struct>(1, "1", ToStruct).val, 1000);
-    unittest::ExpectEqual(int, doc.GetCell<Struct>("A", 0, ToStruct).val, 100);
-    unittest::ExpectEqual(int, doc.GetCell<Struct>("B", "1", ToStruct).val, 1000);
+    unittest::ExpectEqual(int, doc.GetCell<Struct COMMA ToStruct>(0, 0).val, 100);
+    unittest::ExpectEqual(int, doc.GetCell<Struct COMMA ToStruct>(1, "1").val, 1000);
+    unittest::ExpectEqual(int, doc.GetCell<Struct COMMA ToStruct>("A", 0).val, 100);
+    unittest::ExpectEqual(int, doc.GetCell<Struct COMMA ToStruct>("B", "1").val, 1000);
 
-    unittest::ExpectEqual(int, doc.GetRow<Struct>(0, ToStruct).at(0).val, 100);
-    unittest::ExpectEqual(int, doc.GetRow<Struct>("2", ToStruct).at(0).val, 10);
+    unittest::ExpectEqual(int, doc.GetRow<Struct COMMA ToStruct>(0).at(0).val, 100);
+    unittest::ExpectEqual(int, doc.GetRow<Struct COMMA ToStruct>("2").at(0).val, 10);
 
-    unittest::ExpectEqual(int, doc.GetColumn<Struct>(0, ToStruct).at(0).val, 100);
-    unittest::ExpectEqual(int, doc.GetColumn<Struct>("B", ToStruct).at(0).val, 1000);
+    unittest::ExpectEqual(int, doc.GetColumn<Struct COMMA ToStruct>(0).at(0).val, 100);
+    unittest::ExpectEqual(int, doc.GetColumn<Struct COMMA ToStruct>("B").at(0).val, 1000);
 
     /*
      * all sytem types are supported by default. 

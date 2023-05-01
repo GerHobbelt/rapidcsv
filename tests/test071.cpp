@@ -26,10 +26,10 @@ int main()
     // 2,  4,  16, 256
     rapidcsv::Document doc2(path, rapidcsv::LabelParams(-1, 0));
 
-    unittest::ExpectEqual(ssize_t, doc2.GetRowIdx("-"), 0);
-    unittest::ExpectEqual(ssize_t, doc2.GetRowIdx("1"), 1);
-    unittest::ExpectEqual(ssize_t, doc2.GetRowIdx("2"), 2);
-    unittest::ExpectEqual(ssize_t, doc2.GetRowIdx("3"), -1);
+    unittest::ExpectEqual(size_t, doc2.GetRowIdx("-"), 0);
+    unittest::ExpectEqual(size_t, doc2.GetRowIdx("1"), 1);
+    unittest::ExpectEqual(size_t, doc2.GetRowIdx("2"), 2);
+    ExpectException(doc2.GetRowIdx("3"), std::out_of_range);
   }
   catch (const std::exception& ex)
   {

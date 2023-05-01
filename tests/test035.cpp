@@ -5,23 +5,19 @@
 #include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
-// Data requested as ints to be converted to fixed-point two decimal numbers
-namespace rapidcsv
-{
-  template<>
-  int ConvertFromStr<int, 1, 0>::ToVal(const std::string& pStr)
+  // Data requested as ints to be converted to fixed-point two decimal numbers
+  int ConvertFromStr_m100_ToVal(const std::string& pStr)
   {
     return static_cast<int>(roundf(100.0f * std::stof(pStr)));
   }
 
-  template<>
-  std::string ConvertFromVal<int, 0>::ToStr(const int& pVal)
+  // Data converted from ints to strings in fixed-point two decimal numbers
+  std::string ConvertFromVal_d100_ToStr(const int& pVal)
   {
     std::ostringstream out;
     out << std::fixed << std::setprecision(2) << static_cast<float>(pVal) / 100.0f;
     return out.str();
   }
-}
 
 int main()
 {
@@ -39,17 +35,17 @@ int main()
   {
     rapidcsv::Document doc(path, rapidcsv::LabelParams(-1, -1));
 
-    unittest::ExpectEqual(int, doc.GetCell<int>(0, 0), 100);
-    unittest::ExpectEqual(int, doc.GetCell<int>(1, 0), 1000);
-    unittest::ExpectEqual(int, doc.GetCell<int>(2, 0), 10000);
-    unittest::ExpectEqual(int, doc.GetCell<int>(3, 0), 100000);
+    unittest::ExpectEqual(int, doc.GetCell<int COMMA &ConvertFromStr_m100_ToVal>(0, 0), 100);
+    unittest::ExpectEqual(int, doc.GetCell<int COMMA &ConvertFromStr_m100_ToVal>(1, 0), 1000);
+    unittest::ExpectEqual(int, doc.GetCell<int COMMA &ConvertFromStr_m100_ToVal>(2, 0), 10000);
+    unittest::ExpectEqual(int, doc.GetCell<int COMMA &ConvertFromStr_m100_ToVal>(3, 0), 100000);
 
-    unittest::ExpectEqual(int, doc.GetCell<int>(0, 1), 10);
-    unittest::ExpectEqual(int, doc.GetCell<int>(1, 1), 1);
-    unittest::ExpectEqual(int, doc.GetCell<int>(2, 1), 0);
-    unittest::ExpectEqual(int, doc.GetCell<int>(3, 1), 1);
+    unittest::ExpectEqual(int, doc.GetCell<int COMMA &ConvertFromStr_m100_ToVal>(0, 1), 10);
+    unittest::ExpectEqual(int, doc.GetCell<int COMMA &ConvertFromStr_m100_ToVal>(1, 1), 1);
+    unittest::ExpectEqual(int, doc.GetCell<int COMMA &ConvertFromStr_m100_ToVal>(2, 1), 0);
+    unittest::ExpectEqual(int, doc.GetCell<int COMMA &ConvertFromStr_m100_ToVal>(3, 1), 1);
 
-    doc.SetCell<int>(0, 0, 12345);
+    doc.SetCell<int, &ConvertFromVal_d100_ToStr>(0, 0, 12345);
     unittest::ExpectEqual(std::string, doc.GetCell<std::string>(0, 0), "123.45");
   }
   catch (const std::exception& ex)

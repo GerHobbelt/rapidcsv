@@ -36,7 +36,7 @@ int main()
     rapidcsv::Document doc(path, rapidcsv::LabelParams(-1, 0));
 
     /////  Filter + Sort
-    const rapidcsv::SortParams<int> spD(1, rapidcsv::ToVal<int, 1>, rapidcsv::e_SortOrder::DESCEND);
+    const rapidcsv::SortParams<int> spD(1, rapidcsv::e_SortOrder::DESCEND);
     rapidcsv::FilterSortDocument<isFirstCellPositive, int> viewdoc2(doc, spD);
 
     ExpectExceptionMsg(viewdoc2.GetViewRowIdx("-"), std::out_of_range, "row not found: -");

@@ -11,23 +11,16 @@ exit ${RV}
 
 #include <rapidcsv/rapidcsv.h>
 
-namespace rapidcsv
+int ToVal(const std::string& pStr)
 {
-  template<>
-  struct ConvertFromStr<int,1,0>
-  {
-    static int ToVal(const std::string& pStr)
-    {
-      return static_cast<int>(roundf(100.0f * std::stof(pStr)));
-    }
-  };
+  return static_cast<int>(roundf(100.0f * std::stof(pStr)));
 }
 
 int main()
 {
   rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(0, 0));
 
-  std::vector<int> close = doc.GetColumn<int>("Close");
+  std::vector<int> close = doc.GetColumn<int, &ToVal >("Close");
   std::cout << "close[0]  = " << close[0] << std::endl;
   std::cout << "close[1]  = " << close[1] << std::endl;
 }

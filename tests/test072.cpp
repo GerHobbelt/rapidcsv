@@ -20,11 +20,11 @@ int main()
   {
     rapidcsv::Document doc(path);
 
-    unittest::ExpectEqual(ssize_t, doc.GetColumnIdx("-"), 0);
-    unittest::ExpectEqual(ssize_t, doc.GetColumnIdx("A"), 1);
-    unittest::ExpectEqual(ssize_t, doc.GetColumnIdx("B"), 2);
-    unittest::ExpectEqual(ssize_t, doc.GetColumnIdx("C"), 3);
-    unittest::ExpectEqual(ssize_t, doc.GetColumnIdx("D"), -1);
+    unittest::ExpectEqual(size_t, doc.GetColumnIdx("-"), 0);
+    unittest::ExpectEqual(size_t, doc.GetColumnIdx("A"), 1);
+    unittest::ExpectEqual(size_t, doc.GetColumnIdx("B"), 2);
+    unittest::ExpectEqual(size_t, doc.GetColumnIdx("C"), 3);
+    ExpectException(doc.GetColumnIdx("D"), std::out_of_range);
   }
   catch (const std::exception& ex)
   {

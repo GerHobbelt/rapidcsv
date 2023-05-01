@@ -20,14 +20,22 @@ int main()
   try
   {
     rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0), rapidcsv::SeparatorParams());
+    unittest::ExpectEqual(std::string, doc.GetCell<std::string>(0, 0), "");
+    unittest::ExpectEqual(std::string, doc.GetCell<std::string>(1, 0), "x");
+    unittest::ExpectEqual(std::string, doc.GetCell<std::string>(2, 0), "#");
 
-    unittest::ExpectEqual(int, doc.GetCell<int COMMA 1 COMMA 1>(0, 0), 0);
-    unittest::ExpectEqual(long long, doc.GetCell<long long COMMA 1 COMMA 1>(1, 0), 0);
-    unittest::ExpectEqual(unsigned int, doc.GetCell<unsigned int COMMA 1 COMMA 1>(2, 0), 0);
+    ExpectException(doc.GetCell<int>(0, 0), std::invalid_argument);
+    ExpectException(doc.GetCell<long long>(1, 0), std::invalid_argument);
+    ExpectException(doc.GetCell<unsigned int>(2, 0), std::invalid_argument);
 
-    unittest::ExpectTrue(std::isnan(doc.GetCell<double COMMA 1 COMMA 1>(0, 1)));
-    unittest::ExpectTrue(std::isnan(doc.GetCell<long double COMMA 1 COMMA 1>(1, 1)));
-    unittest::ExpectTrue(std::isnan(doc.GetCell<float COMMA 1 COMMA 1>(2, 1)));
+    //doc.GetCell<int, &rapidcsv::ConvertFromStr_fNaN<int>::ToVal>(0, 0); // will not compile
+    //doc.GetCell<long long, &rapidcsv::ConvertFromStr_fNaN<long long>::ToVal>(1, 0); // will not compile
+    //doc.GetCell<unsigned int, &rapidcsv::ConvertFromStr_fNaN<unsigned int>::ToVal>(2, 0); // will not compile
+
+    //doc.GetCell<double, &rapidcsv::ConvertFromStr_fNaN<double>::ToVal>(0, 1);
+    unittest::ExpectTrue(std::isnan(doc.GetCell<double COMMA &rapidcsv::ConvertFromStr_fNaN<double>::ToVal>(0, 1)));
+    unittest::ExpectTrue(std::isnan(doc.GetCell<long double COMMA &rapidcsv::ConvertFromStr_fNaN<long double>::ToVal>(1, 1)));
+    unittest::ExpectTrue(std::isnan(doc.GetCell<float COMMA &rapidcsv::ConvertFromStr_fNaN<float>::ToVal>(2, 1)));
   }
   catch (const std::exception& ex)
   {
