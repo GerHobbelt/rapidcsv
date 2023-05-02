@@ -276,10 +276,10 @@ namespace rapidcsv
 
   template<typename T>
   struct S2T_DefaultFormat< T,
-                            typename std::enable_if<
-                              is_integer_type<T>::value ||
-                              std::is_floating_point_v<T>
-                            >::type
+                            typename  std::enable_if<
+                                        is_integer_type<T>::value ||
+                                        std::is_floating_point_v<T>
+                                      >::type
                           > 
   {
     using type = S2T_Format_std_StoT;
@@ -591,13 +591,13 @@ namespace rapidcsv
     }
   };
 
-  template<typename T, typename S2T_FORMAT = S2T_DefaultFormat<T>::type >
+  template<typename T, typename S2T_FORMAT = typename S2T_DefaultFormat<T>::type >
   using ConvertFromStr = _ConvertFromStr<T, S2T_FORMAT >;
 
-  template<c_signaling_NaN T, typename S2T_FORMAT = S2T_DefaultFormat<T>::type >
+  template<c_signaling_NaN T, typename S2T_FORMAT = typename S2T_DefaultFormat<T>::type >
   using ConvertFromStr_fNaN = _ConvertFromStr_fNaN<T, S2T_FORMAT >;
 
-  template<c_number_type T, typename S2T_FORMAT = S2T_DefaultFormat<T>::type >
+  template<c_number_type T, typename S2T_FORMAT = typename S2T_DefaultFormat<T>::type >
   using ConvertFromStr_gNaN = _ConvertFromStr_gNaN<T, S2T_FORMAT >;
   // ]=============================================================] ConvertFromStr
 
@@ -679,11 +679,10 @@ namespace rapidcsv
   };
 
   template<typename T>
-  struct T2S_DefaultFormat<T, typename std::enable_if<
-                                  (   std::is_same_v<T, std::string> ||
-                                      is_char<T>::value ||
-                                      std::is_same_v<T, bool>
-                                  ) >::type
+  struct T2S_DefaultFormat<T, typename std::enable_if_t<
+                                              (   std::is_same_v<T, std::string> ||
+                                                  is_char<T>::value ||
+                                                  std::is_same_v<T, bool>   ) >
                           >
   {
     using type = T2S_Format_WorkAround;
@@ -853,7 +852,7 @@ namespace rapidcsv
     }
   };
 
-  template<typename T, typename T2S_FORMAT = T2S_DefaultFormat<T>::type >
+  template<typename T, typename T2S_FORMAT = typename T2S_DefaultFormat<T>::type >
   using ConvertFromVal = _ConvertFromVal<T, T2S_FORMAT >;
   // ]=============================================================] ConvertFromVal
 

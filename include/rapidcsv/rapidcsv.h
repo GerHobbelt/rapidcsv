@@ -716,7 +716,8 @@ namespace rapidcsv
     template< typename T,
               auto (*CONV_S2T)(const std::string&)
                        = &ConvertFromStr<T>::ToVal >
-    typename std::result_of<decltype(CONV_S2T)(const std::string&)>::type
+    //typename std::result_of<decltype(CONV_S2T)(const std::string&)>::type  -- depcreated in C++20
+    typename std::invoke_result<decltype(CONV_S2T), const std::string& >::type
     GetCell(const c_sizet_or_string auto& pColumnNameIdx,
             const c_sizet_or_string auto& pRowNameIdx) const
     {
