@@ -305,7 +305,8 @@ namespace rapidcsv
           T val = CONV_S2T(cellStrVal);
           column.push_back(val);
         } else {
-          const std::string errStr = "ViewDocument::GetViewColumn() # requested column index " +
+          const std::string errStr = std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+
+            " # requested column index " +
             std::to_string(pColumnIdx) + " >= " +
             std::to_string(row.size() - _document._getDataColumnIndex(0).dataIdx) +
             " (number of columns on row index " + std::to_string(rowIdx) + ")";
@@ -327,7 +328,7 @@ namespace rapidcsv
       ssize_t viewRowIdx = _mapRowIdx2ViewRowIdx.at(rowIdx);
       if (viewRowIdx < 0)
       {
-        throw std::out_of_range("row filtered out: " + pRowName);
+        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+" row filtered out: " + pRowName);
       }
 
       return static_cast<size_t>(viewRowIdx);
@@ -345,7 +346,7 @@ namespace rapidcsv
       ssize_t viewRowIdx = _mapRowIdx2ViewRowIdx.at(rowIdx);
       if (viewRowIdx < 0)
       {
-        throw std::out_of_range("row filtered out: " + pRowName);
+        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+" row filtered out: " + pRowName);
       }
 
       return rowIdx;

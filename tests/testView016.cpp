@@ -44,7 +44,7 @@ int main()
     unittest::ExpectEqual(int, ints.at(1), 25);
     unittest::ExpectEqual(int, ints.at(2), 625);
 
-    ExpectExceptionMsg(viewdoc.GetViewRow<int>("1"), std::out_of_range, "row not found: 1");
+    ExpectExceptionMsg(viewdoc.GetViewRow<int>("1"), std::out_of_range, "include/rapidcsv/rapidcsv.h:569 row not found: 1");
     /*
        unittest::ExpectEqual(size_t, ints.size(), 3);
        unittest::ExpectEqual(int, ints.at(0), 3);
@@ -58,7 +58,7 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(1), "9");
     unittest::ExpectEqual(std::string, strs.at(2), "81");
 
-    // ExpectExceptionMsg(viewdoc.GetViewRow<int>("2"), std::out_of_range, "row filtered out: 2");
+    // ExpectExceptionMsg(viewdoc.GetViewRow<int>("2"), std::out_of_range, "include/rapidcsv/rapidcsv.h:569 row filtered out: 2");
 
     /////   Sort
     const rapidcsv::SortParams<int> spA(0);
@@ -70,7 +70,7 @@ int main()
     unittest::ExpectEqual(int, ints.at(1), 36);
     unittest::ExpectEqual(int, ints.at(2), 1296);
 
-    ExpectExceptionMsg(viewdoc1.GetViewRow<int>("1"), std::out_of_range, "row not found: 1");
+    ExpectExceptionMsg(viewdoc1.GetViewRow<int>("1"), std::out_of_range, "include/rapidcsv/rapidcsv.h:569 row not found: 1");
     /*
        unittest::ExpectEqual(size_t, ints.size(), 3);
        unittest::ExpectEqual(int, ints.at(0), 3);
@@ -94,7 +94,7 @@ int main()
     unittest::ExpectEqual(int, ints.at(1), 49);
     unittest::ExpectEqual(int, ints.at(2), 2401);
 
-    ExpectExceptionMsg(viewdoc2.GetViewRow<int>("1"), std::out_of_range, "row not found: 1");
+    ExpectExceptionMsg(viewdoc2.GetViewRow<int>("1"), std::out_of_range, "include/rapidcsv/rapidcsv.h:569 row not found: 1");
     /*
        unittest::ExpectEqual(size_t, ints.size(), 3);
        unittest::ExpectEqual(int, ints.at(0), 3);
@@ -108,7 +108,7 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(1), "81");
     unittest::ExpectEqual(std::string, strs.at(2), "6561");
 
-    // ExpectExceptionMsg(viewdoc.GetViewRow<int>("2"), std::out_of_range, "row filtered out: 2");
+    // ExpectExceptionMsg(viewdoc.GetViewRow<int>("2"), std::out_of_range, "include/rapidcsv/rapidcsv.h:569 row filtered out: 2");
 
   }
   catch (const std::exception& ex)

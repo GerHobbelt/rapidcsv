@@ -32,7 +32,7 @@ static T _ConvertFromStr<T, S2T_FORMAT>::ToVal(const std::string& pStr);
 ```
 
 ### Removed `struct ConverterParams`
-Instead use, typename(s) 'S2T_FORMAT' and 'T2S_FORMAT' which indicates the conversion algorithm for type-to-string and string-to-type repectively.
+Instead use, typename(s) 'S2T_FORMAT' and 'T2S_FORMAT' which indicates the conversion algorithm for type-to-string and string-to-type respectively.
 
 Default 'S2T_FORMAT' types are provided by `rapidcsv::S2T_DefaultFormat<T>::type`.
 * for T = {integer-types} &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;-> &nbsp; &nbsp; S2T_FORMAT = rapidcsv::S2T_Format_std_StoT
@@ -40,7 +40,7 @@ Default 'S2T_FORMAT' types are provided by `rapidcsv::S2T_DefaultFormat<T>::type
 * for T = {string, char, bool} &nbsp; &nbsp; &nbsp;-> &nbsp; &nbsp; S2T_FORMAT =  rapidcsv::S2T_Format_WorkAround
 * for T = {year_month_day} &nbsp; &nbsp; &nbsp;-> &nbsp; &nbsp; S2T_FORMAT =  rapidcsv::S2T_Format_StreamAsIs
 
-_S2T_Format_StreamAsIs_ and _S2T_Format_StreamUseClassicLocale_ use _std::istringstream_ for string to T conversion. 
+_S2T_Format_StreamAsIs_ , _S2T_Format_StreamUseClassicLocale_ and _S2T_Format_StreamUserLocale_ use _std::istringstream_ for **string to T** conversion. 
 
 Default 'T2S_FORMAT' types are provided by `rapidcsv::T2S_DefaultFormat<T>::type`.
 * for T = {integer-types} &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;-> &nbsp; &nbsp; T2S_FORMAT = rapidcsv::T2S_Format_std_TtoS
@@ -48,7 +48,7 @@ Default 'T2S_FORMAT' types are provided by `rapidcsv::T2S_DefaultFormat<T>::type
 * for T = {string, char, bool} &nbsp; &nbsp; &nbsp;-> &nbsp; &nbsp; T2S_FORMAT =  rapidcsv::T2S_Format_WorkAround
 * for T = {year_month_day} &nbsp; &nbsp; &nbsp;-> &nbsp; &nbsp; T2S_FORMAT =  rapidcsv::T2S_Format_StreamAsIs
 
-_T2S_Format_StreamAsIs_ , _T2S_Format_StreamUseClassicLocale_  and _T2S_Format_StreamDecimalPrecision\<T>_ use _std::ostringstream_ for T to string conversion.
+_T2S_Format_StreamAsIs_ , _T2S_Format_StreamUseClassicLocale_  , _T2S_Format_StreamDecimalPrecision\<T>_ and _T2S_Format_StreamUserLocale_ use _std::ostringstream_ for **T to string** conversion.
 
 One can also provide their own implementations of _T2S_FORMAT_ or _S2T_FORMAT_. For implentation details, refer **exConv001.cpp, ex008.cpp, ex009.cpp**.
 
@@ -57,12 +57,12 @@ One can also provide their own implementations of _T2S_FORMAT_ or _S2T_FORMAT_. 
 For types which are not supported will generate compile-time error. This approach is better then getting a run-time exception.
 
 ## Performance gains
-Removed header `<typeinfo>` and call to function `typeid(...)`.
-In template based library usage of `typeid(...)` is unnecessary as we templates are working with _types_ itself. When C++ template supports specialization based on types, call to `typeid(...)` for run-time branching-conditions inside of class-member-functions takes a performance hit. Instead use of template class specializations and compile time code selection/elimination using  **constexpr** eliminates conditional branching at run-time, thereby improving performance.
+Removed header `<typeinfo>` and calls to function `typeid(...)`.
+In template based library usage of `typeid(...)` is unnecessary as templates are working with _types_ itself, as C++ template supports specialization based on types. Calls to `typeid(...)` for run-time branching-conditions inside of class-member-functions takes a performance hit. Instead use of template class specializations and compile time code selection/elimination using  **constexpr** eliminates conditional branching at run-time, thereby improving performance.
 
-Inside some of the for-loops in upstream-repo, Conditional branching based on result of `std::distance(...)` has been eliminated by shifting-ahead the starting iterator of the for-loop.
+Inside some of the for-loops in upstream-repo, conditional branching based on result of `std::distance(...)` has been eliminated by shifting-ahead the starting iterator of the for-loop.
 
-Function addresses are template-parameter instead of previously function-parameter. This helps the compiler make inline/direct call instead if pointer-indirection.
+Function addresses are passed as template-parameter, instead of previously function-parameter. This helps the compiler make inline/direct call instead of pointer-indirection.
 
 ## View rows using Filter and Sort on columns
 Filter on rows using template class `FilterDocument`. Similar to SQL `WHERE`.  
@@ -73,10 +73,12 @@ For usage examples refer any of [tests/testView*.cpp](tests/testView001.cpp)
 
 Example Usage
 =============
-Here is a simple example reading a CSV file and getting 'Close' column as a
-vector of floats.
+Here is a simple example reading a CSV file and getting 'Close' column as a vector of floats.
 
 [colhdr.csv](examples/colhdr.csv) content:
+
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/master/examples/colhdr.csv
+
 ```csv
 Open,High,Low,Close,Volume,Adj Close
 64.529999,64.800003,64.139999,64.620003,21705200,64.620003
@@ -88,7 +90,7 @@ Open,High,Low,Close,Volume,Adj Close
 
 [ex001.cpp](examples/ex001.cpp) content:
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/ae8ab2a4d9e7bf38c67ebabdd2978f81739d766c/examples/ex001.cpp#L8-L19
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/master/examples/ex001.cpp
 
 
 ```cpp
@@ -149,8 +151,7 @@ More Examples
 =============
 
 Several of the following examples are also provided in the `examples/`
-directory and can be executed directly under Linux and macOS. Example running
-ex001.cpp:
+directory and can be executed directly under Linux and macOS. Example running ex001.cpp:
 
 ```
 ./examples/ex001.cpp
@@ -359,9 +360,7 @@ int main()
 
 Custom Data Type Conversion Per Call
 ------------------------------------
-It is also possible to override conversions on a per-call basis, enabling more
-flexibility. This is illustrated in the following example. Additional conversion
-override usage can be found in the test 
+It is also possible to override conversions on a per-call basis, enabling more flexibility. This is illustrated in the following example. Additional conversion override usage can be found in the test 
 [tests/test063.cpp](tests/test063.cpp), 
 [tests/test087.cpp](tests/test087.cpp) and
 [tests/test092.cpp](tests/test092.cpp)
@@ -654,6 +653,16 @@ It is possible to configure rapidcsv_FilterSort to use locale dependent parsing 
 
 ```cpp
   doc.GetCell<float, &rapidcsv::ConvertFromStr<float, rapidcsv::S2T_Format_StreamUseClassicLocale>::ToVal>("A", "2");
+```
+
+... or specify any specific locale, see for example [tests/test092.cpp](tests/test092.cpp)
+
+```cpp
+constexpr char de_Loc[] = "de_DE";  // string literal object with static storage duration
+
+  using deLocal_iss = rapidcsv::S2T_Format_StreamUserLocale<de_Loc>;
+
+  doc.GetCell<float, &rapidcsv::ConvertFromStr<float, deLocal_iss>::ToVal>("A", "2");
 ```
 
 #### WARNING

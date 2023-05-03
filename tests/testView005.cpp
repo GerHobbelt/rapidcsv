@@ -56,7 +56,7 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(1), "9");
     unittest::ExpectEqual(std::string, strs.at(2), "81");
 
-    ExpectExceptionMsg(viewdoc.GetViewRow<int>("2"), std::out_of_range, "row filtered out: 2");
+    ExpectExceptionMsg(viewdoc.GetViewRow<int>("2"), std::out_of_range, "include/rapidcsv/view.h:349 row filtered out: 2");
 
     /////   Sort
     const rapidcsv::SortParams<int> spA(1);
@@ -102,7 +102,7 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(1), "81");
     unittest::ExpectEqual(std::string, strs.at(2), "6561");
 
-    ExpectExceptionMsg(viewdoc.GetViewRow<int>("2"), std::out_of_range, "row filtered out: 2");
+    ExpectExceptionMsg(viewdoc.GetViewRow<int>("2"), std::out_of_range, "include/rapidcsv/view.h:349 row filtered out: 2");
 
   }
   catch (const std::exception& ex)

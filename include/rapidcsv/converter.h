@@ -33,10 +33,18 @@
   #include <date/date.h>
 #endif
 
-
+/*
 #define SHOW(...) \
     std::cout << std::setw(29) << #__VA_ARGS__ << " == " << __VA_ARGS__ << '\n'
 // usage :: SHOW( std::is_integral_v<float> );
+*/
+
+#if  USE_MACROPREFIXMAP == 1
+  #define __RAPIDCSV_FILE__    __FILE__
+#else
+  // https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
+  #define __RAPIDCSV_FILE__   (__FILE__ + RAPIDCSV_SOURCE_PATH_SIZE)
+#endif
 
 /*
  *  NUMERIC_LOCALE : Number locales are specific settings for the 1000 separators and decimals.
@@ -139,17 +147,28 @@ namespace rapidcsv
   struct Format_StreamAsIs
   {
     using stream_type = IOSS;
-    constexpr static void streamUpdate([[maybe_unused]] IOSS& ss) {}
+    constexpr static inline void streamUpdate([[maybe_unused]] IOSS& ss) {}
   };
 
   template<c_iostream IOSS>
   struct Format_StreamUseClassicLocale
   {
     using stream_type = IOSS;
-    static void streamUpdate(IOSS& ss)
+    static inline void streamUpdate(IOSS& ss)
     {
       const std::locale& ulocale = std::locale::classic();
       ss.imbue(ulocale);
+    }
+  };
+
+  template<c_iostream IOSS, const char* usrLoc>
+  struct Format_StreamUserLocale
+  {
+    using stream_type = IOSS;
+    static inline void streamUpdate(IOSS& ss)
+    {
+      const std::locale userlocale(usrLoc);
+      ss.imbue(userlocale);
     }
   };
 
@@ -186,7 +205,7 @@ namespace rapidcsv
   struct Format_StreamCombineFormat
   {
     using stream_type = IOSS;
-    static void streamUpdate(IOSS& ss)
+    static inline void streamUpdate(IOSS& ss)
     {
       FORMAT_2::streamUpdate(ss);
       FORMAT_1::streamUpdate(ss);
@@ -249,6 +268,8 @@ namespace rapidcsv
   struct S2T_Format_std_StoT {};
   using S2T_Format_StreamAsIs = Format_StreamAsIs<std::istringstream>;
   using S2T_Format_StreamUseClassicLocale = Format_StreamUseClassicLocale<std::istringstream>;
+  template <const char* usrLoc>
+  using S2T_Format_StreamUserLocale = Format_StreamUserLocale<std::istringstream, usrLoc>;
 
   template <typename, typename = void>
   struct is_formatISS : std::false_type {};
@@ -340,6 +361,7 @@ namespace rapidcsv
       if (iss.fail() || iss.bad()) // || iss.eof())
       {
         std::ostringstream eoss;
+        eoss << __RAPIDCSV_FILE__ << ":" << __LINE__ << " ";
         eoss << "ERROR : rapidcsv :: in function 'T _ConvertFromStr<T,S2T_FORMAT_STREAM>::ToVal(const std::string& str)' ::: str='";
         eoss << str << "'  istringstream-conversion failed...";
         eoss << std::boolalpha << "   iss.fail() = " << iss.fail()
@@ -448,6 +470,7 @@ namespace rapidcsv
       if(str.length()>1)
       {
         std::ostringstream eoss;
+        eoss << __RAPIDCSV_FILE__ << ":" << __LINE__ << " ";
         eoss << "ERROR : rapidcsv :: in function 'T _ConvertFromStr<T,S2T_Format_WorkAround>::ToVal(const std::string& str)' ::: for T=char-type-(un)signed, str='";
         eoss << str << "' which violates expected rule # ( str.length()==1 )";
         throw std::invalid_argument(eoss.str());
@@ -471,6 +494,7 @@ namespace rapidcsv
       if(val > 1)
       {
         std::ostringstream eoss;
+        eoss << __RAPIDCSV_FILE__ << ":" << __LINE__ << " ";
         eoss << "ERROR : rapidcsv :: in function 'T _ConvertFromStr<bool,S2T_Format_WorkAround>::ToVal(const std::string& str)' ::: str='";
         eoss << str << "' which violates expected rule # ( val==0 || val==1 )";
         throw std::invalid_argument(eoss.str());
@@ -503,6 +527,7 @@ namespace rapidcsv
       if (iss.fail() || iss.bad() ) // || !iss.eof())
       {
         std::ostringstream eoss;
+        eoss << __RAPIDCSV_FILE__ << ":" << __LINE__ << " ";
         eoss << "ERROR : rapidcsv :: in function 'T _ConvertFromStr<datelib::year_month_day, S2T_FORMAT_STREAM>::ToVal(const std::string& str)' ::: str='";
         eoss << str << "'  istringstream-conversion failed...";
         eoss << std::boolalpha << "   iss.fail() = " << iss.fail()
@@ -610,6 +635,8 @@ namespace rapidcsv
   struct T2S_Format_std_TtoS {};
   using T2S_Format_StreamAsIs = Format_StreamAsIs<std::ostringstream>;
   using T2S_Format_StreamUseClassicLocale = Format_StreamUseClassicLocale<std::ostringstream>;
+  template <const char* usrLoc>
+  using T2S_Format_StreamUserLocale = Format_StreamUserLocale<std::ostringstream, usrLoc>;
 
   template <typename, typename = void>
   struct is_formatOSS : std::false_type {};
@@ -714,6 +741,7 @@ namespace rapidcsv
       if (oss.fail() || oss.bad()) // || oss.eof())
       {
         std::ostringstream eoss;
+        eoss << __RAPIDCSV_FILE__ << ":" << __LINE__ << " ";
         eoss << "ERROR : rapidcsv :: in function 'std::string _ConvertFromVal<T, T2S_FORMAT_STREAM>::ToStr(const T& val)' ::: ";
         try {
           eoss << "val='" << val << "'";
@@ -838,6 +866,7 @@ namespace rapidcsv
       if (oss.fail() || oss.bad()) // || oss.eof())
       {
         std::ostringstream eoss;
+        eoss << __RAPIDCSV_FILE__ << ":" << __LINE__ << " ";
         eoss << "ERROR : rapidcsv :: in function 'std::string _ConvertFromVal<datelib::year_month_date, T2S_FORMAT_STREAM>::ToStr(const datelib::year_month_date& val)' ::: ";
         try {
           eoss << "year{" << val.year() << "}-month{" << val.month() << "}-day{" << val.day() << "}' : val.ok()=" << val.ok() << " format='" << fmt << "'";

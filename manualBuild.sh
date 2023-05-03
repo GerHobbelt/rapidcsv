@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # ./manualBuild.sh tests test001   > err.log 2>&1
-# ./manualBuild.sh tests testTemplateInstanciation -DI_KNOW_WHAT_IAM_DOING
+# ./manualBuild.sh tests testTemplateInstantiation -DENABLE_STD_TtoS
+# ./manualBuild.sh tests checkMacroPrefixMap
+
 
 rm -f ./build-tmp/${2}
 
@@ -18,10 +20,14 @@ rm -f ./build-tmp/${2}
                          -Wcast-qual -Wno-missing-braces -Wswitch-default -Wcast-align \
                          -Wunreachable-code -Wundef -Wuninitialized -Wold-style-cast \
                          -Wsign-conversion -Weffc++ \
-     -DUSE_CHRONO=0 ${3} --std=gnu++2a -fconcepts \
-     -I ./include -I ./build-debug/_deps/date-src/include/ \
-     -o ./build-tmp/${2}  ./${1}/${2}.cpp
+     -DUSE_CHRONO=0 -DUSE_MACROPREFIXMAP=1 -fmacro-prefix-map="$(pwd)/"= ${3} --std=gnu++2a -fconcepts \
+     -I "$(pwd)/include" -I "$(pwd)/build-debug/_deps/date-src/include/" \
+     -o ./build-tmp/${2}  "$(pwd)/${1}/${2}.cpp"
 #fi
+
+#     -DUSE_CHRONO=0 -DUSE_MACROPREFIXMAP=0 -DRAPIDCSV_SOURCE_PATH_SIZE=$(pwd | wc -c) ${3} --std=gnu++2a -fconcepts \
+#                                                                         echo "$(pwd)/" not using this as
+#                                                               echo "12345" | wc -c -> 6   as it counts '\0'
 
 
 #gcc -lstdc++ --verbose ${3}  --std=gnu++2a -fconcepts -I ./include ./${1}/${2}.cpp  -o ./build-tmp/${2} 

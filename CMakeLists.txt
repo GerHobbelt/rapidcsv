@@ -5,6 +5,9 @@ set (CMAKE_CXX_STANDARD 20)
 #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 
 
+#[==============================================[
+    Check if chrono-lib is supported
+#]==============================================]
 try_compile(USE_CHRONO_LIB
             SOURCES  "${CMAKE_SOURCE_DIR}/tests/checkChrono.cpp"
             CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
@@ -12,6 +15,7 @@ try_compile(USE_CHRONO_LIB
             CXX_STANDARD "${CMAKE_CXX_STANDARD}"
             CXX_STANDARD_REQUIRED True
            )
+
 
 if(USE_CHRONO_LIB)
   message(STATUS "Using date-time-lib : <chrono>")
@@ -36,9 +40,35 @@ else()
   #  add_subdirectory(${${DATELIB}_SOURCE_DIR} ${${DATELIB}_BINARY_DIR} EXCLUDE_FROM_ALL)
   #endif()
 endif()
-#[==============================================[
-#]==============================================]
 
+
+
+#[=====================================================================================[
+      Check if compiler supports '-fmacro-prefix-map=old=new'  option
+      refer ::: https://stackoverflow.com/questions/8487986/file-macro-shows-full-path
+#]=====================================================================================]
+try_compile(USE_MACROPREFIXMAP
+            SOURCES  "${CMAKE_SOURCE_DIR}/tests/checkMacroPrefixMap.cpp"
+            CMAKE_FLAGS  "--std=gnu++2a   -fmacro-prefix-map=${CMAKE_SOURCE_DIR}=PRJ_FOLDER"
+            #COMPILE_DEFINITIONS "-DUSE_CHRONO=1"
+            CXX_STANDARD "${CMAKE_CXX_STANDARD}"
+            CXX_STANDARD_REQUIRED True
+           )
+
+if(USE_MACROPREFIXMAP)
+  message(STATUS "compiler option '-fmacro-prefix-map=old=new' SUPPORTED")
+  add_definitions(-DUSE_MACROPREFIXMAP=1)
+
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=")
+else()
+  # as of writing this code, clang does not support option '-fmacro-prefix-map=...'
+  message(STATUS "compiler option '-fmacro-prefix-map=old=new' NOT SUPPORTED")
+  add_definitions(-DUSE_MACROPREFIXMAP=0)
+
+  # https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
+  string(LENGTH "${CMAKE_SOURCE_DIR}/" RAPIDCSV_SOURCE_PATH_SIZE)
+  add_definitions("-DRAPIDCSV_SOURCE_PATH_SIZE=${RAPIDCSV_SOURCE_PATH_SIZE}")
+endif()
 
 
 if(MSVC)

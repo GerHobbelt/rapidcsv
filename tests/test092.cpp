@@ -4,18 +4,35 @@
 #include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
+/*
+ * To run this test, locale 'de_DE' needs to be installed on the system.
+ * on ubuntu steps are...
+ * $ locale -a                                     # to check existing locale(s)
+ * $ sudo apt-get install language-pack-de
+ * $ locale -a                                     # check again
+ * $ sudo locale-gen de_DE
+ * $ sudo update-locale
+ * 
+ * refer ::: https://askubuntu.com/questions/76013/how-do-i-add-locale-to-ubuntu-server
+ */
+
+
+// string literal object with static storage duration
+constexpr char de_Loc[] = "de_DE"; // uses comma (,) as decimal separator
+
 int main()
 {
   int rv = 0;
 
-  std::string loc = "de_DE"; // uses comma (,) as decimal separator
+  using deLocal_iss = rapidcsv::S2T_Format_StreamUserLocale<de_Loc>;
   try
   {
-    std::locale::global(std::locale(loc));
+    std::istringstream iss;
+    deLocal_iss::streamUpdate(iss);
   }
   catch (const std::exception& ex)
   {
-    std::cout << "locale " << loc << " not available (" << ex.what()
+    std::cout << "locale " << de_Loc << " not available (" << ex.what()
               << "), skipping test.\n";
     // pass test for systems without locale present. for ci testing, make.sh
     // ensures that the necessary locale is installed.
@@ -37,9 +54,11 @@ int main()
 
       rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0),
                              rapidcsv::SeparatorParams(';' /* pSeparator */));
-      unittest::ExpectEqual(float, doc.GetCell<float>("A", "2"), 0.1f);
-      unittest::ExpectEqual(float, doc.GetCell<float>("B", "2"), 0.01f);
-      unittest::ExpectEqual(float, doc.GetCell<float>("C", "2"), 0.001f);
+      unittest::ExpectEqual(float, doc.GetCell<float COMMA &rapidcsv::ConvertFromStr<float COMMA deLocal_iss>::ToVal>("A", "2"), 0.1f);
+      unittest::ExpectEqual(float, doc.GetCell<float COMMA &rapidcsv::ConvertFromStr<float COMMA deLocal_iss>::ToVal>("B", "2"), 0.01f);
+      unittest::ExpectEqual(float, doc.GetCell<float COMMA &rapidcsv::ConvertFromStr<float COMMA deLocal_iss>::ToVal>("C", "2"), 0.001f);
+
+      unittest::DeleteFile(path);
     }
 
     {
@@ -57,15 +76,17 @@ int main()
       unittest::ExpectEqual(float, doc.GetCell<float COMMA &rapidcsv::ConvertFromStr<float COMMA rapidcsv::S2T_Format_StreamAsIs>::ToVal>("A", "2"), 0.1f);
       unittest::ExpectEqual(float, doc.GetCell<float COMMA &rapidcsv::ConvertFromStr<float COMMA rapidcsv::S2T_Format_StreamAsIs>::ToVal>("B", "2"), 0.01f);
       unittest::ExpectEqual(float, doc.GetCell<float COMMA &rapidcsv::ConvertFromStr<float COMMA rapidcsv::S2T_Format_StreamAsIs>::ToVal>("C", "2"), 0.001f);
+
+      unittest::DeleteFile(path);
     }
   }
   catch (const std::exception& ex)
   {
     std::cout << ex.what() << std::endl;
     rv = 1;
-  }
 
-  unittest::DeleteFile(path);
+    unittest::DeleteFile(path);
+  }
 
   return rv;
 }

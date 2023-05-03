@@ -75,15 +75,15 @@ namespace rapidcsv
     {
       if (mColumnNameIdx < -1)
       {
-        const std::string errStr = "invalid column name index " +
-          std::to_string(mColumnNameIdx) + " < -1";
+        std::string errStr = std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+
+          " invalid column name index " + std::to_string(mColumnNameIdx) + " < -1";
         throw std::out_of_range(errStr);
       }
 
       if (mRowNameIdx < -1)
       {
-        const std::string errStr = "invalid row name index " +
-          std::to_string(mRowNameIdx) + " < -1";
+        const std::string errStr = std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+
+          " invalid row name index " + std::to_string(mRowNameIdx) + " < -1";
         throw std::out_of_range(errStr);
       }
     }
@@ -369,7 +369,7 @@ namespace rapidcsv
       }
       if (columnIdx < 0)
       {
-        throw std::out_of_range("column not found: " + pColumnName);
+        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+" column not found: " + pColumnName);
       }
       return static_cast<size_t>(columnIdx);
     }
@@ -410,7 +410,8 @@ namespace rapidcsv
         }
         else
         {
-          const std::string errStr = "Document::GetColumn() # requested column index " +
+          const std::string errStr = std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+
+            " Document::GetColumn() # requested column index " +
             std::to_string(pColumnIdx) + " >= " +
             std::to_string(itRow->size() - _getDataColumnIndex(0).dataIdx) +
             " (number of columns on row index " + std::to_string(rowIdx-_getDataColumnIndex(0).dataIdx) + ")";
@@ -565,7 +566,7 @@ namespace rapidcsv
       }
       if (rowIdx < 0)
       {
-        throw std::out_of_range("row not found: " + pRowName);
+        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+" row not found: " + pRowName);
       }
       return static_cast<size_t>(rowIdx);
     }
@@ -780,7 +781,7 @@ namespace rapidcsv
       const size_t dataColumnIdx = _getDataColumnIndex(pColumnIdx).dataIdx;
       if (_mLabelParams.mColumnNameIdx < 0)
       {
-        throw std::out_of_range("column name row index < 0: " + std::to_string(_mLabelParams.mColumnNameIdx));
+        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+" column name row index < 0: " + std::to_string(_mLabelParams.mColumnNameIdx));
       }
 
       return _mData.at(static_cast<size_t>(_mLabelParams.mColumnNameIdx)).at(dataColumnIdx);
@@ -795,7 +796,7 @@ namespace rapidcsv
     {
       if (_mLabelParams.mColumnNameIdx < 0)
       {
-        throw std::out_of_range("column name row index < 0: " + std::to_string(_mLabelParams.mColumnNameIdx));
+        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+" column name row index < 0: " + std::to_string(_mLabelParams.mColumnNameIdx));
       }
 
       const size_t dataColumnIdx = _getDataColumnIndex(pColumnIdx).dataIdx;
@@ -842,7 +843,7 @@ namespace rapidcsv
       const size_t dataRowIdx = _getDataRowIndex(pRowIdx).dataIdx;
       if (_mLabelParams.mRowNameIdx < 0)
       {
-        throw std::out_of_range("row name column index < 0: " + std::to_string(_mLabelParams.mRowNameIdx));
+        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+" row name column index < 0: " + std::to_string(_mLabelParams.mRowNameIdx));
       }
 
       return _mData.at(dataRowIdx).at(static_cast<size_t>(_mLabelParams.mRowNameIdx));
@@ -859,7 +860,7 @@ namespace rapidcsv
       _mRowNames[pRowName] = dataRowIdx;
       if (_mLabelParams.mRowNameIdx < 0)
       {
-        throw std::out_of_range("row name column index < 0: " + std::to_string(_mLabelParams.mRowNameIdx));
+        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+" row name column index < 0: " + std::to_string(_mLabelParams.mRowNameIdx));
       }
 
       // increase table size if necessary:
@@ -1310,6 +1311,6 @@ namespace rapidcsv
 
 
     template<Document::f_EvalBoolExpr evaluateBooleanExpression, typename... Types>
-    friend struct ViewDocument;
+    friend class ViewDocument;
   };
 }
