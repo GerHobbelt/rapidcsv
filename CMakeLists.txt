@@ -49,8 +49,7 @@ endif()
 #]=====================================================================================]
 try_compile(USE_MACROPREFIXMAP
             SOURCES  "${CMAKE_SOURCE_DIR}/tests/checkMacroPrefixMap.cpp"
-            CMAKE_FLAGS  "--std=gnu++2a   -fmacro-prefix-map=${CMAKE_SOURCE_DIR}=PRJ_FOLDER"
-            #COMPILE_DEFINITIONS "-DUSE_CHRONO=1"
+            CMAKE_FLAGS  "--std=gnu++2a   -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=  -Werror"
             CXX_STANDARD "${CMAKE_CXX_STANDARD}"
             CXX_STANDARD_REQUIRED True
            )

@@ -77,7 +77,7 @@ Here is a simple example reading a CSV file and getting 'Close' column as a vect
 
 [colhdr.csv](examples/colhdr.csv) content:
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/master/examples/colhdr.csv
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/master/examples/colhdr.csv#L1-L6
 
 ```csv
 Open,High,Low,Close,Volume,Adj Close
@@ -90,7 +90,7 @@ Open,High,Low,Close,Volume,Adj Close
 
 [ex001.cpp](examples/ex001.cpp) content:
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/master/examples/ex001.cpp
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/master/examples/ex001.cpp#L8-L19
 
 
 ```cpp

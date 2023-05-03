@@ -389,14 +389,19 @@ namespace rapidcsv
     std::vector<T> GetColumn(const auto& pColumnNameIdx,
                              ARGS&& ... args) const
     */
-    template<typename T,
-             T (*CONV_S2T)(const std::string&) =
-                       &ConvertFromStr<T>::ToVal >
-    std::vector<T> GetColumn(const c_sizet_or_string auto& pColumnNameIdx) const
+    // TODO unit tests  for gNan, fNaN
+    // TODO unit tests  for ARGS...
+    template< typename T,
+              auto (*CONV_S2T)(const std::string&)
+                       = &ConvertFromStr<T>::ToVal ,
+              typename R = typename std::invoke_result<decltype(CONV_S2T),
+                                                       const std::string& >::type
+            >
+    std::vector<R> GetColumn(const c_sizet_or_string auto& pColumnNameIdx) const
     {
       const size_t pColumnIdx = GetColumnIdx(pColumnNameIdx);
       const size_t dataColumnIdx = _getDataColumnIndex(pColumnIdx).dataIdx;
-      std::vector<T> column;
+      std::vector<R> column;
       size_t rowIdx = _getDataRowIndex(0).dataIdx;
       for (auto itRow = _mData.begin() + static_cast<ssize_t>(_getDataRowIndex(0).dataIdx);
            itRow != _mData.end(); ++itRow, ++rowIdx)
@@ -404,8 +409,8 @@ namespace rapidcsv
         if (dataColumnIdx < itRow->size())
         {
           const std::string& cellStrVal = itRow->at(dataColumnIdx);
-          //T val = CONV_S2T(cellStrVal, std::forward<ARGS>(args)...);
-          T val = CONV_S2T(cellStrVal);
+          //R val = CONV_S2T(cellStrVal, std::forward<ARGS>(args)...);
+          R val = CONV_S2T(cellStrVal);
           column.push_back(val);
         }
         else
@@ -578,18 +583,21 @@ namespace rapidcsv
      * @returns vector of row data.
      */
     //template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
-    template<typename T,
-             T (*CONV_S2T)(const std::string&) =
-                       &ConvertFromStr<T>::ToVal >
-    std::vector<T> GetRow(const c_sizet_or_string auto& pRowNameIdx) const
+    template< typename T,
+              auto (*CONV_S2T)(const std::string&)
+                       = &ConvertFromStr<T>::ToVal ,
+              typename R = typename std::invoke_result<decltype(CONV_S2T),
+                                                       const std::string& >::type
+            >
+    std::vector<R> GetRow(const c_sizet_or_string auto& pRowNameIdx) const
     {
       const size_t pRowIdx = GetRowIdx(pRowNameIdx);
       const size_t dataRowIdx = _getDataRowIndex(pRowIdx).dataIdx;
-      std::vector<T> row;
+      std::vector<R> row;
       const ssize_t colIdx = static_cast<ssize_t>(_getDataColumnIndex(0).dataIdx);
       for (auto itCol = _mData.at(dataRowIdx).begin() + colIdx; itCol != _mData.at(dataRowIdx).end(); ++itCol)
       {
-        T val = CONV_S2T(*itCol);
+        R val = CONV_S2T(*itCol);
         row.push_back(val);
       }
       return row;
@@ -713,14 +721,16 @@ namespace rapidcsv
      * @returns cell data.
      */
     //template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
+    // TODO unit tests  for gNan, fNaN
     // TODO unit tests  for ARGS...
     template< typename T,
               auto (*CONV_S2T)(const std::string&)
-                       = &ConvertFromStr<T>::ToVal >
-    //typename std::result_of<decltype(CONV_S2T)(const std::string&)>::type  -- depcreated in C++20
-    typename std::invoke_result<decltype(CONV_S2T), const std::string& >::type
-    GetCell(const c_sizet_or_string auto& pColumnNameIdx,
-            const c_sizet_or_string auto& pRowNameIdx) const
+                       = &ConvertFromStr<T>::ToVal ,
+              typename R = typename std::invoke_result<decltype(CONV_S2T),
+                                                       const std::string& >::type
+            >
+    R GetCell(const c_sizet_or_string auto& pColumnNameIdx,
+              const c_sizet_or_string auto& pRowNameIdx) const
     {
       const size_t pColumnIdx = GetColumnIdx(pColumnNameIdx);
       const size_t pRowIdx = GetRowIdx(pRowNameIdx);

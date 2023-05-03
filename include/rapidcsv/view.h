@@ -28,6 +28,9 @@ namespace rapidcsv
     DESCEND
   };
 
+
+  // sort on NaN values is undefined.
+  // Hence we are not handling return type R = std::variant<T, gNaN>
   template<typename T,
            T (*CONV_S2T)(const std::string&) =
                       &ConvertFromStr<T>::ToVal >
