@@ -4,6 +4,7 @@
 # ./manualBuild.sh tests testTemplateInstantiation -DENABLE_STD_TtoS
 # ./manualBuild.sh tests checkMacroPrefixMap
 
+mkdir ./build-tmp/
 
 rm -f ./build-tmp/${2}
 

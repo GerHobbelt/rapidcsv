@@ -77,7 +77,7 @@ Here is a simple example reading a CSV file and getting 'Close' column as a vect
 
 [colhdr.csv](examples/colhdr.csv) content:
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/master/examples/colhdr.csv#L1-L6
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/4bb7f4c482ab9ad193608182eb9dff5def43c0cf/examples/colhdr.csv#L1-L6
 
 ```csv
 Open,High,Low,Close,Volume,Adj Close
@@ -90,7 +90,7 @@ Open,High,Low,Close,Volume,Adj Close
 
 [ex001.cpp](examples/ex001.cpp) content:
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/master/examples/ex001.cpp#L8-L19
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/4bb7f4c482ab9ad193608182eb9dff5def43c0cf/examples/ex001.cpp#L1-L12
 
 
 ```cpp
@@ -151,10 +151,14 @@ More Examples
 =============
 
 Several of the following examples are also provided in the `examples/`
-directory and can be executed directly under Linux and macOS. Example running ex001.cpp:
+directory. And can be individually compiled using `manualBuild.sh` and executed in Linux and macOS. Example running ex001.cpp:
 
 ```
-./examples/ex001.cpp
+./manualBuild.sh examples ex001
+./build-tmp/ex001
+
+./manualBuild.sh tests test001
+./build-tmp/test001
 ```
 
 
@@ -782,7 +786,10 @@ Technical Details
 =================
 Rapidcsv uses cmake for its tests. Commands to build and execute the test suite:
 
-    mkdir -p build && cd build && cmake -DRAPIDCSV_BUILD_TESTS=ON .. && make && ctest -C unit --output-on-failure && ctest -C perf --verbose ; cd -
+    mkdir -p build && cd build
+    cmake -DRAPIDCSV_BUILD_TESTS=ON .. && make
+    ctest -C unit --output-on-failure && ctest -C perf --verbose
+    cd -
 
 Rapidcsv uses [doxygenmd](https://github.com/d99kris/doxygenmd) to generate
 its Markdown API documentation:

@@ -9,7 +9,7 @@ set (CMAKE_CXX_STANDARD 20)
     Check if chrono-lib is supported
 #]==============================================]
 try_compile(USE_CHRONO_LIB
-            SOURCES  "${CMAKE_SOURCE_DIR}/tests/checkChrono.cpp"
+            SOURCES  "${CMAKE_CURRENT_SOURCE_DIR}/tests/checkChrono.cpp"
             CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
             COMPILE_DEFINITIONS "-DUSE_CHRONO=1"
             CXX_STANDARD "${CMAKE_CXX_STANDARD}"
@@ -41,31 +41,32 @@ else()
   #endif()
 endif()
 
+file(TO_NATIVE_PATH "/" _path_separator)
+message("The systems's path separator is '${_path_separator}'")
 
-
-#[=====================================================================================[
+#[======================================================================[
       Check if compiler supports '-fmacro-prefix-map=old=new'  option
-      refer ::: https://stackoverflow.com/questions/8487986/file-macro-shows-full-path
-#]=====================================================================================]
-try_compile(USE_MACROPREFIXMAP
-            SOURCES  "${CMAKE_SOURCE_DIR}/tests/checkMacroPrefixMap.cpp"
-            CMAKE_FLAGS  "--std=gnu++2a   -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=  -Werror"
-            CXX_STANDARD "${CMAKE_CXX_STANDARD}"
-            CXX_STANDARD_REQUIRED True
-           )
-
-if(USE_MACROPREFIXMAP)
+      refer ::: https://fossies.org/linux/bareos/core/CMakeLists.txt
+#]======================================================================]
+include(CheckCXXCompilerFlag)
+check_cxx_compiler_flag(
+  -fmacro-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}=.
+  cxx_compiler_macro_prefix_map
+)
+if(cxx_compiler_macro_prefix_map)
   message(STATUS "compiler option '-fmacro-prefix-map=old=new' SUPPORTED")
   add_definitions(-DUSE_MACROPREFIXMAP=1)
 
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=")
+  set(CMAKE_CXX_FLAGS
+      "${CMAKE_CXX_FLAGS} -fmacro-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}${_path_separator}="
+  )
 else()
   # as of writing this code, clang does not support option '-fmacro-prefix-map=...'
   message(STATUS "compiler option '-fmacro-prefix-map=old=new' NOT SUPPORTED")
   add_definitions(-DUSE_MACROPREFIXMAP=0)
 
   # https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
-  string(LENGTH "${CMAKE_SOURCE_DIR}/" RAPIDCSV_SOURCE_PATH_SIZE)
+  string(LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" RAPIDCSV_SOURCE_PATH_SIZE)
   add_definitions("-DRAPIDCSV_SOURCE_PATH_SIZE=${RAPIDCSV_SOURCE_PATH_SIZE}")
 endif()
 
