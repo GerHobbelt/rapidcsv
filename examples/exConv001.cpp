@@ -37,7 +37,8 @@ namespace rapidcsv
 {
   template<>
   struct _ConvertFromStr<int, format_num>
-  //struct ConvertFromStr<int, format_num>  #As ConvertFromStr is a typename connot override it
+  // struct ConvertFromStr<int, format_num>  #As ConvertFromStr is
+  // template-alias-declarations cannot override it
   {
     static int ToVal(const std::string& pStr)
     {
@@ -48,7 +49,8 @@ namespace rapidcsv
 
   template<c_floating_point T>
   struct _ConvertFromVal<T, format_num>
-  //struct _ConvertFromVal<T, format_num >  #As ConvertFromVal is a typename connot override it
+  // struct ConvertFromStr<int, format_num>  #As ConvertFromStr is
+  // template-alias-declarations cannot override it
   {
     static std::string ToStr(const T& val)
     {
@@ -83,6 +85,8 @@ void testType(const std::string& typeData, const T& orgT)
             << typeData << " = " << strT << " ; conv" << typeData << " = " << convT << std::endl;
 }
 
+constexpr char dmY_fmt[] = "%d-%m-%Y";  // string literal object with static storage duration
+
 int main()
 {
 
@@ -97,6 +101,26 @@ int main()
   testType<long double>("LongDouble", 23453.1234567890123456789012345L);
   testType<char>("Char", 'G');
   testType<bool>("Bool", true);
+  namespace rdb = rapidcsv::datelib;
+  testType<rdb::year_month_day>("YearMonthDay", rdb::year_month_day{rdb::year{2023}, rdb::month{rdb::mar}, rdb::day{14} } );
+
+  typename std::string (*dmY_To_str)(const rdb::year_month_day& str) =
+              &rapidcsv::ConvertFromVal<  rdb::year_month_day,
+                                          rapidcsv::T2S_Format_StreamYMD< dmY_fmt >
+                                       >::ToStr;
+
+  typename rdb::year_month_day (*To_dmY)(const std::string& str) =
+              &rapidcsv::ConvertFromStr<  rdb::year_month_day,
+                                          rapidcsv::S2T_Format_StreamYMD< dmY_fmt >
+                                       >::ToVal;
+  {
+    rdb::year_month_day orgT{rdb::year{1980}, rdb::month{rdb::aug}, rdb::day{17}};
+    const std::string strT = dmY_To_str(orgT);
+    const rdb::year_month_day convT = To_dmY(strT);
+
+    std::cout << std::setprecision(25) << "orgYMD = " << orgT << " ; str_dmY"
+              << " = " << strT << " ; convYMD" << " = " << convT << std::endl;
+  }
 
   std::cout << "=============   using specialization" << std::endl;
 

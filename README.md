@@ -13,7 +13,7 @@ The [library of upstream repo](https://github.com/d99kris/rapidcsv) was featured
 
 Differences with the [upstream repo](https://github.com/d99kris/rapidcsv)
 -------------------------------------------------------------------------
-## Refactored 'Convertor' template-class to template-typenames 'ConvertFromVal' and 'ConvertFromStr'
+## Refactored 'Convertor' template-class to template-alias-declarations 'ConvertFromVal' and 'ConvertFromStr'
 
 class-member-functions in upstream [d99kris/.../rapidcsv.h](https://github.com/d99kris/rapidcsv/blob/master/src/rapidcsv.h) has been refactored away ...
 
@@ -26,27 +26,31 @@ void Converter<T>::ToVal(const std::string& pStr, T& pVal) const;
 ... instead call, Class-static-functions ...
 
 ```cpp
-static std::string _ConvertFromVal<T, T2S_FORMAT>::ToStr(const T& pVal);
+static std::string ConvertFromVal<T, T2S_FORMAT>::ToStr(const T& pVal);
                     AND
-static T _ConvertFromStr<T, S2T_FORMAT>::ToVal(const std::string& pStr);
+static T ConvertFromStr<T, S2T_FORMAT>::ToVal(const std::string& pStr);
 ```
 
+Note: `ConvertFromVal` and `ConvertFromStr` are alias declarations of template-classes `_ConvertFromVal` and `_ConvertFromStr` respectively.
+
+
 ### Removed `struct ConverterParams`
-Instead use, typename(s) 'S2T_FORMAT' and 'T2S_FORMAT' which indicates the conversion algorithm for type-to-string and string-to-type respectively.
+`struct ConverterParams`, which had several member variables to determine the run time conversion behaviour has been done away with.
+Instead use template-prameters 'S2T_FORMAT' and 'T2S_FORMAT' which indicates the conversion algorithm for type-to-string and string-to-type respectively.
 
 Default 'S2T_FORMAT' types are provided by `rapidcsv::S2T_DefaultFormat<T>::type`.
 * for T = {integer-types} &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;-> &nbsp; &nbsp; S2T_FORMAT = rapidcsv::S2T_Format_std_StoT
 * for T = {floating-types} &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; -> &nbsp; &nbsp; S2T_FORMAT = rapidcsv::S2T_Format_std_StoT
 * for T = {string, char, bool} &nbsp; &nbsp; &nbsp;-> &nbsp; &nbsp; S2T_FORMAT =  rapidcsv::S2T_Format_WorkAround
-* for T = {year_month_day} &nbsp; &nbsp; &nbsp;-> &nbsp; &nbsp; S2T_FORMAT =  rapidcsv::S2T_Format_StreamAsIs
+* for T = {year_month_day} &nbsp; &nbsp; &nbsp;-> &nbsp; &nbsp; S2T_FORMAT =  rapidcsv::S2T_Format_StreamYMD< _"%F"_ >
 
 _S2T_Format_StreamAsIs_ , _S2T_Format_StreamUseClassicLocale_ and _S2T_Format_StreamUserLocale_ use _std::istringstream_ for **string to T** conversion. 
 
 Default 'T2S_FORMAT' types are provided by `rapidcsv::T2S_DefaultFormat<T>::type`.
 * for T = {integer-types} &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;-> &nbsp; &nbsp; T2S_FORMAT = rapidcsv::T2S_Format_std_TtoS
-* for T = {floating-types} &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; -> &nbsp; &nbsp; T2S_FORMAT = rapidcsv::T2S_Format_StreamDecimalPrecision\<T>
+* for T = {floating-types} &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; -> &nbsp; &nbsp; T2S_FORMAT = rapidcsv::T2S_Format_StreamDecimalPrecision< _T_ >
 * for T = {string, char, bool} &nbsp; &nbsp; &nbsp;-> &nbsp; &nbsp; T2S_FORMAT =  rapidcsv::T2S_Format_WorkAround
-* for T = {year_month_day} &nbsp; &nbsp; &nbsp;-> &nbsp; &nbsp; T2S_FORMAT =  rapidcsv::T2S_Format_StreamAsIs
+* for T = {year_month_day} &nbsp; &nbsp; &nbsp;-> &nbsp; &nbsp; T2S_FORMAT =  rapidcsv::T2S_Format_StreamYMD< _"%F"_ >
 
 _T2S_Format_StreamAsIs_ , _T2S_Format_StreamUseClassicLocale_  , _T2S_Format_StreamDecimalPrecision\<T>_ and _T2S_Format_StreamUserLocale_ use _std::ostringstream_ for **T to string** conversion.
 
@@ -58,13 +62,15 @@ For types which are not supported will generate compile-time error. This approac
 
 ## Performance gains
 Removed header `<typeinfo>` and calls to function `typeid(...)`.
-In template based library usage of `typeid(...)` is unnecessary as templates are working with _types_ itself, as C++ template supports specialization based on types. Calls to `typeid(...)` for run-time branching-conditions inside of class-member-functions takes a performance hit. Instead use of template class specializations and compile time code selection/elimination using  **constexpr** eliminates conditional branching at run-time, thereby improving performance.
+In template based code, calling any _RTTI_ functions such as `typeid(...)` is unnecessary, as templates are working with _types_ itself.
+As C++ template supports specialization based on types, calls to `typeid(...)` for run-time branching-conditions inside of class-member-functions takes a performance hit.
+Instead use of template class specializations and compile time code selection/elimination using  **constexpr** eliminates run-time conditional branching, thereby improving performance.
 
 Inside some of the for-loops in upstream-repo, conditional branching based on result of `std::distance(...)` has been eliminated by shifting-ahead the starting iterator of the for-loop.
 
 Function addresses are passed as template-parameter, instead of previously function-parameter. This helps the compiler make inline/direct call instead of pointer-indirection.
 
-## View rows using Filter and Sort on columns
+## Added feature : View rows using Filter and Sort on columns
 Filter on rows using template class `FilterDocument`. Similar to SQL `WHERE`.  
 Sort rows using template class `SortDocument`. Similar to SQL `ORDER BY`.  
 Both filter and sort is provided by template class `FilterSortDocument`.
@@ -75,38 +81,12 @@ Example Usage
 =============
 Here is a simple example reading a CSV file and getting 'Close' column as a vector of floats.
 
-[colhdr.csv](examples/colhdr.csv) content:
-
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/4bb7f4c482ab9ad193608182eb9dff5def43c0cf/examples/colhdr.csv#L1-L6
-
-```csv
-Open,High,Low,Close,Volume,Adj Close
-64.529999,64.800003,64.139999,64.620003,21705200,64.620003
-64.419998,64.730003,64.190002,64.620003,20235200,64.620003
-64.330002,64.389999,64.050003,64.360001,19259700,64.360001
-64.610001,64.949997,64.449997,64.489998,19384900,64.489998
-64.470001,64.690002,64.300003,64.620003,21234600,64.620003
-```
-
-[ex001.cpp](examples/ex001.cpp) content:
-
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/4bb7f4c482ab9ad193608182eb9dff5def43c0cf/examples/ex001.cpp#L1-L12
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/45acc4b127268c0cf650ec66470b264256bb5f87/examples/colhdr.csv#L1-L6
 
 
-```cpp
-#include <iostream>
-#include <vector>
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/45acc4b127268c0cf650ec66470b264256bb5f87/examples/ex001.cpp#L1-L12
 
-#include <rapidcsv/rapidcsv.h>
 
-int main()
-{
-  rapidcsv::Document doc("examples/colhdr.csv");
-
-  std::vector<float> col = doc.GetColumn<float>("Close");
-  std::cout << "Read " << col.size() << " values." << std::endl;
-}
-```
 
 Refer to section [More Examples](#more-examples) below for more examples.
 The [tests](tests/) directory also contains many simple usage examples.
@@ -138,7 +118,7 @@ or Simply copy ...
 [include/rapidcsv/converter.h](include/rapidcsv/converter.h)  
 [include/rapidcsv/view.h](include/rapidcsv/view.h)
 
-... to your project/include/rapidcsv/ directory and include it. OR alternatively you can call script ...  
+... to your project/include/rapidcsv/ directory and include it.
 
 
 [//]: # (TODO : add to 'vcpkg' and 'conan' packages)
@@ -170,89 +150,28 @@ but not rows or cells (only using indices). In order to treat the first column
 as row headers one needs to use LabelParams and set pRowNameIdx to 0.
 
 ### Column and Row Headers
-[colrowhdr.csv](examples/colrowhdr.csv) content:
-```
-Date,Open,High,Low,Close,Volume,Adj Close
-2017-02-24,64.529999,64.800003,64.139999,64.620003,21705200,64.620003
-2017-02-23,64.419998,64.730003,64.190002,64.620003,20235200,64.620003
-2017-02-22,64.330002,64.389999,64.050003,64.360001,19259700,64.360001
-2017-02-21,64.610001,64.949997,64.449997,64.489998,19384900,64.489998
-2017-02-17,64.470001,64.690002,64.300003,64.620003,21234600,64.620003
-```
 
-[ex002.cpp](examples/ex002.cpp) content:
-```cpp
-#include <iostream>
-#include <vector>
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/45acc4b127268c0cf650ec66470b264256bb5f87/examples/colrowhdr.csv#L1-L6
 
-#include <rapidcsv/rapidcsv.h>
 
-int main()
-{
-  rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(0, 0));
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/45acc4b127268c0cf650ec66470b264256bb5f87/examples/ex002.cpp#L1-L15
 
-  std::vector<float> close = doc.GetRow<float>("2017-02-22");
-  std::cout << "Read " << close.size() << " values." << std::endl;
-
-  long long volume = doc.GetCell<long long>("Volume", "2017-02-22");
-  std::cout << "Volume " << volume << " on 2017-02-22." << std::endl;
-}
-```
 
 ### Row Headers Only
-[rowhdr.csv](examples/rowhdr.csv) content:
-```
-2017-02-24,64.529999,64.800003,64.139999,64.620003,21705200,64.620003
-2017-02-23,64.419998,64.730003,64.190002,64.620003,20235200,64.620003
-2017-02-22,64.330002,64.389999,64.050003,64.360001,19259700,64.360001
-2017-02-21,64.610001,64.949997,64.449997,64.489998,19384900,64.489998
-2017-02-17,64.470001,64.690002,64.300003,64.620003,21234600,64.620003
-```
 
-[ex003.cpp](examples/ex003.cpp) content:
-```cpp
-#include <iostream>
-#include <vector>
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/45acc4b127268c0cf650ec66470b264256bb5f87/examples/rowhdr.csv#L1-L6
 
-#include <rapidcsv/rapidcsv.h>
 
-int main()
-{
-  rapidcsv::Document doc("examples/rowhdr.csv", rapidcsv::LabelParams(-1, 0));
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/45acc4b127268c0cf650ec66470b264256bb5f87/examples/ex003.cpp#L1-L12
 
-  std::vector<std::string> row = doc.GetRow<std::string>("2017-02-22");
-  std::cout << "Read " << row.size() << " values." << std::endl;
-}
-```
 
 ### No Headers
-[nohdr.csv](examples/nohdr.csv) content:
-```
-64.529999,64.800003,64.139999,64.620003,21705200,64.620003
-64.419998,64.730003,64.190002,64.620003,20235200,64.620003
-64.330002,64.389999,64.050003,64.360001,19259700,64.360001
-64.610001,64.949997,64.449997,64.489998,19384900,64.489998
-64.470001,64.690002,64.300003,64.620003,21234600,64.620003
-```
 
-[ex004.cpp](examples/ex004.cpp) content:
-```cpp
-#include <iostream>
-#include <vector>
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/45acc4b127268c0cf650ec66470b264256bb5f87/examples/nohdr.csv#L1-L5
 
-#include <rapidcsv/rapidcsv.h>
 
-int main()
-{
-  rapidcsv::Document doc("examples/nohdr.csv", rapidcsv::LabelParams(-1, -1));
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/45acc4b127268c0cf650ec66470b264256bb5f87/examples/ex004.cpp#L1-L15
 
-  std::vector<float> close = doc.GetColumn<float>(5);
-  std::cout << "Read " << close.size() << " values." << std::endl;
-
-  long long volume = doc.GetCell<long long>(4, 2);
-  std::cout << "Volume " << volume << " on 2017-02-22." << std::endl;
-}
-```
 
 Reading a File with Custom Separator
 ------------------------------------
@@ -270,25 +189,12 @@ Date;Open;High;Low;Close;Volume;Adj Close
 2017-02-17;64.470001;64.690002;64.300003;64.620003;21234600;64.620003
 ```
 
-[ex005.cpp](examples/ex005.cpp) content:
-```cpp
-#include <iostream>
-#include <vector>
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/45acc4b127268c0cf650ec66470b264256bb5f87/examples/semi.csv#L1-L6
 
-#include <rapidcsv/rapidcsv.h>
 
-int main()
-{
-  rapidcsv::Document doc("examples/semi.csv", rapidcsv::LabelParams(0, 0),
-                          rapidcsv::SeparatorParams(';'));
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/45acc4b127268c0cf650ec66470b264256bb5f87/examples/ex005.cpp#L1-L16
 
-  std::vector<float> close = doc.GetColumn<float>("Close");
-  std::cout << "Read " << close.size() << " values." << std::endl;
 
-  long long volume = doc.GetCell<long long>("Volume", "2017-02-22");
-  std::cout << "Volume " << volume << " on 2017-02-22." << std::endl;
-}
-```
 
 Supported Get/Set Data Types
 ----------------------------
@@ -299,68 +205,24 @@ of `char-types` or `bool`. For `char-types`, rapidcsv interprets the cell's (fir
 byte as a character. For `bool`, the expected integer values are `0` or `1`.
 The following example illustrates the supported data types.
 
-[colrowhdr.csv](examples/colrowhdr.csv) content:
-```
-Date,Open,High,Low,Close,Volume,Adj Close
-2017-02-24,64.529999,64.800003,64.139999,64.620003,21705200,64.620003
-2017-02-23,64.419998,64.730003,64.190002,64.620003,20235200,64.620003
-2017-02-22,64.330002,64.389999,64.050003,64.360001,19259700,64.360001
-2017-02-21,64.610001,64.949997,64.449997,64.489998,19384900,64.489998
-2017-02-17,64.470001,64.690002,64.300003,64.620003,21234600,64.620003
-```
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/45acc4b127268c0cf650ec66470b264256bb5f87/examples/colrowhdr.csv#L1-L6
 
-[ex006.cpp](examples/ex006.cpp) content:
-```cpp
-#include <iostream>
-#include <vector>
 
-#include <rapidcsv/rapidcsv.h>
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/45acc4b127268c0cf650ec66470b264256bb5f87/examples/ex006.cpp#L1-L21
 
-int main()
-{
-  rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(0, 0));
 
-  std::cout << doc.GetCell<std::string>("Volume", "2017-02-22") << std::endl;
-  std::cout << doc.GetCell<int>("Volume", "2017-02-22") << std::endl;
-  std::cout << doc.GetCell<long>("Volume", "2017-02-22") << std::endl;
-  std::cout << doc.GetCell<long long>("Volume", "2017-02-22") << std::endl;
-  std::cout << doc.GetCell<unsigned>("Volume", "2017-02-22") << std::endl;
-  std::cout << doc.GetCell<unsigned long>("Volume", "2017-02-22") << std::endl;
-  std::cout << doc.GetCell<unsigned long long>("Volume", "2017-02-22") << std::endl;
-  std::cout << doc.GetCell<float>("Volume", "2017-02-22") << std::endl;
-  std::cout << doc.GetCell<double>("Volume", "2017-02-22") << std::endl;
-  std::cout << doc.GetCell<long double>("Volume", "2017-02-22") << std::endl;
-  std::cout << doc.GetCell<char>("Volume", "2017-02-22") << std::endl;
-}
+**rapidcsv::datelib::year_month_day** is the alias Date Type
+------------------------------------------------------------
+As of writing this, `std::chrono` is not fully supported by various compilers. If that's the case then, alias `rapidcsv::datelib` which points to [date](https://github.com/HowardHinnant/date) is used. The default date format is _"%F"_ (i.e "%Y-%m-%d"). For configuring a different date format refer [exConv001.cpp](examples/exConv001.cpp) and [test001.cpp](tests/test001.cpp)
 
-```
 
 Global Custom Data Type Conversion
 ----------------------------------
 One may override conversion routines (or add new ones) by implementing ToVal() and/or ToStr(). Below is an example of int conversion, to instead provide two decimal fixed-point numbers. Also see [tests/test035.cpp](tests/test035.cpp) for test using specialized instances of `ToVal()` and `ToStr()`.
 
-[ex008.cpp](examples/ex008.cpp) content:
-```cpp
-#include <iostream>
-#include <vector>
-#include <cmath>
 
-#include <rapidcsv/rapidcsv.h>
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/45acc4b127268c0cf650ec66470b264256bb5f87/examples/ex008.cpp#L1-L19
 
-int ToVal(const std::string& pStr)
-{
-  return static_cast<int>(roundf(100.0f * std::stof(pStr)));
-}
-
-int main()
-{
-  rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(0, 0));
-
-  std::vector<int> close = doc.GetColumn<int, &ToVal >("Close");
-  std::cout << "close[0]  = " << close[0] << std::endl;
-  std::cout << "close[1]  = " << close[1] << std::endl;
-}
-```
 
 Custom Data Type Conversion Per Call
 ------------------------------------
@@ -369,52 +231,8 @@ It is also possible to override conversions on a per-call basis, enabling more f
 [tests/test087.cpp](tests/test087.cpp) and
 [tests/test092.cpp](tests/test092.cpp)
 
-[ex009.cpp](examples/ex009.cpp) content:
-```cpp
-#include <iostream>
-#include <vector>
-#include <cmath>
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/45acc4b127268c0cf650ec66470b264256bb5f87/examples/ex009.cpp#L1-L43
 
-#include <rapidcsv/rapidcsv.h>
-
-int ConvFixPoint(const std::string& pStr)
-{
-  return static_cast<int>(roundf(100.0f * std::stof(pStr)));
-}
-
-struct MyStruct
-{
-  int val = 0;
-};
-
-MyStruct ConvMyStruct(const std::string& pStr)
-{
-  MyStruct ms;
-  ms.val = static_cast<int>(roundf(100.0f * std::stof(pStr)));
-  return ms;
-}
-
-int main()
-{
-  rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(0, 0));
-
-  std::cout << "regular         = " << doc.GetCell<int>("Close", "2017-02-21") << "\n";
-  std::cout << "fixpointfunc    = " << doc.GetCell<int, &ConvFixPoint>("Close", "2017-02-21") << "\n";
-
-  /*
-    Lambda-expressions are not allowed in unevaluated expressions, template arguments,
-    alias declarations, typedef declarations, and anywhere in a function
-    (or function template) declaration except the function body and the function's default
-    arguments.  -- (until C++20)  -- perhaps when bumping up to C++2Z, the below 2 lines
-    can be uncommented
-  */
-  // TODO C++2Z check if it complies
-  //auto convFixLambda = [](const std::string& pStr) { return static_cast<int>(roundf(100.0f * stof(pStr))); };
-  //std::cout << "fixpointlambda  = " << doc.GetCell<int, convFixLambda>("Close", "2017-02-21") << "\n";
-
-  std::cout << "mystruct        = " << doc.GetCell<MyStruct, &ConvMyStruct>("Close", "2017-02-21").val << "\n";
-}
-```
 
 Reading CSV Data from a Stream or String
 ----------------------------------------
@@ -423,34 +241,7 @@ from a stream and, indirectly through stringstream, from a string. File streams
 used with rapidcsv should be opened in `std::ios::binary` mode to enable full
 functionality. Here is a simple example reading CSV data from a string:
 
-[ex007.cpp](examples/ex007.cpp) content:
-```cpp
-#include <iostream>
-#include <vector>
-
-#include <rapidcsv/rapidcsv.h>
-
-int main()
-{
-  const std::string& csv =
-    "Date,Open,High,Low,Close,Volume,Adj Close\n"
-    "2017-02-24,64.529999,64.800003,64.139999,64.620003,21705200,64.620003\n"
-    "2017-02-23,64.419998,64.730003,64.190002,64.620003,20235200,64.620003\n"
-    "2017-02-22,64.330002,64.389999,64.050003,64.360001,19259700,64.360001\n"
-    "2017-02-21,64.610001,64.949997,64.449997,64.489998,19384900,64.489998\n"
-    "2017-02-17,64.470001,64.690002,64.300003,64.620003,21234600,64.620003\n"
-  ;
-
-  std::stringstream sstream(csv);
-  rapidcsv::Document doc(sstream, rapidcsv::LabelParams(0, 0));
-
-  std::vector<float> close = doc.GetColumn<float>("Close");
-  std::cout << "Read " << close.size() << " values." << std::endl;
-
-  long long volume = doc.GetCell<long long>("Volume", "2017-02-22");
-  std::cout << "Volume " << volume << " on 2017-02-22." << std::endl;
-}
-```
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/45acc4b127268c0cf650ec66470b264256bb5f87/examples/ex007.cpp#L1-L25
 
 Data Conversion Precision
 -------------------------
@@ -493,150 +284,8 @@ One can also provide their own decimal precision parameter thru several ways. Th
 
 Note: If only data conversions is needed, then just include [rapidcsv/converter.h](include/rapidcsv/converter.h).
 
-[exConv001.cpp](examples/exConv001.cpp) content:
-```cpp
-#include <iostream>
-#include <vector>
-#include <iomanip>
-#include <cmath>
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/45acc4b127268c0cf650ec66470b264256bb5f87/examples/exConv001.cpp#L1-L174
 
-#include <rapidcsv/converter.h>
-
-struct format_num {};
-
-template<rapidcsv::c_floating_point T>
-struct format_oss {
-    using stream_type = std::ostringstream;
-    static void streamUpdate(std::ostringstream& oss)
-    {
-      std::cout << "call from -> static void format_oss<T>::streamUpdate(std::ostringstream& oss);" << std::endl;
-      oss.precision( std::numeric_limits<T>::digits10 + 1 );
-      oss << std::fixed;
-    }
-};
-
-template<rapidcsv::c_floating_point T>
-constexpr int getHigherDecimalPrecision()
-{
-  if constexpr (std::is_same_v<T, float>)
-    return FLT_DIG+10;
-  else
-  if constexpr (std::is_same_v<T, double>)
-    return DBL_DIG+10;
-  else
-  if constexpr (std::is_same_v<T, long double>)
-    return LDBL_DIG+10;
-}
-template<rapidcsv::c_floating_point T>
-using T2S_Format_hdp = rapidcsv::T2S_Format_StreamDecimalPrecision<T, getHigherDecimalPrecision<T>() >;
-
-namespace rapidcsv
-{
-  template<>
-  struct _ConvertFromStr<int, format_num>
-  //struct ConvertFromStr<int, format_num>  #As ConvertFromStr is a typename connot override it
-  {
-    static int ToVal(const std::string& pStr)
-    {
-      return static_cast<int>(roundf(100.0f * std::stof(pStr)));
-    }
-  };
-
-
-  template<c_floating_point T>
-  struct _ConvertFromVal<T, format_num>
-  //struct _ConvertFromVal<T, format_num >  #As ConvertFromVal is a typename connot override it
-  {
-    static std::string ToStr(const T& val)
-    {
-      std::cout << "call from -> static std::string _ConvertFromVal<T, format_num>::ToStr(const T& val);" << std::endl;
-      std::ostringstream oss;
-      oss.precision( std::numeric_limits<T>::digits10 + 1 );
-      oss << std::fixed;
-      oss << val;
-      return oss.str();
-    }
-  };
-}
-
-template<typename T>
-std::string ToStr(const T& val)
-{
-  std::cout << "call from -> std::string ToStr<T>(const T& val);" << std::endl;
-  std::ostringstream oss;
-  oss.precision( std::numeric_limits<T>::digits10 + 1 );
-  oss << std::fixed;
-  oss << val;
-  return oss.str();
-}
-
-template<typename T>
-void testType(const std::string& typeData, const T& orgT)
-{
-  const std::string strT = rapidcsv::ConvertFromVal<T>::ToStr(orgT);
-  const T convT = rapidcsv::ConvertFromStr<T>::ToVal(strT);
-
-  std::cout << std::setprecision(25) << "org" << typeData << " = " << orgT << " ; str"
-            << typeData << " = " << strT << " ; conv" << typeData << " = " << convT << std::endl;
-}
-
-int main()
-{
-  testType<int>("Int", -100);
-  testType<long>("Long", -10000000);
-  testType<long long>("LongLong", -10000000000);
-  testType<unsigned>("Unsigned", 100);
-  testType<unsigned long>("UnsignedLong", 10000000);
-  testType<unsigned long long>("UnsignedLongLong", 10000000000);
-  testType<float>("Float", 313.1234567890123456789012345F);
-  testType<double>("Double", 3462424.1234567890123456789012345);
-  testType<long double>("LongDouble", 23453.1234567890123456789012345L);
-  testType<char>("Char", 'G');
-  testType<bool>("Bool", true);
-
-  std::cout << "=============   using specialization" << std::endl;
-
-  const long double orgLongDouble  = 100.1234567890123456789012345L;
-
-  std::cout << "-------------   case 1 ::     long-double -> string -> int" << std::endl;
-  std::cout << "                      step1.  long-double -> string" << std::endl;
-
-  // call to -> static std::string _ConvertFromVal<T, format_num> >::ToStr(const T& val);
-  const std::string strLongDouble1 = rapidcsv::ConvertFromVal<long double,
-                                                              format_num
-                                                            >::ToStr(orgLongDouble);
-  std::cout << "                      step2.  string -> int" << std::endl;
-  const int convInt1 = rapidcsv::ConvertFromStr<int,format_num>::ToVal(strLongDouble1);
-
-  std::cout << "orgLongDouble = " << orgLongDouble << " ; strLongDouble1 = "
-            << strLongDouble1 << " ; convInt1 = " << convInt1 << std::endl;
-
-  std::cout << "-------------   case 2 ::     long-double -> string -> int" << std::endl;
-  std::cout << "                      step1.  long-double -> string" << std::endl;
-  const std::string strLongDouble2 = rapidcsv::ConvertFromVal<long double,
-                                                              format_oss<long double>
-                                                             >::ToStr(orgLongDouble);
-  std::cout << "                      step2.  string -> int" << std::endl;
-  const int convInt2 = rapidcsv::ConvertFromStr<int,format_num>::ToVal(strLongDouble2);
-
-  std::cout << "orgLongDouble = " << orgLongDouble << " ; strLongDouble2 = "
-            << strLongDouble2 << " ; convInt2 = " << convInt2 << std::endl;
-
-  std::cout << "-------------   case 3 ::     long-double -> string -> int" << std::endl;
-  std::cout << "                      step1.  long-double -> string" << std::endl;
-
-  std::cout << "call to -> int getHigherDecimalPrecision<T>();" << std::endl;
-  std::cout << "check the higher precision of 'strLongDouble3'" << std::endl;
-  const std::string strLongDouble3 = rapidcsv::ConvertFromVal<long double,
-                                                              T2S_Format_hdp<long double>
-                                                             >::ToStr(orgLongDouble);
-  std::cout << "                      step2.  string -> int" << std::endl;
-  const int convInt3 = rapidcsv::ConvertFromStr<int,format_num>::ToVal(strLongDouble3);
-
-  std::cout << "orgLongDouble = " << orgLongDouble << " ; strLongDouble3 = "
-            << strLongDouble3 << " ; convInt3 = " << convInt3 << std::endl;
-}
-```
 
 Locale Parsing Formats
 ----------------------
@@ -670,7 +319,7 @@ constexpr char de_Loc[] = "de_DE";  // string literal object with static storage
 ```
 
 #### WARNING
-With floating point types `std::to_string(...)` may yield unexpected results as the number of significant digits in the returned string can be zero, for e.g: pVal = 1e-09. The return value may differ significantly from what `std::cout` prints by default. That's why this particular specialization is disabled by default. In case if this is needed enable it by defining maco `ENABLE_STD_TtoS`
+With floating point types `std::to_string(...)` may yield unexpected results as the number of significant digits in the returned string can be zero, for e.g: pVal = 1e-09. The return value may differ significantly from what `std::cout` prints by default. That's why this particular specialization is disabled by default. In case if this is needed enable it by defining macro `ENABLE_STD_TtoS`
 
 ```cpp
 template<c_floating_point T>
@@ -773,6 +422,7 @@ automatically detected.
 
 API Documentation
 =================
+[//]: # (TODO : update the below readme's)
 The following classes makes up the Rapidcsv interface:
  - [class rapidcsv::Document](doc/rapidcsv_Document.md)
  - [class rapidcsv::LabelParams](doc/rapidcsv_LabelParams.md)
@@ -786,23 +436,26 @@ Technical Details
 =================
 Rapidcsv uses cmake for its tests. Commands to build and execute the test suite:
 
-    mkdir -p build && cd build
-    cmake -DRAPIDCSV_BUILD_TESTS=ON .. && make
-    ctest -C unit --output-on-failure && ctest -C perf --verbose
-    cd -
+```bash
+mkdir -p build && cd build
+cmake -DRAPIDCSV_BUILD_TESTS=ON .. && make
+ctest -C unit --output-on-failure && ctest -C perf --verbose
+cd -
+```
 
 Rapidcsv uses [doxygenmd](https://github.com/d99kris/doxygenmd) to generate
 its Markdown API documentation:
 
-    doxygenmd include doc
+```bash
+doxygenmd include doc
+```
 
 Rapidcsv uses Uncrustify to ensure consistent code formatting:
 
-    uncrustify -c uncrustify.cfg --no-backup include/rapidcsv/rapidcsv.h
+```bash
+uncrustify -c uncrustify.cfg --no-backup include/rapidcsv/rapidcsv.h
+```
 
-Rapidcsv can be installed using the following command:
-
-    ./install.sh '/path/to/install/dir/'
 
 Alternatives
 ============

@@ -172,6 +172,15 @@ namespace rapidcsv
     }
   };
 
+  constexpr char defYMDfmt[] = "%F";  // string literal object with static storage duration
+  template<c_iostream IOSS, const char* _ymdFormat = defYMDfmt> // %F -> "%Y-%m-%d"
+  struct Format_StreamYMD
+  {
+    using stream_type = IOSS;
+    constexpr static const char* ymdFormat = _ymdFormat;
+    constexpr static inline void streamUpdate([[maybe_unused]] IOSS& ss) {}
+  };
+
   template <typename, typename = void>
   struct has_streamUpdate : std::false_type {};
 
@@ -196,6 +205,18 @@ namespace rapidcsv
   {};
   template <typename FMT>
   concept c_formatSS = is_formatSS<FMT>::value;
+
+  template <typename, typename = void>
+  struct is_formatYMDss : std::false_type {};
+
+  template <typename FMT>
+  struct is_formatYMDss< FMT,
+                         std::void_t<decltype(FMT::ymdFormat)>  // check for the presence of FMT::ymdFormat
+                     >
+           : is_formatSS<FMT>
+  {};
+  template <typename FMT>
+  concept c_formatYMDss = is_formatYMDss<FMT>::value;
 
   template<c_iostream IOSS,
            c_formatSS FORMAT_1,
@@ -270,6 +291,9 @@ namespace rapidcsv
   using S2T_Format_StreamUseClassicLocale = Format_StreamUseClassicLocale<std::istringstream>;
   template <const char* usrLoc>
   using S2T_Format_StreamUserLocale = Format_StreamUserLocale<std::istringstream, usrLoc>;
+  template < const char* formatYMD = defYMDfmt > // %F -> "%Y-%m-%d"
+  using S2T_Format_StreamYMD = Format_StreamYMD<std::istringstream, formatYMD>;
+
 
   template <typename, typename = void>
   struct is_formatISS : std::false_type {};
@@ -277,17 +301,29 @@ namespace rapidcsv
   template <typename FMT>
   struct is_formatISS<  FMT,
                         typename std::enable_if<
-                            is_formatSS<FMT>::value
-                            && std::is_same_v<typename FMT::stream_type,std::istringstream>
+                            std::is_same_v<typename FMT::stream_type, std::istringstream>
                         >::type
                      >
-            : std::true_type
+            : is_formatSS<FMT>
   {};
   template <typename FMT>
   concept c_formatISS = is_formatISS<FMT>::value;
 
-  //template<typename T, typename ... ARGS >
-  //using f_defConvFuncToVal = T(const std::string & str, ARGS&& ... args);
+
+  template <typename, typename = void>
+  struct is_formatYMDiss : std::false_type {};
+
+  template <typename FMT>
+  struct is_formatYMDiss< FMT,
+                          typename std::enable_if<
+                              std::is_same_v<typename FMT::stream_type, std::istringstream>
+                          >::type
+                        >
+            : is_formatYMDss<FMT>
+  {};
+  template <typename FMT>
+  concept c_formatYMDiss = is_formatYMDiss<FMT>::value;
+
 
   template<typename T, typename = void >
   struct S2T_DefaultFormat 
@@ -321,7 +357,7 @@ namespace rapidcsv
   template<>
   struct S2T_DefaultFormat<datelib::year_month_day, void>
   {
-    using type = S2T_Format_StreamAsIs;
+    using type = S2T_Format_StreamYMD< defYMDfmt >; // %F -> "%Y-%m-%d"
   };
   // ]=============================================================] S2T_FORMAT
 
@@ -503,14 +539,13 @@ namespace rapidcsv
     }
   };
 
-  template<c_formatISS S2T_FORMAT_STREAM>
-  struct _ConvertFromStr< datelib::year_month_day, S2T_FORMAT_STREAM>
+  template<c_formatYMDiss S2T_FORMAT_YMD>
+  struct _ConvertFromStr< datelib::year_month_day, S2T_FORMAT_YMD>
   {
-    // TODO unit tests
     inline static datelib::year_month_day
     ToVal(const std::string& str)
     {
-      return ToVal_args( str, static_cast<const std::string::value_type*>("%F")); // %F -> "%Y-%m-%d"
+      return ToVal_args( str, S2T_FORMAT_YMD::ymdFormat); // %F -> "%Y-%m-%d"
     }
 
     // TODO unit tests
@@ -522,7 +557,7 @@ namespace rapidcsv
     {
       datelib::year_month_day ymd;
       std::istringstream iss(str);
-      S2T_FORMAT_STREAM::streamUpdate(iss);
+      S2T_FORMAT_YMD::streamUpdate(iss);
       datelib::from_stream(iss, fmt, ymd, abbrev, offset);
       if (iss.fail() || iss.bad() ) // || !iss.eof())
       {
@@ -637,6 +672,8 @@ namespace rapidcsv
   using T2S_Format_StreamUseClassicLocale = Format_StreamUseClassicLocale<std::ostringstream>;
   template <const char* usrLoc>
   using T2S_Format_StreamUserLocale = Format_StreamUserLocale<std::ostringstream, usrLoc>;
+  template < const char* formatYMD = defYMDfmt > // %F -> "%Y-%m-%d"
+  using T2S_Format_StreamYMD = Format_StreamYMD<std::ostringstream, formatYMD>;
 
   template <typename, typename = void>
   struct is_formatOSS : std::false_type {};
@@ -644,15 +681,29 @@ namespace rapidcsv
   template <typename FMT>
   struct is_formatOSS<  FMT,
                         typename std::enable_if<
-                            is_formatSS<FMT>::value
-                              && std::is_same_v<typename FMT::stream_type, std::ostringstream>
+                            std::is_same_v<typename FMT::stream_type, std::ostringstream>
                         >::type
                      >
-            : std::true_type
+            : is_formatSS<FMT>
   {};
-
   template <typename FMT>
   concept c_formatOSS = is_formatOSS<FMT>::value;
+
+
+  template <typename, typename = void>
+  struct is_formatYMDoss : std::false_type {};
+
+  template <typename FMT>
+  struct is_formatYMDoss< FMT,
+                           typename std::enable_if<
+                             std::is_same_v<typename FMT::stream_type, std::ostringstream>
+                        >::type
+                     >
+            : is_formatYMDss<FMT>
+  {};
+  template <typename FMT>
+  concept c_formatYMDoss = is_formatYMDoss<FMT>::value;
+
 
   template<c_floating_point T, int decimalPrecision = getDecimalPrecision<T>()>
   struct T2S_Format_StreamDecimalPrecision
@@ -718,7 +769,7 @@ namespace rapidcsv
   template<>
   struct T2S_DefaultFormat<datelib::year_month_day, void>
   {
-    using type = T2S_Format_StreamAsIs;
+    using type = T2S_Format_StreamYMD< defYMDfmt >; // %F -> "%Y-%m-%d"
   };
   // ]=============================================================] T2S_FORMAT
 
@@ -836,14 +887,13 @@ namespace rapidcsv
     }
   };
 
-  template<c_formatOSS T2S_FORMAT_STREAM>
-  struct _ConvertFromVal< datelib::year_month_day, T2S_FORMAT_STREAM>
+  template<c_formatYMDoss T2S_FORMAT_YMD>
+  struct _ConvertFromVal< datelib::year_month_day, T2S_FORMAT_YMD>
   {
-    // TODO unit tests
     inline static std::string
     ToStr(  const datelib::year_month_day& val)
     {
-      return ToStr_args( val, static_cast<const std::string::value_type*>("%F")); // %F -> "%Y-%m-%d"
+      return ToStr_args( val, T2S_FORMAT_YMD::ymdFormat); // %F -> "%Y-%m-%d"
     }
   
     // TODO unit tests
@@ -854,13 +904,14 @@ namespace rapidcsv
                  std::chrono::seconds* offset_sec = nullptr)
     {
       std::ostringstream oss;
-      T2S_FORMAT_STREAM::streamUpdate(oss);
+      T2S_FORMAT_YMD::streamUpdate(oss);
 #if  USE_CHRONO == 1
       // refer https://omegaup.com/docs/cpp/en/cpp/chrono/local_t/to_stream.html
-      std::chrono::to_stream(oss, fmt, val, abbrev, offset_sec);
+      //std::chrono::to_stream(oss, fmt, val, abbrev, offset_sec); // does not compile
+      oss << std::chrono::format(fmt, val);  // for now , no support for abbrev, offset_sec
 #else
-      using CT = std::chrono::seconds;
-      date::fields<CT> fds{val};
+      using CS = std::chrono::seconds;
+      date::fields<CS> fds{val};
       date::to_stream(oss, fmt, fds, abbrev, offset_sec);
 #endif
       if (oss.fail() || oss.bad()) // || oss.eof())

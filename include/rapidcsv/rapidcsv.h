@@ -389,7 +389,6 @@ namespace rapidcsv
     std::vector<T> GetColumn(const auto& pColumnNameIdx,
                              ARGS&& ... args) const
     */
-    // TODO unit tests  for gNan, fNaN
     // TODO unit tests  for ARGS...
     template< typename T,
               auto (*CONV_S2T)(const std::string&)
@@ -721,7 +720,6 @@ namespace rapidcsv
      * @returns cell data.
      */
     //template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
-    // TODO unit tests  for gNan, fNaN
     // TODO unit tests  for ARGS...
     template< typename T,
               auto (*CONV_S2T)(const std::string&)

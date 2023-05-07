@@ -3,14 +3,20 @@
 #include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
+
+constexpr char dmY_fmt[] = "%d-%m-%Y";  // string literal object with static storage duration
+namespace rdb = rapidcsv::datelib;
+constexpr rdb::year_month_day (*To_dmY)(const std::string& str) =
+                    &rapidcsv::ConvertFromStr< rdb::year_month_day, rapidcsv::S2T_Format_StreamYMD< dmY_fmt > >::ToVal;
+
 int main()
 {
   int rv = 0;
 
   std::string csv =
-    "-,A,B,C\n"
-    "1,3,9,81\n"
-    "2,4,16,256\n"
+    "-,A,B,C,D,E\n"
+    "1,3,9,81,2023-05-15,27-12-2020\n"
+    "2,4,16,256,1997-07-23,28-02-1980\n"
   ;
 
   std::string path = unittest::TempPath();
@@ -27,10 +33,21 @@ int main()
     unittest::ExpectEqual(int, doc.GetCell<int>("A", 1), 4);
     unittest::ExpectEqual(int, doc.GetCell<int>(0, "2"), 4);
     unittest::ExpectEqual(int, doc.GetCell<int>("A", "2"), 4);
-    
+
     unittest::ExpectEqual(std::string, doc.GetCell<std::string>("A", "2"), "4");
     unittest::ExpectEqual(std::string, doc.GetCell<std::string>("B", "2"), "16");
     unittest::ExpectEqual(std::string, doc.GetCell<std::string>("C", "2"), "256");
+
+    unittest::ExpectEqual(rdb::year_month_day, doc.GetCell<rdb::year_month_day>("D", "1"),
+                          rdb::year_month_day{rdb::year{2023} COMMA rdb::month{rdb::may} COMMA rdb::day{15} });
+    unittest::ExpectEqual(rdb::year_month_day, doc.GetCell<rdb::year_month_day>("D", "2"),
+                          rdb::year_month_day{rdb::year{1997} COMMA rdb::month{rdb::jul} COMMA rdb::day{23} });
+
+    unittest::ExpectEqual(rdb::year_month_day, doc.GetCell<rdb::year_month_day COMMA To_dmY >("E", "1"),
+                          rdb::year_month_day{rdb::year{2020} COMMA rdb::month{rdb::dec} COMMA rdb::day{27} });
+    unittest::ExpectEqual(rdb::year_month_day, doc.GetCell<rdb::year_month_day COMMA To_dmY >("E", "2"),
+                          rdb::year_month_day{rdb::year{1980} COMMA rdb::month{rdb::feb} COMMA rdb::day{28} });
+
   }
   catch (const std::exception& ex)
   {

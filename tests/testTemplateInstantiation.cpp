@@ -45,7 +45,7 @@ int main()
   static_assert(std::is_same_v<typename rapidcsv::S2T_DefaultFormat<std::string>::type, rapidcsv::S2T_Format_WorkAround>);
   static_assert(std::is_same_v<typename rapidcsv::S2T_DefaultFormat<char>::type, rapidcsv::S2T_Format_WorkAround>);
   static_assert(std::is_same_v<typename rapidcsv::S2T_DefaultFormat<bool>::type, rapidcsv::S2T_Format_WorkAround>);
-  static_assert(std::is_same_v<typename rapidcsv::S2T_DefaultFormat<rapidcsv::datelib::year_month_day>::type, rapidcsv::S2T_Format_StreamAsIs>);
+  static_assert(std::is_same_v<typename rapidcsv::S2T_DefaultFormat<rapidcsv::datelib::year_month_day>::type, rapidcsv::S2T_Format_StreamYMD< rapidcsv::defYMDfmt > >);
 
   // check for default T2S_FORMAT types
   static_assert(std::is_same_v<typename rapidcsv::T2S_DefaultFormat<int>::type, rapidcsv::T2S_Format_std_TtoS>);
@@ -53,7 +53,7 @@ int main()
   static_assert(std::is_same_v<typename rapidcsv::T2S_DefaultFormat<std::string>::type, rapidcsv::T2S_Format_WorkAround>);
   static_assert(std::is_same_v<typename rapidcsv::T2S_DefaultFormat<char>::type, rapidcsv::T2S_Format_WorkAround>);
   static_assert(std::is_same_v<typename rapidcsv::T2S_DefaultFormat<bool>::type, rapidcsv::T2S_Format_WorkAround>);
-  static_assert(std::is_same_v<typename rapidcsv::T2S_DefaultFormat<rapidcsv::datelib::year_month_day>::type, rapidcsv::T2S_Format_StreamAsIs>);
+  static_assert(std::is_same_v<typename rapidcsv::T2S_DefaultFormat<rapidcsv::datelib::year_month_day>::type, rapidcsv::T2S_Format_StreamYMD< rapidcsv::defYMDfmt > >);
 
   static_assert(std::is_same_v< decltype(&rapidcsv::ConvertFromVal<double>::ToStr), std::string(*)(const double&)>);
   static_assert(std::is_same_v< decltype(&rapidcsv::ConvertFromStr<int>::ToVal),    int(*)(const std::string&)>);
