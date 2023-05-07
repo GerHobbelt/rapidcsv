@@ -2,6 +2,7 @@
 #include <string>
 #include <cassert>
 
+//  ./manualBuild.sh tests checkChrono_fromStream -DUSE_CHRONO=1
 
 #if  USE_CHRONO == 1
   #include <chrono>
@@ -31,6 +32,6 @@ datelib::year_month_day
 int main()
 {
     std::string date("2016-12-11");
-    datelib::year_month_day ymd = ToYMD(date, (char*)"%F");
+    datelib::year_month_day ymd = ToYMD(date, const_cast<char*> ("%F") );
     assert(ymd == datelib::year(2016)/12/11);
 }

@@ -9,12 +9,29 @@ set (CMAKE_CXX_STANDARD 20)
     Check if chrono-lib is supported
 #]==============================================]
 try_compile(USE_CHRONO_LIB
-            SOURCES  "${CMAKE_CURRENT_SOURCE_DIR}/tests/checkChrono.cpp"
+            SOURCES  "${CMAKE_CURRENT_SOURCE_DIR}/tests/checkChrono_fromStream.cpp"
             CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
             COMPILE_DEFINITIONS "-DUSE_CHRONO=1"
             CXX_STANDARD "${CMAKE_CXX_STANDARD}"
             CXX_STANDARD_REQUIRED True
            )
+if(USE_CHRONO_LIB)
+  message(STATUS "'checkChrono_fromStream' succeded")
+  try_compile(USE_CHRONO_LIB
+              SOURCES  "${CMAKE_CURRENT_SOURCE_DIR}/tests/checkChrono_toStream.cpp"
+              CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
+              COMPILE_DEFINITIONS "-DUSE_CHRONO=1"
+              CXX_STANDARD "${CMAKE_CXX_STANDARD}"
+              CXX_STANDARD_REQUIRED True
+            )
+  if(USE_CHRONO_LIB)
+    message(STATUS "'checkChrono_toStream' succeded")
+  else()
+    message(STATUS "'checkChrono_toStream' failed")
+  endif()
+else()
+  message(STATUS "'checkChrono_fromStream' failed")
+endif()
 
 
 if(USE_CHRONO_LIB)
