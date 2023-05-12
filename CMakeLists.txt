@@ -17,14 +17,14 @@ try_compile(USE_CHRONO_LIB
            )
 if(USE_CHRONO_LIB)
   message(STATUS "'checkChrono_fromStream' succeded")
-  try_compile(USE_CHRONO_LIB
+  try_compile(IS_CHRONO_TOSTREAM
               SOURCES  "${CMAKE_CURRENT_SOURCE_DIR}/tests/checkChrono_toStream.cpp"
               CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
               COMPILE_DEFINITIONS "-DUSE_CHRONO=1"
               CXX_STANDARD "${CMAKE_CXX_STANDARD}"
               CXX_STANDARD_REQUIRED True
             )
-  if(USE_CHRONO_LIB)
+  if(IS_CHRONO_TOSTREAM)
     message(STATUS "'checkChrono_toStream' succeded")
   else()
     message(STATUS "'checkChrono_toStream' failed")
@@ -38,6 +38,11 @@ if(USE_CHRONO_LIB)
   message(STATUS "Using date-time-lib : <chrono>")
   add_definitions(-DUSE_CHRONO=1)
   unset(DATELIB)
+  if(IS_CHRONO_TOSTREAM)
+    add_definitions(-DUSE_CHRONO_TOSTREAM=1)
+  else()
+    add_definitions(-DUSE_CHRONO_TOSTREAM=0)
+  endif()
 else()
   message(STATUS "Using date-time-lib : <date/date.h>")
   add_definitions(-DUSE_CHRONO=0)
@@ -324,6 +329,9 @@ if(RAPIDCSV_BUILD_TESTS)
   add_unit_test(testView071)
 
   add_unit_test(testViewB001)
+  add_unit_test(testViewYmd001)
+  add_unit_test(testViewYmd003)
+  add_unit_test(testViewYmd005)
 
   # perf tests
   add_perf_test(ptest001)

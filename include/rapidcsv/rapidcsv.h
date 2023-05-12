@@ -1318,7 +1318,6 @@ namespace rapidcsv
     bool _mHasUtf8BOM = false;
 
 
-    template<Document::f_EvalBoolExpr evaluateBooleanExpression, typename... Types>
-    friend class ViewDocument;
+    friend class _ViewDocument;
   };
 }

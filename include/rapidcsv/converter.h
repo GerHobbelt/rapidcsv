@@ -906,10 +906,19 @@ namespace rapidcsv
       std::ostringstream oss;
       T2S_FORMAT_YMD::streamUpdate(oss);
 #if  USE_CHRONO == 1
+  #if  DUSE_CHRONO_TOSTREAM == 1
+      // As of writing this code, no compiler supports chrono::to_stream() yet.
+      // This code hereis for future reference once compiler starts supporting.
       // refer https://omegaup.com/docs/cpp/en/cpp/chrono/local_t/to_stream.html
-      //std::chrono::to_stream(oss, fmt, val, abbrev, offset_sec); // does not compile
-      oss << std::chrono::format(fmt, val);  // for now , no support for abbrev, offset_sec
+      std::chrono::to_stream(oss, fmt, val, abbrev, offset_sec); // does not compile
+  #else
+      // msvc supports only from_stream and not to_stream.
+      // date-lib is not compatible with msvc (min/max macro clash), therefore
+      // we are left with std::format() alternative
+      oss << std::format(fmt, val);  // for now , no support for abbrev, offset_sec
+  #endif
 #else
+      // gcc and clang does not support the required functionality here
       using CS = std::chrono::seconds;
       date::fields<CS> fds{val};
       date::to_stream(oss, fmt, fds, abbrev, offset_sec);

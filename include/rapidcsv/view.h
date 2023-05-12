@@ -1,5 +1,5 @@
 /*
- * ViewDocument.h
+ * _ViewDocument.h
  *
  * URL:      https://github.com/panchaBhuta/rapidcsv_FilterSort
  * Version:  2.01
@@ -19,6 +19,8 @@
 #include <string>
 
 #include <rapidcsv/rapidcsv.h>
+
+//TODO documentation
 
 namespace rapidcsv
 {
@@ -68,6 +70,10 @@ namespace rapidcsv
         nextIndex(row, spArgs...)
     {}
 
+    RowIndex(const T& val, Types&&... args)
+      : value(val), nextIndex(std::forward<Types>(args)...)
+    {}
+
     bool operator < (const RowIndex<T, Types...>& other) const
     {
       if (value < other.value)
@@ -106,6 +112,9 @@ namespace rapidcsv
     RowIndex(const Document::t_dataRow& row,
              const SortParams<T>& pSortParams)
       : value(pSortParams.getValue(row))
+    {}
+
+    RowIndex(const T& val) : value(val)
     {}
 
     inline bool operator < (const RowIndex<T>& other) const
@@ -216,59 +225,22 @@ namespace rapidcsv
     }
   };
 
-  template<Document::f_EvalBoolExpr evaluateBooleanExpression, typename... Types>
-  class ViewDocument
+  class _ViewDocument
   {
   protected:
-    explicit ViewDocument(const Document& document)
-      : _document(document), _mapViewRowIdx2RowIdx(), _mapRowIdx2ViewRowIdx()
-    {
-      size_t rowIdx = 0;
-      ssize_t viewRowIdx = 0;
-      const ssize_t rowIdxStart = static_cast<ssize_t>(_document._getDataRowIndex(0).dataIdx);
-      for (auto itRow = _document._mData.begin() + rowIdxStart;
-           itRow != _document._mData.end(); ++itRow, ++rowIdx)
-      {
-        if (evaluateBooleanExpression(*itRow))
-        {
-          _mapViewRowIdx2RowIdx.push_back(rowIdx);
-          _mapRowIdx2ViewRowIdx.push_back(viewRowIdx);
-          ++viewRowIdx;
-        } else {
-          _mapRowIdx2ViewRowIdx.push_back(-10);
-        }
-      }
-    }
+    const Document& _document;
+    const std::vector<Document::t_dataRow>& _mData;
+    std::vector< size_t> _mapViewRowIdx2RowIdx;
+    std::vector<ssize_t> _mapRowIdx2ViewRowIdx;
 
-    template<typename... SPtypes>
-    explicit ViewDocument(const Document& document, const SPtypes & ... spArgs)
-      : _document(document), _mapViewRowIdx2RowIdx(), _mapRowIdx2ViewRowIdx()
-    {
-      RowComparator<Types...> sortPredicate(spArgs...);
-      std::map<const RowIndex<Types...>, size_t, RowComparator<Types...>> sortedData(sortPredicate);
-      size_t rowIdx = 0;
-      const ssize_t rowIdxStart = static_cast<ssize_t>(_document._getDataRowIndex(0).dataIdx);
-      for (auto itRow = _document._mData.begin() + rowIdxStart;
-           itRow != _document._mData.end(); ++itRow, ++rowIdx)
-      {
-        if (evaluateBooleanExpression(*itRow))
-        {
-          RowIndex<Types...> rowIndexValues((*itRow), spArgs...);
-          // std::cout << "rowIndexValues.value = " << rowIndexValues.value << std::endl;
-          sortedData[rowIndexValues] = rowIdx;
-        }
-        _mapRowIdx2ViewRowIdx.push_back(-10);
-      }
+    explicit _ViewDocument(const Document& document)
+      : _document(document),     _mData(document._mData),
+        _mapViewRowIdx2RowIdx(), _mapRowIdx2ViewRowIdx()
+    {}
 
-      ssize_t viewRowIdx = 0;
-      for (auto itMap = sortedData.begin();
-           itMap != sortedData.end(); ++itMap, ++viewRowIdx)
-      {
-        rowIdx = itMap->second;
-        _mapViewRowIdx2RowIdx.push_back(rowIdx);
-        _mapRowIdx2ViewRowIdx.at(rowIdx) = viewRowIdx;
-        // std::cout << "rowIdx("<< rowIdx <<") <-> viewRowIdx(" << viewRowIdx << ")" << std::endl;
-      }
+    inline RawIdx _getDataRowIndex(const size_t pRowIdx) const
+    {
+      return _document._getDataRowIndex(pRowIdx);
     }
 
   public:
@@ -386,54 +358,135 @@ namespace rapidcsv
      * @param   pConvertToVal         conversion function (optional argument).
      * @returns cell data.
      */
-    //template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
-    template<typename T,
-             T (*CONV_S2T)(const std::string&) =
-                       &ConvertFromStr<T>::ToVal >
-    const T GetViewCell(const c_sizet_or_string auto& pColumnNameIdx,
-	                    const c_sizet_or_string auto& pRowName_ViewRowIdx) const
+    template< typename T,
+              auto (*CONV_S2T)(const std::string&)
+                       = &ConvertFromStr<T>::ToVal ,
+              typename R = typename std::invoke_result<decltype(CONV_S2T),
+                                                       const std::string& >::type
+            >
+    R GetViewCell(const c_sizet_or_string auto& pColumnNameIdx,
+	                const c_sizet_or_string auto& pRowName_ViewRowIdx) const
     {
       const size_t pColumnIdx = _document.GetColumnIdx(pColumnNameIdx);
       const size_t docRowIdx  = GetDocumentRowIdx(pRowName_ViewRowIdx);
       return _document.GetCell<T, CONV_S2T >(pColumnIdx, docRowIdx);
     }
-
-  private:
-    const Document& _document;
-    std::vector<size_t> _mapViewRowIdx2RowIdx;
-    std::vector<ssize_t> _mapRowIdx2ViewRowIdx;
   };
 
 
   template<Document::f_EvalBoolExpr evaluateBooleanExpression, typename... Types>
-  class FilterDocument : public ViewDocument<evaluateBooleanExpression, Types...>
+  class FilterDocument : public _ViewDocument
   {
   public:
     explicit FilterDocument(const Document& document)
-      : ViewDocument<evaluateBooleanExpression, Types...>(document)
-    {}
+      : _ViewDocument(document)
+    {
+      size_t rowIdx = 0;
+      ssize_t viewRowIdx = 0;
+      const ssize_t rowIdxStart = static_cast<ssize_t>(_getDataRowIndex(0).dataIdx);
+      for (auto itRow  = _mData.begin() + rowIdxStart;
+                itRow != _mData.end(); ++itRow, ++rowIdx)
+      {
+        if (evaluateBooleanExpression(*itRow))
+        {
+          _mapViewRowIdx2RowIdx.push_back(rowIdx);
+          _mapRowIdx2ViewRowIdx.push_back(viewRowIdx);
+          ++viewRowIdx;
+        } else {
+          _mapRowIdx2ViewRowIdx.push_back(-10);
+        }
+      }
+    }
+  };
+
+
+  template<Document::f_EvalBoolExpr evaluateBooleanExpression, typename... Types>
+  class FilterSortDocument : public _ViewDocument
+  {
+  public:
+    using t_sortKey = RowIndex<Types...>;
+
+    template<typename... SPtypes>
+    explicit FilterSortDocument(const Document& document, const SPtypes & ... spArgs)
+      : _ViewDocument(document), _sortPredicate(spArgs...), _sortedData(_sortPredicate)
+    {
+      size_t rowIdx = 0;
+      const ssize_t rowIdxStart = static_cast<ssize_t>(_getDataRowIndex(0).dataIdx);
+      for (auto itRow  = _mData.begin() + rowIdxStart;
+                itRow != _mData.end(); ++itRow, ++rowIdx)
+      {
+        if (evaluateBooleanExpression(*itRow))
+        {
+          t_sortKey rowIndexValues((*itRow), spArgs...);
+          // std::cout << "rowIndexValues.value = " << rowIndexValues.value << std::endl;
+          _sortedData[rowIndexValues] = rowIdx;
+        }
+        _mapRowIdx2ViewRowIdx.push_back(-10);
+      }
+
+      ssize_t viewRowIdx = 0;
+      for (auto itMap  = _sortedData.begin();
+                itMap != _sortedData.end(); ++itMap, ++viewRowIdx)
+      {
+        rowIdx = itMap->second;
+        _mapViewRowIdx2RowIdx.push_back(rowIdx);
+        _mapRowIdx2ViewRowIdx.at(rowIdx) = viewRowIdx;
+        // std::cout << "rowIdx("<< rowIdx <<") <-> viewRowIdx(" << viewRowIdx << ")" << std::endl;
+      }
+    }
+
+    template< typename T,
+              auto (*CONV_S2T)(const std::string&)
+                       = &ConvertFromStr<T>::ToVal ,
+              typename R = typename std::invoke_result<decltype(CONV_S2T),
+                                                       const std::string& >::type
+            >
+    std::vector<R> GetSortRow(const t_sortKey& pRowKey) const
+    {
+      size_t docRowIdx;
+      try {
+        docRowIdx  = _sortedData.at(pRowKey);
+      } catch (std::out_of_range& err) {
+        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)
+              +" rowKey not found in 'sortedKeyMap'. FilterSortDocument::GetSortedRow() : " + err.what());
+      }
+      return _document.GetRow<T, CONV_S2T >(docRowIdx);
+    }
+
+    template< typename T,
+              auto (*CONV_S2T)(const std::string&)
+                       = &ConvertFromStr<T>::ToVal ,
+              typename R = typename std::invoke_result<decltype(CONV_S2T),
+                                                       const std::string& >::type
+            >
+    R GetSortCell(const c_sizet_or_string auto& pColumnNameIdx,
+	                const t_sortKey& pRowKey) const
+    {
+      const size_t pColumnIdx = _document.GetColumnIdx(pColumnNameIdx);
+      size_t docRowIdx;
+      try {
+        docRowIdx  = _sortedData.at(pRowKey);
+      } catch (std::out_of_range& err) {
+        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)
+              +" rowKey not found in 'sortedKeyMap'. FilterSortDocument::GetSortedCell() : " + err.what());
+      }
+      return _document.GetCell<T, CONV_S2T >(pColumnIdx, docRowIdx);
+    }
+
+  private:
+    const RowComparator<Types...> _sortPredicate;
+    std::map<const t_sortKey, size_t, RowComparator<Types...>> _sortedData;
   };
 
 
   constexpr bool selectAll(const Document::t_dataRow&) { return true; }
   template<typename... Types>
-  class SortDocument : public ViewDocument<selectAll, Types...>
+  class SortDocument : public FilterSortDocument<selectAll, Types...>
   {
   public:
     template<typename... SPtypes>
     explicit SortDocument(const Document& document, const SPtypes & ... spArgs)
-      : ViewDocument<selectAll, Types...>(document, spArgs...)
-    {}
-  };
-
-
-  template<Document::f_EvalBoolExpr evaluateBooleanExpression, typename... Types>
-  class FilterSortDocument : public ViewDocument<evaluateBooleanExpression, Types...>
-  {
-  public:
-    template<typename... SPtypes>
-    explicit FilterSortDocument(const Document& document, const SPtypes & ... spArgs)
-      : ViewDocument<evaluateBooleanExpression, Types...>(document, spArgs...)
+      : FilterSortDocument<selectAll, Types...>(document, spArgs...)
     {}
   };
 }
