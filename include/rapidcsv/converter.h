@@ -77,7 +77,9 @@ namespace rapidcsv
   struct is_signed_char<T, void> {
     // plain chars can be either signed or unsigned as they are machine dependent, but printable characters are always positive
     static constexpr bool
-    value = (static_cast<int>(std::numeric_limits<T>::min()) < 0);
+    value = (static_cast<int>((std::numeric_limits<T>::min)()) < 0);
+    // warning C4003: not enough arguments for function-like macro invocation 'min'
+    // work-around is (std::numeric_limits<T>::min)()
   };
   template <typename T>
   concept c_signed_char = is_signed_char<T>::value;
@@ -94,7 +96,7 @@ namespace rapidcsv
   struct is_unsigned_char<T, void> {
     // plain chars can be either signed or unsigned as they are machine dependent, but printable characters are always positive
     static constexpr bool
-    value = (static_cast<int>(std::numeric_limits<T>::min()) == 0);
+    value = (static_cast<int>((std::numeric_limits<T>::min)()) == 0);
   };
   template <typename T>
   concept c_unsigned_char = is_unsigned_char<T>::value;

@@ -36,7 +36,7 @@ int main()
     rapidcsv::FilterDocument<isFirstCellPositive> viewdoc(doc);
 
 
-    unittest::ExpectEqual(int, viewdoc.GetViewRowCount(), 4);
+    unittest::ExpectEqual(size_t, viewdoc.GetViewRowCount(), 4);
 
     unittest::ExpectEqual(int, viewdoc.GetViewCell<int>(0, 0), 3);
     unittest::ExpectEqual(int, viewdoc.GetViewCell<int>(1, 0), 9);
@@ -58,7 +58,7 @@ int main()
     const rapidcsv::SortParams<int> spA(0);
     rapidcsv::SortDocument<int> viewdoc1(doc, spA);
 
-    unittest::ExpectEqual(int, viewdoc1.GetViewRowCount(), 7);
+    unittest::ExpectEqual(size_t, viewdoc1.GetViewRowCount(), 7);
 
     unittest::ExpectEqual(int, viewdoc1.GetViewCell<int>(0, 0), -8);
     unittest::ExpectEqual(int, viewdoc1.GetViewCell<int>(1, 0), 64);
@@ -80,7 +80,7 @@ int main()
     const rapidcsv::SortParams<int> spD(0, rapidcsv::e_SortOrder::DESCEND);
     rapidcsv::FilterSortDocument<isFirstCellPositive, int> viewdoc2(doc, spD);
 
-    unittest::ExpectEqual(int, viewdoc2.GetViewRowCount(), 4);
+    unittest::ExpectEqual(size_t, viewdoc2.GetViewRowCount(), 4);
 
     unittest::ExpectEqual(int, viewdoc2.GetViewCell<int>(0, 0), 9);
     unittest::ExpectEqual(int, viewdoc2.GetViewCell<int>(1, 0), 81);

@@ -16,6 +16,13 @@ bool isYear2016(const rapidcsv::Document::t_dataRow& dataRow)
 int main()
 {
   int rv = 0;
+  std::string mapErr;
+  try {
+    std::map<int,int> rdmp;
+    rdmp.at(0);
+  } catch (std::out_of_range& err) {
+    mapErr = err.what();
+  }
 
   try
   {
@@ -54,7 +61,7 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(4), "308160000");
     unittest::ExpectEqual(std::string, strs.at(5), "0.06796");
 
-    rdb::year_month_day tDate{rdb::year{1986}, rdb::month{rdb::mar}, rdb::day{17} };
+    rdb::year_month_day tDate{rdb::year{1986}, rdb::month{3}, rdb::day{17} };
     rapidcsv::RowIndex<rdb::year_month_day> riDate(tDate);
     strs = viewdoc1.GetSortRow<std::string>(riDate);
     unittest::ExpectEqual(size_t, strs.size(), 6);
@@ -78,7 +85,7 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(4), "10250600");
     unittest::ExpectEqual(std::string, strs.at(5), "62.520968");
 
-    rdb::year_month_day tDate2{rdb::year{2016}, rdb::month{rdb::dec}, rdb::day{28} };
+    rdb::year_month_day tDate2{rdb::year{2016}, rdb::month{12}, rdb::day{28} };
     rapidcsv::RowIndex<rdb::year_month_day> riDate2(tDate2);
     strs = viewdoc2.GetSortRow<std::string>(riDate2);
     unittest::ExpectEqual(size_t, strs.size(), 6);
@@ -86,10 +93,10 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(4), "14653300");
     unittest::ExpectEqual(std::string, strs.at(5), "62.610426");
 
-    rdb::year_month_day tDate3{rdb::year{2015}, rdb::month{rdb::dec}, rdb::day{28} };
+    std::string errMsg = "include/rapidcsv/view.h:450 rowKey not found in 'sortedKeyMap'. FilterSortDocument::GetSortedRow() : " + mapErr;
+    rdb::year_month_day tDate3{rdb::year{2015}, rdb::month{12}, rdb::day{28} };
     rapidcsv::RowIndex<rdb::year_month_day> riDate3(tDate3);
-    ExpectExceptionMsg(viewdoc2.GetSortRow<std::string>(riDate3), std::out_of_range,
-      "include/rapidcsv/view.h:450 rowKey not found in 'sortedKeyMap'. FilterSortDocument::GetSortedRow() : map::at");
+    ExpectExceptionMsg(viewdoc2.GetSortRow<std::string>(riDate3), std::out_of_range, errMsg );
   }
   catch (const std::exception& ex)
   {
