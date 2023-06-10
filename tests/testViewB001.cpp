@@ -1,4 +1,4 @@
-// testView001.cpp - read cell value
+// testViewB001.cpp - read cell value  :: multi-column sort
 
 #include <rapidcsv/view.h>
 #include "unittest.h"
@@ -33,7 +33,7 @@ int main()
   {
     rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0));
 
-    /////   Sort
+    /////  Filter + Sort
     const rapidcsv::SortParams<int> spA(1);
     const rapidcsv::SortParams<int> spD(2, rapidcsv::e_SortOrder::DESCEND);
     rapidcsv::FilterSortDocument<isFirstCellPositive, int, int> viewdoc1(doc, spA, spD);

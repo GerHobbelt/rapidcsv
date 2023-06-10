@@ -31,11 +31,7 @@ namespace rapidcsv
   };
 
 
-  // sort on NaN values is undefined.
-  // Hence we are not handling return type R = std::variant<T, gNaN>
-  template<typename T,
-           T (*CONV_S2T)(const std::string&) =
-                      &ConvertFromStr<T>::ToVal >
+  template< typename T, c_S2Tconverter S2Tconv = ConvertFromStr<T> >
   class SortParams
   {
   public:
@@ -48,10 +44,11 @@ namespace rapidcsv
       sortOrder(SORT_ORDER)
     {}
 
-    T getValue(const Document::t_dataRow& row) const
+    typename S2Tconv::return_type
+    getValue(const Document::t_dataRow& row) const
     {
       const std::string& cellStr = row.at(rawDataColumnIndex);
-      return CONV_S2T(cellStr);
+      return S2Tconv::ToVal(cellStr);
     }
   };
 
@@ -62,10 +59,10 @@ namespace rapidcsv
     const T value;
     const RowIndex<Types...> nextIndex;
 
-    template<typename... SPtypes>  // SPtypes -> SortParams<?>
+    template<typename... SPtypes>  // SPtypes -> SortParams<Types...>
     RowIndex(const Document::t_dataRow& row,
-             const SortParams<T>& pSortParams,
-             const SPtypes & ... spArgs)
+             //   <typename T             , typename... Types>
+             const SortParams<T, auto>& pSortParams, const SPtypes& ... spArgs)
       : value(pSortParams.getValue(row)),
         nextIndex(row, spArgs...)
     {}
@@ -110,7 +107,7 @@ namespace rapidcsv
     const T value;
 
     RowIndex(const Document::t_dataRow& row,
-             const SortParams<T>& pSortParams)
+             const SortParams<T, auto>& pSortParams)
       : value(pSortParams.getValue(row))
     {}
 
@@ -134,7 +131,7 @@ namespace rapidcsv
   private:
     const RowComparator<Types...> _nextColumnInfo;
 
-    typedef bool (RowComparator<T, Types...>::* tf_sortOrder)
+    typedef bool (RowComparator<T, Types...>::* tf_sortOrder)    // tf -> type-function
       (const RowIndex<T, Types...>& lhVal,
        const RowIndex<T, Types...>& rhVal) const;
 
@@ -174,7 +171,7 @@ namespace rapidcsv
 
   public:
     template<typename... SPtypes>
-    RowComparator(const SortParams<T>& pSortParams,
+    RowComparator(const SortParams<T, auto>& pSortParams,
                   const SPtypes & ... spArgs)
       : _nextColumnInfo(spArgs...),
         _sortOrder(  (e_SortOrder::ASCEND == pSortParams.sortOrder) ?
@@ -213,7 +210,7 @@ namespace rapidcsv
     }
 
   public:
-    RowComparator(const SortParams<T>& pSortParams)
+    RowComparator(const SortParams<T, auto>& pSortParams)
       : _sortOrder((e_SortOrder::ASCEND == pSortParams.sortOrder) ?
                    &RowComparator<T>::_ascendingOrder :
                    &RowComparator<T>::_descendingOrder)
@@ -225,6 +222,12 @@ namespace rapidcsv
     }
   };
 
+  /**
+   * @brief     Class representing a CSV document view. The underlying 'Document' is viewed after
+   *            applying filter and/or sort on rows, based on cell values after type-conversion.
+   *            Only intended for converter internal usage, but exposed externally
+   *            to allow specialization on datatypes.
+   */
   class _ViewDocument
   {
   protected:
@@ -374,6 +377,11 @@ namespace rapidcsv
   };
 
 
+  /**
+   * @brief     Class representing a CSV document filtered-view. The underlying 'Document' is viewed after
+   *            applying filter on rows, based on cell values after type-conversion.
+   */
+//TODO  create test testView....cpp  similar to test048.cpp and test049.cpp  which checks for NaN and null value for comparsion and sort
   template<Document::f_EvalBoolExpr evaluateBooleanExpression, typename... Types>
   class FilterDocument : public _ViewDocument
   {
@@ -407,7 +415,7 @@ namespace rapidcsv
     using t_sortKey = RowIndex<Types...>;
 
     template<typename... SPtypes>
-    explicit FilterSortDocument(const Document& document, const SPtypes & ... spArgs)
+    explicit FilterSortDocument(const Document& document, const SPtypes& ... spArgs)
       : _ViewDocument(document), _sortPredicate(spArgs...), _sortedData(_sortPredicate)
     {
       size_t rowIdx = 0;
@@ -435,32 +443,34 @@ namespace rapidcsv
       }
     }
 
-    template< typename T,
-              auto (*CONV_S2T)(const std::string&)
-                       = &ConvertFromStr<T>::ToVal ,
-              typename R = typename std::invoke_result<decltype(CONV_S2T),
-                                                       const std::string& >::type
-            >
-    std::vector<R> GetSortRow(const t_sortKey& pRowKey) const
+    template< typename T, c_S2Tconverter S2Tconv = ConvertFromStr<T> >
+    std::vector<typename S2Tconv::return_type>
+    GetDocRow(const t_sortKey& pRowKey) const
     {
       size_t docRowIdx;
       try {
         docRowIdx  = _sortedData.at(pRowKey);
       } catch (std::out_of_range& err) {
         throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)
-              +" rowKey not found in 'sortedKeyMap'. FilterSortDocument::GetSortedRow() : " + err.what());
+              +" rowKey not found in 'sortedKeyMap'. FilterSortDocument::GetDocRow() : " + err.what());
       }
-      return _document.GetRow<T, CONV_S2T >(docRowIdx);
+      return _document.GetRow<T, S2Tconv >(docRowIdx);
     }
 
-    template< typename T,
-              auto (*CONV_S2T)(const std::string&)
-                       = &ConvertFromStr<T>::ToVal ,
-              typename R = typename std::invoke_result<decltype(CONV_S2T),
-                                                       const std::string& >::type
-            >
-    R GetSortCell(const c_sizet_or_string auto& pColumnNameIdx,
-	                const t_sortKey& pRowKey) const
+    template< typename T, auto (*CONV_S2T)(const std::string&) >
+    inline std::vector< typename std::invoke_result_t< decltype(CONV_S2T),
+                                                       const std::string&
+                                                     >
+                      >
+    GetDocRow(const t_sortKey& pRowKey) const
+    {
+      return GetDocRow<T, S2TwrapperFunction<T, CONV_S2T> >(pRowKey);
+    }
+
+    template< typename T, c_S2Tconverter S2Tconv = ConvertFromStr<T> >
+    typename S2Tconv::return_type
+    GetDocCell(const c_sizet_or_string auto& pColumnNameIdx,
+	             const t_sortKey& pRowKey) const
     {
       const size_t pColumnIdx = _document.GetColumnIdx(pColumnNameIdx);
       size_t docRowIdx;
@@ -468,14 +478,24 @@ namespace rapidcsv
         docRowIdx  = _sortedData.at(pRowKey);
       } catch (std::out_of_range& err) {
         throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)
-              +" rowKey not found in 'sortedKeyMap'. FilterSortDocument::GetSortedCell() : " + err.what());
+              +" rowKey not found in 'sortedKeyMap'. FilterSortDocument::GetDocCell() : " + err.what());
       }
-      return _document.GetCell<T, CONV_S2T >(pColumnIdx, docRowIdx);
+      return _document.GetCell<T, S2Tconv >(pColumnIdx, docRowIdx);
+    }
+
+    template< typename T, auto (*CONV_S2T)(const std::string&) >
+    inline typename std::invoke_result_t< decltype(CONV_S2T),
+                                          const std::string&
+                                        >
+    GetDocCell(const c_sizet_or_string auto& pColumnNameIdx,
+	             const t_sortKey& pRowKey) const
+    {
+      return GetDocCell<T, S2TwrapperFunction<T, CONV_S2T> >( pColumnNameIdx, pRowKey);
     }
 
   private:
     const RowComparator<Types...> _sortPredicate;
-    std::map<const t_sortKey, size_t, RowComparator<Types...>> _sortedData;
+    std::map<const t_sortKey, size_t, RowComparator<Types...> > _sortedData;
   };
 
 

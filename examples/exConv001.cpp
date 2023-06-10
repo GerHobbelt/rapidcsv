@@ -82,7 +82,7 @@ void testType(const std::string& typeData, const T& orgT)
   const T convT = rapidcsv::ConvertFromStr<T>::ToVal(strT);
 
   std::cout << std::setprecision(25) << "org" << typeData << " = " << orgT << " ; str"
-            << typeData << " = " << strT << " ; conv" << typeData << " = " << convT << std::endl;
+            << typeData << " = " << strT << " ; conv-" << typeData << " = " << convT << std::endl;
 }
 
 constexpr char dmY_fmt[] = "%d-%m-%Y";  // string literal object with static storage duration

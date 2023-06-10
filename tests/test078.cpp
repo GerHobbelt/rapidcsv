@@ -28,24 +28,24 @@ int main()
     unittest::ExpectEqual(int, doc.GetColumn<int>(0).at(0), 3);
     unittest::ExpectEqual(int, doc.GetColumn<int>("A").at(0), 3);
 
-    doc.SetColumn(0, std::vector<int>({ 4, 5 }));
+    doc.SetColumn<int>(0, std::vector<int>({ 4, 5 }));
     unittest::ExpectEqual(int, doc.GetColumn<int>(0).at(0), 4);
-    doc.SetColumn("A", std::vector<int>({ 5, 6 }));
+    doc.SetColumn<int>("A", std::vector<int>({ 5, 6 }));
     unittest::ExpectEqual(int, doc.GetColumn<int>("A").at(0), 5);
 
-    doc.InsertColumn(0, std::vector<int>({ 7, 8 }), "A2");
+    doc.InsertColumn<int>(0, std::vector<int>({ 7, 8 }), "A2");
     unittest::ExpectEqual(int, doc.GetColumn<int>("A2").at(0), 7);
 
     unittest::ExpectEqual(int, doc.GetRow<int>(0).at(0), 7);
     unittest::ExpectEqual(int, doc.GetRow<int>("1").at(0), 7);
 
-    doc.SetRow(0, std::vector<int>({ 9, 3, 9, 81 }));
+    doc.SetRow<int>(0, std::vector<int>({ 9, 3, 9, 81 }));
     unittest::ExpectEqual(int, doc.GetRow<int>(0).at(0), 9);
 
-    doc.SetRow("1", std::vector<int>({ 9, 3, 9, 81 }));
+    doc.SetRow<int>("1", std::vector<int>({ 9, 3, 9, 81 }));
     unittest::ExpectEqual(int, doc.GetRow<int>("1").at(0), 9);
 
-    doc.InsertRow(0, std::vector<int>({ 1, 2, 3, 4 }), "1B");
+    doc.InsertRow<int>(0, std::vector<int>({ 1, 2, 3, 4 }), "1B");
     unittest::ExpectEqual(int, doc.GetRow<int>("1B").at(0), 1);
 
     unittest::ExpectEqual(int, doc.GetCell<int>(0, 0), 1);
@@ -53,9 +53,9 @@ int main()
     unittest::ExpectEqual(int, doc.GetCell<int>(0, "1B"), 1);
     unittest::ExpectEqual(int, doc.GetCell<int>("A2", 0), 1);
 
-    doc.SetCell(1, 1, 111);
+    doc.SetCell<int>(1, 1, 111);
     unittest::ExpectEqual(int, doc.GetCell<int>(1, 1), 111);
-    doc.SetCell("A", "2", 222);
+    doc.SetCell<int>("A", "2", 222);
     unittest::ExpectEqual(int, doc.GetCell<int>("A", "2"), 222);
   }
   catch (const std::exception& ex)

@@ -63,7 +63,7 @@ int main()
 
     rdb::year_month_day tDate{rdb::year{1986}, rdb::month{3}, rdb::day{17} };
     rapidcsv::RowIndex<rdb::year_month_day> riDate(tDate);
-    strs = viewdoc1.GetSortRow<std::string>(riDate);
+    strs = viewdoc1.GetDocRow<std::string>(riDate);
     unittest::ExpectEqual(size_t, strs.size(), 6);
     unittest::ExpectEqual(std::string, strs.at(0), "29.000001");
     unittest::ExpectEqual(std::string, strs.at(4), "133171200");
@@ -87,16 +87,16 @@ int main()
 
     rdb::year_month_day tDate2{rdb::year{2016}, rdb::month{12}, rdb::day{28} };
     rapidcsv::RowIndex<rdb::year_month_day> riDate2(tDate2);
-    strs = viewdoc2.GetSortRow<std::string>(riDate2);
+    strs = viewdoc2.GetDocRow<std::string>(riDate2);
     unittest::ExpectEqual(size_t, strs.size(), 6);
     unittest::ExpectEqual(std::string, strs.at(0), "63.400002");
     unittest::ExpectEqual(std::string, strs.at(4), "14653300");
     unittest::ExpectEqual(std::string, strs.at(5), "62.610426");
 
-    std::string errMsg = "include/rapidcsv/view.h:450 rowKey not found in 'sortedKeyMap'. FilterSortDocument::GetSortedRow() : " + mapErr;
+    std::string errMsg = "include/rapidcsv/view.h:461 rowKey not found in 'sortedKeyMap'. FilterSortDocument::GetDocRow() : " + mapErr;
     rdb::year_month_day tDate3{rdb::year{2015}, rdb::month{12}, rdb::day{28} };
     rapidcsv::RowIndex<rdb::year_month_day> riDate3(tDate3);
-    ExpectExceptionMsg(viewdoc2.GetSortRow<std::string>(riDate3), std::out_of_range, errMsg );
+    ExpectExceptionMsg(viewdoc2.GetDocRow<std::string>(riDate3), std::out_of_range, errMsg );
   }
   catch (const std::exception& ex)
   {

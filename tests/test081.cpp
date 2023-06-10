@@ -21,14 +21,14 @@ int main()
   {
     rapidcsv::Document doc("", rapidcsv::LabelParams(0, 0), rapidcsv::SeparatorParams(',', false, false));
 
-    doc.InsertColumn(0, std::vector<int>({ 4, 9, 16, 25 }), "B");
-    doc.InsertColumn(0, std::vector<int>({ 2, 3, 4, 5 }), "A");
+    doc.InsertColumn<int>(0, std::vector<int>({ 4, 9, 16, 25 }), "B");
+    doc.InsertColumn<int>(0, std::vector<int>({ 2, 3, 4, 5 }), "A");
 
     doc.InsertColumn<int>(2);
-    doc.SetColumn(2, std::vector<int>({ 16, 81, 256, 625 }));
+    doc.SetColumn<int>(2, std::vector<int>({ 16, 81, 256, 625 }));
     doc.SetColumnName(2, "C");
 
-    doc.InsertColumn(3, std::vector<int>({ 256, 6561, 65536, 390625 }), "D");
+    doc.InsertColumn<int>(3, std::vector<int>({ 256, 6561, 65536, 390625 }), "D");
 
     std::vector<int> ints = doc.GetColumn<int>("B");
     unittest::ExpectEqual(size_t, ints.size(), 4);

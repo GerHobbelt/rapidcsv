@@ -66,9 +66,9 @@ int main()
 
     rdb::year_month_day tDate{rdb::year{1986}, rdb::month{3}, rdb::day{19} };
     rapidcsv::RowIndex<rdb::year_month_day> riDate(tDate);
-    unittest::ExpectEqual(double, viewdoc1.GetSortCell<double>("Open", riDate), 28.75);
-    unittest::ExpectEqual(unsigned long, viewdoc1.GetSortCell<unsigned long>("Volume", riDate), 47894400);
-    unittest::ExpectEqual(long double, viewdoc1.GetSortCell<long double>("Adj Close", riDate), 0.066202L);
+    unittest::ExpectEqual(double, viewdoc1.GetDocCell<double>("Open", riDate), 28.75);
+    unittest::ExpectEqual(unsigned long, viewdoc1.GetDocCell<unsigned long>("Volume", riDate), 47894400);
+    unittest::ExpectEqual(long double, viewdoc1.GetDocCell<long double>("Adj Close", riDate), 0.066202L);
 
     /////  Filter + Sort
     const rapidcsv::SortParams<rdb::year_month_day> spD(0, rapidcsv::e_SortOrder::DESCEND);
@@ -94,9 +94,9 @@ int main()
 
     rdb::year_month_day tDate2{rdb::year{2016}, rdb::month{12}, rdb::day{23} };
     rapidcsv::RowIndex<rdb::year_month_day> riDate2(tDate2);
-    unittest::ExpectEqual(double, viewdoc2.GetSortCell<double>("Open", riDate2), 63.450001);
-    unittest::ExpectEqual(unsigned long, viewdoc2.GetSortCell<unsigned long>("Volume", riDate2), 12403800);
-    unittest::ExpectEqual(long double, viewdoc2.GetSortCell<long double>("Adj Close", riDate2), 62.858919L);
+    unittest::ExpectEqual(double, viewdoc2.GetDocCell<double>("Open", riDate2), 63.450001);
+    unittest::ExpectEqual(unsigned long, viewdoc2.GetDocCell<unsigned long>("Volume", riDate2), 12403800);
+    unittest::ExpectEqual(long double, viewdoc2.GetDocCell<long double>("Adj Close", riDate2), 62.858919L);
   }
   catch (const std::exception& ex)
   {

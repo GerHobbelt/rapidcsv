@@ -21,14 +21,14 @@ int main()
   {
     rapidcsv::Document doc("", rapidcsv::LabelParams(0, 0), rapidcsv::SeparatorParams(',', false, false));
 
-    doc.InsertRow(0, std::vector<int>({ 3, 9, 81, 6561 }), "1");
-    doc.InsertRow(0, std::vector<int>({ 2, 4, 16, 256 }), "0");
+    doc.InsertRow<int>(0, std::vector<int>({ 3, 9, 81, 6561 }), "1");
+    doc.InsertRow<int>(0, std::vector<int>({ 2, 4, 16, 256 }), "0");
 
     doc.InsertRow<int>(2);
-    doc.SetRow(2, std::vector<int>({ 4, 16, 256, 65536 }));
+    doc.SetRow<int>(2, std::vector<int>({ 4, 16, 256, 65536 }));
     doc.SetRowName(2, "2");
 
-    doc.InsertRow(3, std::vector<int>({ 5, 25, 625, 390625 }), "3");
+    doc.InsertRow<int>(3, std::vector<int>({ 5, 25, 625, 390625 }), "3");
 
     std::vector<int> ints = doc.GetRow<int>("1");
     unittest::ExpectEqual(size_t, ints.size(), 4);

@@ -17,6 +17,7 @@
 #include <iostream>
 #include <cfloat>
 #include <climits>
+#include <cmath>
 #include <limits>
 #include <type_traits>
 #include <string>
@@ -60,7 +61,6 @@ namespace rapidcsv
   namespace datelib = date;
 #endif
 
-  // TODO - comments 
 
 
 
@@ -187,10 +187,11 @@ namespace rapidcsv
   struct has_streamUpdate : std::false_type {};
 
   template <typename FMT>
-  struct has_streamUpdate<FMT, std::void_t<decltype(FMT::streamUpdate),  // check for the presence of FMT::streamUpdate
-                                           typename FMT::stream_type>    // check for the presence of FMT::stream_type
+  struct has_streamUpdate<FMT, std::void_t< decltype(FMT::streamUpdate),  // check for the presence of member   FMT::streamUpdate
+                                            typename FMT::stream_type     // check for the presence of type-def FMT::stream_type
+                                          >
                          >
-           : std::is_same<decltype(&FMT::streamUpdate), void(*)(typename FMT::stream_type&)>
+           : std::is_same<decltype(&FMT::streamUpdate), void(*)(typename FMT::stream_type&)>  // member is function
   {};
 
   template <typename, typename = void >
@@ -198,8 +199,8 @@ namespace rapidcsv
 
   template <typename FMT>
   struct is_formatSS< FMT,
-                      typename std::enable_if<
-                          has_streamUpdate<FMT>::value &&
+                      typename std::enable_if
+                      <   has_streamUpdate<FMT>::value &&
                           is_iostream<typename FMT::stream_type>::value
                       >::type
                     >
@@ -214,7 +215,7 @@ namespace rapidcsv
   template <typename FMT>
   struct is_formatYMDss< FMT,
                          std::void_t<decltype(FMT::ymdFormat)>  // check for the presence of FMT::ymdFormat
-                     >
+                       >
            : is_formatSS<FMT>
   {};
   template <typename FMT>
@@ -346,12 +347,12 @@ namespace rapidcsv
 
   template<typename T>
   struct S2T_DefaultFormat< T,
-                            typename std::enable_if<
-                              std::is_same_v<T, std::string> ||
-                              is_char<T>::value ||
-                              std::is_same_v<T, bool>
-                            >::type
-                          > 
+                            typename  std::enable_if<
+                                        std::is_same_v<T, std::string> ||
+                                        is_char<T>::value ||
+                                        std::is_same_v<T, bool>
+                                      >::type
+                          >
   {
     using type = S2T_Format_WorkAround;
   };
@@ -361,15 +362,58 @@ namespace rapidcsv
   {
     using type = S2T_Format_StreamYMD< defYMDfmt >; // %F -> "%Y-%m-%d"
   };
+
+
+  template <typename, typename = void>
+  struct is_S2Tconverter : std::false_type {};
+
+  template <typename CFS>
+  struct is_S2Tconverter< CFS, std::void_t< decltype(CFS::ToVal),      // check for the presence of member   CFS::ToVal
+                                            typename CFS::value_type,  // check for the presence of type-def CFS::value_type
+                                            typename CFS::return_type  // check for the presence of type-def CFS::return_type
+                                          >
+                        >
+           : std::is_same<decltype(&CFS::ToVal), typename CFS::return_type(*)(const std::string&)>  // member is function
+  {};
+
+  template <typename CFS>
+  concept c_S2Tconverter = is_S2Tconverter<CFS>::value;
+
+
+  template< typename T,
+            auto (*CONV_S2T)(const std::string&)
+          >
+  struct S2TwrapperFunction
+  {
+    using value_type  = T;
+    using return_type = typename std::invoke_result_t< decltype(CONV_S2T),
+                                                       const std::string& >;
+
+    inline static return_type
+    ToVal(const std::string& str)
+    {
+      return CONV_S2T(str);
+    }
+  };
+
   // ]=============================================================] S2T_FORMAT
 
 
   // [=============================================================[ ConvertFromStr
     // https://eli.thegreenplace.net/2014/perfect-forwarding-and-universal-references-in-c/
-  //template<typename T, int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0>
+  /**
+   * @brief     Convertor class implementation for any types, FROM string using 'std::istringstream'.
+   *            Only intended for converter internal usage, but exposed externally (thru type-alias 'ConvertFromStr')
+   *            to allow specialization for custom datatype conversions.
+   * @tparam  T                     'type' converted to, from string data.
+   * @tparam  S2T_FORMAT            Class which encapsulates conversion parameters/logic such as 'Locale'.
+   */
   template<typename T, typename S2T_FORMAT = S2T_Format_StreamAsIs >
   struct _ConvertFromStr
   {
+    using value_type  = T;
+    using return_type = T;
+
     /*
         https://stackoverflow.com/questions/52299062/template-specialization-for-sfinae
         That is simply how SFINAE works ;)
@@ -386,6 +430,12 @@ namespace rapidcsv
         {}
     */
     // also refer  ::  https://stackoverflow.com/questions/11055923/stdenable-if-parameter-vs-template-parameter/11056146#11056146
+    /**
+     * @brief   Converts string holding a numerical value to numerical datatype representation.
+     * @param   str                 input string.
+     * @returns Numerical value if conversion succeeds.
+     *          Else 'std::invalid_argument' on conversion failure.
+     */
     inline static
     typename std::enable_if_t<is_formatISS<S2T_FORMAT>::value
                               && (!std::is_same_v<T, std::string>), T>
@@ -411,9 +461,19 @@ namespace rapidcsv
     }
   };
  
+  /**
+   * @brief     Convertor class implementation for integer types from string.
+   *            Only intended for converter internal usage, but exposed externally (thru type-alias 'ConvertFromStr')
+   *            to allow specialization for custom datatype conversions.
+   * @tparam  T                     'type' converted to, from string data.
+   * @tparam  S2T_FORMAT            Class which encapsulates conversion parameters/logic.
+   */
   template <c_integer_type T>
   struct _ConvertFromStr<T, S2T_Format_std_StoT >
   {
+    using value_type  = T;
+    using return_type = T;
+
     // TODO unit tests
     inline static T
     ToVal_args(const std::string& str, std::size_t* pos = nullptr, int base = 10)
@@ -460,6 +520,12 @@ namespace rapidcsv
       }
     }
 
+    /**
+     * @brief   Converts string holding a integer represenation to integer datatype.
+     * @param   str                 input string.
+     * @returns Numerical value if conversion succeeds.
+     *          Else throws error on conversion failure.
+     */
     inline static T
     ToVal(const std::string& str)
     {
@@ -467,9 +533,19 @@ namespace rapidcsv
     }
   };
 
+  /**
+   * @brief     Convertor class implementation for floating types from string.
+   *            Only intended for converter internal usage, but exposed externally (thru type-alias 'ConvertFromStr')
+   *            to allow specialization for custom datatype conversions.
+   * @tparam  T                     'type' converted to, from string data.
+   * @tparam  S2T_FORMAT            Class which encapsulates conversion parameters/logic.
+   */
   template<c_floating_point T>
   struct _ConvertFromStr<T, S2T_Format_std_StoT >
   {
+    using value_type  = T;
+    using return_type = T;
+
     // TODO unit tests
     inline static T
     ToVal_args(const std::string& str, std::size_t* pos = nullptr)
@@ -485,6 +561,12 @@ namespace rapidcsv
       }
     }
 
+    /**
+     * @brief   Converts string holding a numerical value to numerical datatype representation.
+     * @param   str                 input string.
+     * @returns Numerical value if conversion succeeds.
+     *          Else throws error on conversion failure.
+     */
     inline static T
     ToVal(const std::string& str)
     {
@@ -492,16 +574,43 @@ namespace rapidcsv
     }
   };
 
+  /**
+   * @brief     Specialized implementation handling string to string conversion.
+   *            Only intended for converter internal usage, but exposed externally (thru type-alias 'ConvertFromStr')
+   *            to allow specialization for custom datatype conversions.
+   */
   template<>
   struct _ConvertFromStr<std::string, S2T_Format_WorkAround>
   {
+    using value_type  = std::string;
+    using return_type = std::string;
+
+    /**
+     * @brief   Converts string to string.
+     * @param   str                 input string.
+     * @returns string.
+     */
     inline static std::string ToVal(const std::string& str) { return str; }
   };
 
+  /**
+   * @brief     Specialized implementation handling string to char conversion.
+   *            Only intended for converter internal usage, but exposed externally (thru type-alias 'ConvertFromStr')
+   *            to allow specialization for custom datatype conversions.
+   * @tparam  T                     'char-type' converted to, from string data.
+   */
   template<c_char T>
   struct _ConvertFromStr< T, S2T_Format_WorkAround >
   {
+    using value_type  = T;
+    using return_type = T;
+
     // TODO unit tests
+    /**
+     * @brief   Converts string holding char value.
+     * @param   str                 input string.
+     * @returns char-type.
+     */
     inline static T
     ToVal(const std::string& str)
     {
@@ -521,10 +630,23 @@ namespace rapidcsv
     }
   };
 
+  /**
+   * @brief     Specialized implementation handling string to bool conversion.
+   *            Only intended for converter internal usage, but exposed externally (thru type-alias 'ConvertFromStr')
+   *            to allow specialization for custom datatype conversions.
+   */
   template<>
   struct _ConvertFromStr<bool, S2T_Format_WorkAround>
   {
+    using value_type  = bool;
+    using return_type = bool;
+
     // TODO unit tests
+    /**
+     * @brief   Converts string holding bool value.
+     * @param   str                 input string.
+     * @returns bool.
+     */
     inline static bool
     ToVal(const std::string& str)
     {
@@ -541,9 +663,23 @@ namespace rapidcsv
     }
   };
 
+  /**
+   * @brief     Specialized implementation handling string to 'year_month_day' conversion.
+   *            Only intended for converter internal usage, but exposed externally (thru type-alias 'ConvertFromStr')
+   *            to allow specialization for custom datatype conversions.
+   * @tparam  S2T_FORMAT_YMD        Class which encapsulates conversion parameters/logic such as 'Locale' specific for 'year_month_day'.
+   */
   template<c_formatYMDiss S2T_FORMAT_YMD>
   struct _ConvertFromStr< datelib::year_month_day, S2T_FORMAT_YMD>
   {
+    using value_type  = datelib::year_month_day;
+    using return_type = datelib::year_month_day;
+
+    /**
+     * @brief   Converts string holding 'year_month_day' value. The string has the format "%F" -> "%Y-%m-%d"
+     * @param   str                 input string.
+     * @returns 'year_month_day'.
+     */
     inline static datelib::year_month_day
     ToVal(const std::string& str)
     {
@@ -576,12 +712,28 @@ namespace rapidcsv
     }
   };
 
+  /**
+   * @brief     Convertor class implementation for (floating) types which support default Not-A-Number (NaN) values.
+   *            Only intended for converter internal usage, but exposed externally (thru type-alias 'ConvertFromStr_fNaN')
+   *            to allow specialization for custom datatype conversions.
+   * @tparam  T                     'type' converted to, from string data. Floating types which supports signaling_NaN.
+   * @tparam  S2T_FORMAT            Class which encapsulates conversion parameters/logic such as 'Locale'.
+   */
   template<c_signaling_NaN T, typename S2T_FORMAT >
-  // this implimentation works only for floating types
-  // refer  https://en.cppreference.com/w/cpp/types/numeric_limits/has_signaling_NaN
   struct _ConvertFromStr_fNaN
   {
-    inline static T ToVal(const std::string& str) noexcept
+    using value_type  = T;
+    using return_type = T;
+
+    // this implimentation works only for floating types
+    // refer  https://en.cppreference.com/w/cpp/types/numeric_limits/has_signaling_NaN
+    /**
+     * @brief   Converts string holding a numerical value to numerical datatype representation.
+     * @param   str                 input string.
+     * @returns Numerical value if conversion succeeds.
+     *          Else std::numeric_limits<T>::signaling_NaN() on conversion failure.
+     */
+    inline static T ToVal(const std::string& str)// noexcept
     {
       try
       {
@@ -593,7 +745,7 @@ namespace rapidcsv
 
     // TODO unit tests
     template<typename ... ARGS>
-    inline static T ToVal_args(const std::string& str, ARGS&& ... args) noexcept
+    inline static T ToVal_args(const std::string& str, ARGS&& ... args)
     {
       try
       {
@@ -604,12 +756,30 @@ namespace rapidcsv
     }
   };
 
-  enum gNaN { isNull=0, isNaN };
-  template<c_number_type T, typename S2T_FORMAT>
+  /**
+   * @brief   Convertor class implementation for any numeric types, with indicators for Not-A-Number (NaN) and Null values
+   *          Only intended for converter internal usage, but exposed externally (thru type-alias 'ConvertFromStr_gNaN')
+   *          to allow specialization for custom datatype conversions.
+   * @tparam  T                     'type' converted to, from string data.
+   * @tparam  S2T_FORMAT            Class which encapsulates conversion parameters/logic such as 'Locale'.
+   */
+  template<c_number_type T, typename S2T_FORMAT = S2T_Format_StreamAsIs >
   struct _ConvertFromStr_gNaN
   {
-    inline static std::variant<T, gNaN>
-    ToVal(const std::string& str) noexcept
+    using value_type  = T;
+    using return_type = std::variant<T, std::string>;
+
+    /**
+     * @brief   Converts string holding a numerical value to numerical datatype representation.
+     * @param   str                 input string.
+     * @returns A std::variant<T, gNaN>.
+     *          It's a Numerical value if conversion succeeds.
+     *          Else on conversion failure ...
+     *          Either gNan::isNull if there is no data (empty string),
+     *          OR     gNaN::isNaN  if string data doesn't convert to type T.
+     */
+    inline static return_type
+    ToVal(const std::string& str)// noexcept
     {
       T val;
       try
@@ -617,22 +787,19 @@ namespace rapidcsv
         val = _ConvertFromStr<T, S2T_FORMAT>::ToVal(str);
         if constexpr (std::numeric_limits<T>::has_signaling_NaN)
         {
-          if (std::isnan(val)) throw std::exception();
+          if(std::isnan(val))
+            return return_type{str};
         }
       } catch (...) {
-        if(str.compare("") == 0) {
-          return std::variant<T, gNaN>{gNaN::isNull};
-        } else {
-          return std::variant<T, gNaN>{gNaN::isNaN};
-        }
+        return return_type{str};
       }
-      return std::variant<T, gNaN>{ val };
+      return return_type{ val };
     }
 
     // TODO unit tests
     template<typename ... ARGS>
-    inline static std::variant<T, gNaN>
-    ToVal_args(const std::string& str, ARGS&& ... args) noexcept
+    inline static return_type
+    ToVal_args(const std::string& str, ARGS&& ... args)
     {
       T val;
       try
@@ -640,25 +807,41 @@ namespace rapidcsv
         val = _ConvertFromStr<T, S2T_FORMAT>::ToVal_args(str, std::forward<ARGS>(args)...);
         if constexpr (std::numeric_limits<T>::has_signaling_NaN)
         {
-          if (std::isnan(val)) throw std::exception();
+          if(std::isnan(val))
+            return return_type{str};
         }
       } catch (...) {
-        if(str.compare("") == 0) {
-          return std::variant<T, gNaN>{gNaN::isNull};
-        } else {
-          return std::variant<T, gNaN>{gNaN::isNaN};
-        }
+        return return_type{str};
       }
-      return std::variant<T, gNaN>{ val };
+      return return_type{ val };
     }
   };
 
+  /**
+   * @brief   Convertor 'Alias type' for any types, FROM string using 'std::istringstream'.
+   * @tparam  T                     'type' converted to, from string data.
+   * @tparam  S2T_FORMAT            Class which encapsulates conversion parameters/logic (optional argument).
+   *                                Specialization for custom datatype conversions, using this template parameter.
+   */
   template<typename T, typename S2T_FORMAT = typename S2T_DefaultFormat<T>::type >
   using ConvertFromStr = _ConvertFromStr<T, S2T_FORMAT >;
 
+  /**
+   * @brief   Convertor 'Alias type' for (floating) types which support default Not-A-Number (NaN) values.
+   * @tparam  T                     'type' converted to, from string data. Floating types which supports signaling_NaN.
+   * @tparam  S2T_FORMAT            Class which encapsulates conversion parameters/logic (optional argument).
+   *                                Specialization for custom datatype conversions, using this template parameter.
+   */
   template<c_signaling_NaN T, typename S2T_FORMAT = typename S2T_DefaultFormat<T>::type >
   using ConvertFromStr_fNaN = _ConvertFromStr_fNaN<T, S2T_FORMAT >;
 
+  /**
+   * @brief   Convertor 'Alias type' for any numeric types on successful conversion,
+   *          else the string value which caused conversion failure.
+   * @tparam  T                     'type' converted to, from string data.
+   * @tparam  S2T_FORMAT            Class which encapsulates conversion parameters/logic (optional argument).
+   *                                Specialization for custom datatype conversions, using this template parameter.
+   */
   template<c_number_type T, typename S2T_FORMAT = typename S2T_DefaultFormat<T>::type >
   using ConvertFromStr_gNaN = _ConvertFromStr_gNaN<T, S2T_FORMAT >;
   // ]=============================================================] ConvertFromStr
@@ -773,15 +956,81 @@ namespace rapidcsv
   {
     using type = T2S_Format_StreamYMD< defYMDfmt >; // %F -> "%Y-%m-%d"
   };
+
+  template <typename, typename = void>
+  struct is_T2Sconverter : std::false_type {};
+
+  template <typename CFV>
+  struct is_T2Sconverter< CFV, std::void_t< decltype(CFV::ToStr),     // check for the presence of member   CFV::ToStr
+                                            typename CFV::value_type, // check for the presence of type-def CFV::value_type
+                                            typename CFV::input_type  // check for the presence of type-def CFV::input_type
+                                          >
+                        >
+           : std::is_same<decltype(&CFV::ToStr), std::string(*)(const typename CFV::input_type&)>  // member is function
+  {};
+
+  template <typename CFV>
+  concept c_T2Sconverter = is_T2Sconverter<CFV>::value;
+
+
+  template< typename T, typename TI,
+            std::string (*CONV_T2S)(const TI&)
+          >
+  struct T2SwrapperFunction
+  {
+    using value_type = T;
+    using input_type = TI;
+
+    inline static std::string
+    //typename std::enable_if_t< (!std::is_same_v<T, TI>),std::string>
+    ToStr(const input_type& val)
+    {
+      return CONV_T2S(val);
+    }
+  };
+
+/*
+  TODO :: this specialization is not recognized in Documnet::SetColumn(...)
+  template< typename T,
+            std::string (*CONV_T2S)(const T&)
+          >
+  struct T2SwrapperFunction<T,T,CONV_T2S>
+  {
+    using value_type = T;
+    using input_type = T;
+
+    inline static std::string
+    ToStr(const input_type& val)
+    {
+      return CONV_T2S(val);
+    }
+  };
+*/
   // ]=============================================================] T2S_FORMAT
 
 
 
 
   // [=============================================================[ ConvertFromVal
+  /**
+   * @brief     Convertor class implementation for any types, TO string using 'std::ostringstream'.
+   *            Only intended for converter internal usage, but exposed externally (thru type-alias 'ConvertFromVal')
+   *            to allow specialization for custom datatype conversions.
+   * @tparam  T                     'type' converted from, to string data.
+   * @tparam  T2S_FORMAT            Class which encapsulates conversion parameters/logic such as 'Locale' (optional argument).
+   */
   template<typename T, typename T2S_FORMAT = T2S_Format_StreamAsIs >
   struct _ConvertFromVal
   {
+    using value_type = T;
+    using input_type = T;
+
+    /**
+     * @brief   Converts numerical datatype from string holding a numerical value.
+     * @param   val                 input numerical value.
+     * @returns Output string if conversion succeeds.
+     *          Else 'std::invalid_argument' on conversion failure.
+     */
     inline static
     typename std::enable_if_t<is_formatOSS<T2S_FORMAT>::value
                               && (!std::is_same_v<T, std::string>), std::string>
@@ -810,9 +1059,24 @@ namespace rapidcsv
   };
 
   // for types refer :: https://en.cppreference.com/w/cpp/language/type
+  /**
+   * @brief     Convertor class implementation from integer types TO string.
+   *            Only intended for converter internal usage, but exposed externally (thru type-alias 'ConvertFromVal')
+   *            to allow specialization for custom datatype conversions.
+   * @tparam  T                     'type' converted from, to string data.
+   */
   template<c_integer_type T>
   struct _ConvertFromVal<T, T2S_Format_std_TtoS >
   {
+    using value_type = T;
+    using input_type = T;
+
+    /**
+     * @brief   Converts integer datatype to string.
+     * @param   val                 numerical value.
+     * @returns string holding a integer represenation.
+     *          Else throws error on conversion failure.
+     */
     inline static std::string
     ToStr( const T& val)
     {
@@ -825,6 +1089,9 @@ namespace rapidcsv
   template<c_floating_point T>
   struct _ConvertFromVal<T, T2S_Format_std_TtoS >
   {
+    using value_type = T;
+    using input_type = T;
+
     inline static
 #ifdef ENABLE_STD_TtoS
     std::string
@@ -862,16 +1129,43 @@ namespace rapidcsv
     }
   };
 
+  /**
+   * @brief     Specialized implementation handling string to string conversion.
+   *            Only intended for converter internal usage, but exposed externally (thru type-alias 'ConvertFromVal')
+   *            to allow specialization for custom datatype conversions.
+   */
   template<>
   struct _ConvertFromVal<std::string, T2S_Format_WorkAround>
   {
+    using value_type = std::string;
+    using input_type = std::string;
+
+    /**
+     * @brief   Converts string to string.
+     * @param   val                 input string.
+     * @returns string.
+     */
     inline static std::string ToStr(const std::string& val) { return val; }
   };
 
+  /**
+   * @brief     Specialized implementation handling char to string conversion.
+   *            Only intended for converter internal usage, but exposed externally (thru type-alias 'ConvertFromVal')
+   *            to allow specialization for custom datatype conversions.
+   * @tparam  T                     'char-type' converted from, to string data.
+   */
   template<c_char T>
   struct _ConvertFromVal<T, T2S_Format_WorkAround>
   {
+    using value_type = T;
+    using input_type = T;
+
     // TODO unit tests
+    /**
+     * @brief   Converts char value to string.
+     * @param   val                 input string.
+     * @returns string.
+     */
     inline static std::string
     ToStr(const T& val)
     {
@@ -879,19 +1173,46 @@ namespace rapidcsv
     }
   };
 
+  /**
+   * @brief     Specialized implementation handling bool to string conversion.
+   *            Only intended for converter internal usage, but exposed externally (thru type-alias 'ConvertFromVal')
+   *            to allow specialization for custom datatype conversions.
+   */
   template<>
   struct _ConvertFromVal<bool, T2S_Format_WorkAround>
   {
+    using value_type = bool;
+    using input_type = bool;
+
     // TODO unit tests
+    /**
+     * @brief   Converts bool value to string.
+     * @param   val                 input bool value.
+     * @returns string. either "0" or "1"  (for : 'false' or 'true')
+     */
     inline static std::string ToStr(const bool& val)
     {
       return std::to_string(static_cast<int>(val));
     }
   };
 
+  /**
+   * @brief     Specialized implementation handling 'year_month_day' to string conversion.
+   *            Only intended for converter internal usage, but exposed externally (thru type-alias 'ConvertFromVal')
+   *            to allow specialization for custom datatype conversions.
+   * @tparam  T2S_FORMAT_YMD        Class which encapsulates conversion parameters/logic such as 'Locale' specific for 'year_month_day'.
+   */
   template<c_formatYMDoss T2S_FORMAT_YMD>
   struct _ConvertFromVal< datelib::year_month_day, T2S_FORMAT_YMD>
   {
+    using value_type = datelib::year_month_day;
+    using input_type = datelib::year_month_day;
+
+    /**
+     * @brief   Converts variable holding 'year_month_day' value to string. The string has the format "%F" -> "%Y-%m-%d"
+     * @param   val                 input 'year_month_day'.
+     * @returns string.
+     */
     inline static std::string
     ToStr(  const datelib::year_month_day& val)
     {
@@ -917,7 +1238,7 @@ namespace rapidcsv
       // msvc supports only from_stream and not to_stream.
       // date-lib is not compatible with msvc (min/max macro clash), therefore
       // we are left with std::format() alternative
-      oss << std::format(fmt, val);  // for now , no support for abbrev, offset_sec
+      oss << std::vformat(fmt, val);  // for now , no support for abbrev, offset_sec
   #endif
 #else
       // gcc and clang does not support the required functionality here
@@ -943,8 +1264,37 @@ namespace rapidcsv
     }
   };
 
+  template<typename T, typename T2S_FORMAT = T2S_Format_StreamAsIs >
+  struct _ConvertFromVal_gNaN
+  {
+    using value_type = T;
+    using input_type = std::variant<T, std::string>;
+
+    inline static std::string
+    ToStr(const input_type& val)
+    {
+      if(val.index()==0)
+      {
+        return _ConvertFromVal<T, T2S_FORMAT>::ToStr(std::get<T>(val));
+      } else {
+        return std::get<std::string>(val);
+      }
+    }
+  };
+
+  /**
+   * @brief     Convertor 'Alias type' for any types, TO string using 'std::istringstream'.
+   * @tparam  T                     'type' converted from, to string.
+   * @tparam  S2T_FORMAT            Class which encapsulates conversion parameters/logic (optional argument).
+   *                                Specialization for custom datatype conversions, using this template parameter.
+   */
   template<typename T, typename T2S_FORMAT = typename T2S_DefaultFormat<T>::type >
   using ConvertFromVal = _ConvertFromVal<T, T2S_FORMAT >;
+
+  //  ConvertFromVal_fNaN  not needed
+
+  template<typename T, typename T2S_FORMAT = typename T2S_DefaultFormat<T>::type >
+  using ConvertFromVal_gNaN = _ConvertFromVal_gNaN<T, T2S_FORMAT >;
   // ]=============================================================] ConvertFromVal
 
 }

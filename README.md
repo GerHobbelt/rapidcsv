@@ -150,6 +150,7 @@ but not rows or cells (only using indices). In order to treat the first column
 as row headers one needs to use LabelParams and set pRowNameIdx to 0.
 
 ### Column and Row Headers
+csv file with both column and row headers
 
 https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/24444bb7d56454fc8a0de783f8729f43a4aa2772/examples/colrowhdr.csv#L1-L6
 
@@ -158,6 +159,7 @@ https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/24444bb7d56454fc8a0de783
 
 
 ### Row Headers Only
+csv file with row header (no column header)
 
 https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/24444bb7d56454fc8a0de783f8729f43a4aa2772/examples/rowhdr.csv#L1-L6
 
@@ -166,6 +168,7 @@ https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/24444bb7d56454fc8a0de783
 
 
 ### No Headers
+csv file with no column and row headers
 
 https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/24444bb7d56454fc8a0de783f8729f43a4aa2772/examples/nohdr.csv#L1-L5
 
