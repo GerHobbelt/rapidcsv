@@ -21,6 +21,7 @@ int main()
     rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0));
 
     std::vector<char> chars;
+    std::tuple<char, char, char> charsTup;
 
     chars = doc.GetColumn<char>(0);
     unittest::ExpectEqual(size_t, chars.size(), 2);
@@ -32,11 +33,11 @@ int main()
     unittest::ExpectEqual(char, chars.at(0), 'b');
     unittest::ExpectEqual(char, chars.at(1), 'y');
 
-    chars = doc.GetRow<char>("2");
-    unittest::ExpectEqual(size_t, chars.size(), 3);
-    unittest::ExpectEqual(char, chars.at(0), 'x');
-    unittest::ExpectEqual(char, chars.at(1), 'y');
-    unittest::ExpectEqual(char, chars.at(2), 'z');
+    charsTup = doc.GetRow<char, char, char>("2");
+    unittest::ExpectEqual(size_t, std::tuple_size<decltype(charsTup)>{}, 3);
+    unittest::ExpectEqual(char, std::get<0>(charsTup), 'x');
+    unittest::ExpectEqual(char, std::get<1>(charsTup), 'y');
+    unittest::ExpectEqual(char, std::get<2>(charsTup), 'z');
   }
   catch (const std::exception& ex)
   {

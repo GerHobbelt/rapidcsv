@@ -21,19 +21,21 @@ int main()
   {
     rapidcsv::Document doc("", rapidcsv::LabelParams(0, 0), rapidcsv::SeparatorParams(',', false, false));
 
-    doc.InsertRow<int>(0, std::vector<int>({ 3, 9, 81, 6561 }), "1");
-    doc.InsertRow<int>(0, std::vector<int>({ 2, 4, 16, 256 }), "0");
+    doc.InsertRow<int, int, unsigned int, long>(0, std::tuple<int, int, unsigned int, long>{ 3, 9, 81, 6561 }, "1");
+    doc.InsertRow<int, int, unsigned int, long>(0, std::tuple<int, int, unsigned int, long>{ 2, 4, 16, 256 }, "0");
 
-    doc.InsertRow<int>(2);
-    doc.SetRow<int>(2, std::vector<int>({ 4, 16, 256, 65536 }));
+    doc.InsertRow<int, int, unsigned int, long>(2);
+    doc.SetRow<int, int, unsigned int, long>(2, std::tuple<int, int, unsigned int, long>{ 4, 16, 256, 65536 });
     doc.SetRowName(2, "2");
 
-    doc.InsertRow<int>(3, std::vector<int>({ 5, 25, 625, 390625 }), "3");
+    doc.InsertRow<int, int, unsigned int, long>(3, std::tuple<int, int, unsigned int, long>{ 5, 25, 625, 390625 }, "3");
 
-    std::vector<int> ints = doc.GetRow<int>("1");
-    unittest::ExpectEqual(size_t, ints.size(), 4);
-    unittest::ExpectEqual(int, ints.at(0), 3);
-    unittest::ExpectEqual(int, ints.at(1), 9);
+    std::tuple<int, int, unsigned int, long> ints;
+    ints = doc.GetRow<int, int, unsigned int, long>("1");
+
+    unittest::ExpectEqual(size_t, std::tuple_size<decltype(ints)>{}, 4);
+    unittest::ExpectEqual(int, std::get<0>(ints), 3);
+    unittest::ExpectEqual(int, std::get<1>(ints), 9);
 
     doc.SetColumnName(0, "A");
     doc.SetColumnName(1, "B");

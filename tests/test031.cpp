@@ -20,13 +20,13 @@ int main()
   {
     rapidcsv::Document doc("", rapidcsv::LabelParams(-1, -1), rapidcsv::SeparatorParams(',', false, false));
 
-    doc.SetRow<int>(0, std::vector<int>({ 2, 4 }));
-    doc.SetRow<int>(1, std::vector<int>({ 3, 9, 81, 6561 }));
-    doc.SetRow<int>(2, std::vector<int>({ 4, 16, 256, 65536 }));
-    doc.SetRow<int>(3, std::vector<int>({ 5, 25, 625, 390625 }));
+    doc.SetRow<int, int>(0, std::tuple<int, int>{ 2, 4 });
+    doc.SetRow<int, int, unsigned int, long>(1, std::tuple<int, int, unsigned int, long>{ 3, 9, 81, 6561 });
+    doc.SetRow<int, int, unsigned int, long>(2, std::tuple<int, int, unsigned int, long>{ 4, 16, 256, 65536 });
+    doc.SetRow<int, int, unsigned int, long>(3, std::tuple<int, int, unsigned int, long>{ 5, 25, 625, 390625 });
 
-    doc.SetCell<int>(2, 0, 16);
-    doc.SetCell<int>(3, 0, 256);
+    doc.SetCell<unsigned int>(2, 0, 16);
+    doc.SetCell<long>(3, 0, 256);
 
     doc.Save(path);
 

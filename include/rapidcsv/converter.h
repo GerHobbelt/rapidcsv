@@ -21,6 +21,7 @@
 #include <limits>
 #include <type_traits>
 #include <string>
+#include <string_view>
 #include <sstream>
 #include <iomanip>
 #include <utility>
@@ -199,10 +200,9 @@ namespace rapidcsv
 
   template <typename FMT>
   struct is_formatSS< FMT,
-                      typename std::enable_if
-                      <   has_streamUpdate<FMT>::value &&
-                          is_iostream<typename FMT::stream_type>::value
-                      >::type
+                      typename std::enable_if_t<   has_streamUpdate<FMT>::value &&
+                                                   is_iostream<typename FMT::stream_type>::value
+                                               >
                     >
            : std::true_type
   {};
@@ -303,9 +303,8 @@ namespace rapidcsv
 
   template <typename FMT>
   struct is_formatISS<  FMT,
-                        typename std::enable_if<
-                            std::is_same_v<typename FMT::stream_type, std::istringstream>
-                        >::type
+                        typename std::enable_if_t< std::is_same_v<typename FMT::stream_type, std::istringstream>
+                                                 >
                      >
             : is_formatSS<FMT>
   {};
@@ -318,9 +317,8 @@ namespace rapidcsv
 
   template <typename FMT>
   struct is_formatYMDiss< FMT,
-                          typename std::enable_if<
-                              std::is_same_v<typename FMT::stream_type, std::istringstream>
-                          >::type
+                          typename std::enable_if_t< std::is_same_v<typename FMT::stream_type, std::istringstream>
+                                                   >
                         >
             : is_formatYMDss<FMT>
   {};
@@ -336,10 +334,9 @@ namespace rapidcsv
 
   template<typename T>
   struct S2T_DefaultFormat< T,
-                            typename  std::enable_if<
-                                        is_integer_type<T>::value ||
-                                        std::is_floating_point_v<T>
-                                      >::type
+                            typename  std::enable_if_t< is_integer_type<T>::value ||
+                                                        std::is_floating_point_v<T>
+                                                      >
                           > 
   {
     using type = S2T_Format_std_StoT;
@@ -347,11 +344,10 @@ namespace rapidcsv
 
   template<typename T>
   struct S2T_DefaultFormat< T,
-                            typename  std::enable_if<
-                                        std::is_same_v<T, std::string> ||
-                                        is_char<T>::value ||
-                                        std::is_same_v<T, bool>
-                                      >::type
+                            typename  std::enable_if_t< std::is_same_v<T, std::string> ||
+                                                        is_char<T>::value ||
+                                                        std::is_same_v<T, bool>
+                                                      >
                           >
   {
     using type = S2T_Format_WorkAround;
@@ -378,6 +374,9 @@ namespace rapidcsv
 
   template <typename CFS>
   concept c_S2Tconverter = is_S2Tconverter<CFS>::value;
+
+  template <typename CFS>
+  concept c_NOT_S2Tconverter = !is_S2Tconverter<CFS>::value;
 
 
   template< typename T,
@@ -437,8 +436,10 @@ namespace rapidcsv
      *          Else 'std::invalid_argument' on conversion failure.
      */
     inline static
-    typename std::enable_if_t<is_formatISS<S2T_FORMAT>::value
-                              && (!std::is_same_v<T, std::string>), T>
+    typename std::enable_if_t< is_formatISS<S2T_FORMAT>::value
+                                 && (!std::is_same_v<T, std::string>),
+                               T
+                             >
     ToVal(const std::string& str)
     {
       using S2T_FORMAT_STREAM = S2T_FORMAT;
@@ -865,9 +866,8 @@ namespace rapidcsv
 
   template <typename FMT>
   struct is_formatOSS<  FMT,
-                        typename std::enable_if<
-                            std::is_same_v<typename FMT::stream_type, std::ostringstream>
-                        >::type
+                        typename std::enable_if_t< std::is_same_v< typename FMT::stream_type, std::ostringstream>
+                                                 >
                      >
             : is_formatSS<FMT>
   {};
@@ -880,10 +880,9 @@ namespace rapidcsv
 
   template <typename FMT>
   struct is_formatYMDoss< FMT,
-                           typename std::enable_if<
-                             std::is_same_v<typename FMT::stream_type, std::ostringstream>
-                        >::type
-                     >
+                          typename std::enable_if_t< std::is_same_v< typename FMT::stream_type, std::ostringstream>
+                                                                   >
+                        >
             : is_formatYMDss<FMT>
   {};
   template <typename FMT>
@@ -942,10 +941,11 @@ namespace rapidcsv
   };
 
   template<typename T>
-  struct T2S_DefaultFormat<T, typename std::enable_if_t<
-                                              (   std::is_same_v<T, std::string> ||
-                                                  is_char<T>::value ||
-                                                  std::is_same_v<T, bool>   ) >
+  struct T2S_DefaultFormat< T,
+                            typename std::enable_if_t< std::is_same_v<T, std::string> ||
+                                                       is_char<T>::value ||
+                                                       std::is_same_v<T, bool>
+                                                     >
                           >
   {
     using type = T2S_Format_WorkAround;
@@ -972,6 +972,9 @@ namespace rapidcsv
   template <typename CFV>
   concept c_T2Sconverter = is_T2Sconverter<CFV>::value;
 
+  template <typename CFV>
+  concept c_NOT_T2Sconverter = !is_T2Sconverter<CFV>::value;
+
 
   template< typename T, typename TI,
             std::string (*CONV_T2S)(const TI&)
@@ -990,7 +993,7 @@ namespace rapidcsv
   };
 
 /*
-  TODO :: this specialization is not recognized in Documnet::SetColumn(...)
+  TODO :: this specialization is not recognized in Document::SetColumn(...)
   template< typename T,
             std::string (*CONV_T2S)(const T&)
           >
@@ -1032,8 +1035,10 @@ namespace rapidcsv
      *          Else 'std::invalid_argument' on conversion failure.
      */
     inline static
-    typename std::enable_if_t<is_formatOSS<T2S_FORMAT>::value
-                              && (!std::is_same_v<T, std::string>), std::string>
+    typename std::enable_if_t< is_formatOSS<T2S_FORMAT>::value
+                                 && (!std::is_same_v<T, std::string>),
+                               std::string
+                             >
     ToStr(const T& val)
     {
       using T2S_FORMAT_STREAM = T2S_FORMAT;
@@ -1238,10 +1243,13 @@ namespace rapidcsv
       // msvc supports only from_stream and not to_stream.
       // date-lib is not compatible with msvc (min/max macro clash), therefore
       // we are left with std::format() alternative
-      oss << std::vformat(fmt, val);  // for now , no support for abbrev, offset_sec
+      //WINDOWS
+      std::string_view fmt_view{fmt};
+      oss << std::vformat(fmt_view, val);  // for now , no support for abbrev, offset_sec
   #endif
 #else
       // gcc and clang does not support the required functionality here
+      // UNIX-like , macOS
       using CS = std::chrono::seconds;
       date::fields<CS> fds{val};
       date::to_stream(oss, fmt, fds, abbrev, offset_sec);

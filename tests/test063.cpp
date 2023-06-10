@@ -11,14 +11,14 @@ int ToVal(const std::string& pStr)
   return static_cast<int>(roundf(100.0f * std::stof(pStr)));
 }
 
-struct Struct
+struct StrVal
 {
   int val = 0;
 };
 
-Struct ToStruct(const std::string& pStr)
+StrVal ToStrVal(const std::string& pStr)
 {
-  Struct sVal;
+  StrVal sVal;
   sVal.val = static_cast<int>(roundf(100.0f * std::stof(pStr)));
   return sVal;
 }
@@ -28,9 +28,11 @@ int main()
   int rv = 0;
 
   std::string csv =
-    "-,A,B,C\n"
+    "-,A,B,C,D\n"
     "1,1,10,100,1000\n"
     "2,0.1,0.01,0.001,0.006\n"
+    "3,0.3,0.03,xyz,\n"
+    "4,0.4,0.04,,abc\n"
   ;
 
   std::string path = unittest::TempPath();
@@ -46,23 +48,65 @@ int main()
     unittest::ExpectEqual(int, doc.GetCell<int COMMA ToVal>("A", 0), 100);
     unittest::ExpectEqual(int, doc.GetCell<int COMMA ToVal>("B", "1"), 1000);
 
-    unittest::ExpectEqual(int, doc.GetRow<int COMMA ToVal>(0).at(0), 100);
-    unittest::ExpectEqual(int, doc.GetRow<int COMMA ToVal>("2").at(0), 10);
+    using t_raw100multi = rapidcsv::S2TwrapperFunction<int, ToVal>;
+    using t_wrp100multi = rapidcsv::S2TwrapperFunction<StrVal, ToStrVal>;
+
+    std::tuple<int, long, int, StrVal> row1 = doc.GetRow< rapidcsv::ConvertFromStr<int>,
+                                                          rapidcsv::ConvertFromStr<long>,
+                                                          t_raw100multi, t_wrp100multi >(0);
+
+    unittest::ExpectEqual(int, std::get<0>(row1),  1);
+    unittest::ExpectEqual(long, std::get<1>(row1),  10);
+    unittest::ExpectEqual(int, std::get<2>(row1),  10000);
+    unittest::ExpectEqual(int, std::get<3>(row1).val,  100000);
 
     unittest::ExpectEqual(int, doc.GetColumn<int COMMA ToVal>(0).at(0), 100);
     unittest::ExpectEqual(int, doc.GetColumn<int COMMA ToVal>("B").at(0), 1000);
 
-    // ToStruct
-    unittest::ExpectEqual(int, doc.GetCell<Struct COMMA ToStruct>(0, 0).val, 100);
-    unittest::ExpectEqual(int, doc.GetCell<Struct COMMA ToStruct>(1, "1").val, 1000);
-    unittest::ExpectEqual(int, doc.GetCell<Struct COMMA ToStruct>("A", 0).val, 100);
-    unittest::ExpectEqual(int, doc.GetCell<Struct COMMA ToStruct>("B", "1").val, 1000);
+    // ToStrVal
+    unittest::ExpectEqual(int, doc.GetCell<StrVal COMMA ToStrVal>(0, 0).val, 100);
+    unittest::ExpectEqual(int, doc.GetCell<StrVal COMMA ToStrVal>(1, "1").val, 1000);
+    unittest::ExpectEqual(int, doc.GetCell<StrVal COMMA ToStrVal>("A", 0).val, 100);
+    unittest::ExpectEqual(int, doc.GetCell<StrVal COMMA ToStrVal>("B", "1").val, 1000);
 
-    unittest::ExpectEqual(int, doc.GetRow<Struct COMMA ToStruct>(0).at(0).val, 100);
-    unittest::ExpectEqual(int, doc.GetRow<Struct COMMA ToStruct>("2").at(0).val, 10);
+    std::tuple<int, StrVal, float, double> row2 = doc.GetRow< t_raw100multi, t_wrp100multi,
+                                                              rapidcsv::ConvertFromStr<float>,
+                                                              rapidcsv::ConvertFromStr<double> >("2");
+    unittest::ExpectEqual(int, std::get<0>(row2),  10);
+    unittest::ExpectEqual(int, std::get<1>(row2).val,  1);
+    unittest::ExpectEqual(float, std::get<2>(row2),  0.001f);
+    unittest::ExpectEqual(double, std::get<3>(row2),  0.006);
 
-    unittest::ExpectEqual(int, doc.GetColumn<Struct COMMA ToStruct>(0).at(0).val, 100);
-    unittest::ExpectEqual(int, doc.GetColumn<Struct COMMA ToStruct>("B").at(0).val, 1000);
+    unittest::ExpectEqual(int, doc.GetColumn<StrVal COMMA ToStrVal>(0).at(0).val, 100);
+    unittest::ExpectEqual(int, doc.GetColumn<StrVal COMMA ToStrVal>("B").at(0).val, 1000);
+
+    std::tuple< float, double, float,
+                rapidcsv::ConvertFromStr_gNaN<double>::return_type > row3 =
+                       doc.GetRow< rapidcsv::ConvertFromStr<float>,
+                                   rapidcsv::ConvertFromStr<double>,
+                                   rapidcsv::ConvertFromStr_fNaN<float>,
+                                   rapidcsv::ConvertFromStr_gNaN<double> >("3");
+
+    unittest::ExpectEqual(float, std::get<0>(row3),  0.3f);
+    unittest::ExpectEqual(double, std::get<1>(row3),  0.03);
+    unittest::ExpectEqual(bool, std::isnan( std::get<2>(row3) ),  true);
+    rapidcsv::ConvertFromStr_gNaN<double>::return_type row3_cell4 = std::get<3>(row3);
+    unittest::ExpectEqual(size_t, row3_cell4.index(),  1);
+    unittest::ExpectEqual(std::string, std::get<std::string>(row3_cell4),  "");
+
+    std::tuple< float, double, float,
+                rapidcsv::ConvertFromStr_gNaN<double>::return_type > row4 =
+                       doc.GetRow< rapidcsv::ConvertFromStr<float>,
+                                   rapidcsv::ConvertFromStr<double>,
+                                   rapidcsv::ConvertFromStr_fNaN<float>,
+                                   rapidcsv::ConvertFromStr_gNaN<double> >("4");
+
+    unittest::ExpectEqual(float, std::get<0>(row4),  0.4f);
+    unittest::ExpectEqual(double, std::get<1>(row4),  0.04);
+    unittest::ExpectEqual(bool, std::isnan( std::get<2>(row4) ),  true);
+    rapidcsv::ConvertFromStr_gNaN<double>::return_type row4_cell4 = std::get<3>(row4);
+    unittest::ExpectEqual(size_t, row4_cell4.index(),  1);
+    unittest::ExpectEqual(std::string, std::get<std::string>(row4_cell4),  "abc");
 
     /*
      * all sytem types are supported by default. 

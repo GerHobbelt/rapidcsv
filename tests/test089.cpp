@@ -43,10 +43,11 @@ int main()
 
     unittest::ExpectEqual(std::string, doc.GetCell<std::string>("B", "1"), "9");
 
-    ints = doc.GetRow<int>("1");
-    unittest::ExpectEqual(size_t, ints.size(), 2);
-    unittest::ExpectEqual(int, ints.at(0), 9);
-    unittest::ExpectEqual(int, ints.at(1), 6561);
+    std::tuple<int, long> ints_row;
+    ints_row = doc.GetRow<int, long>("1");
+    unittest::ExpectEqual(size_t, std::tuple_size<decltype(ints_row)>{}, 2);
+    unittest::ExpectEqual(int, std::get<0>(ints_row), 9);
+    unittest::ExpectEqual(long, std::get<1>(ints_row), 6561);
 
     doc.Save();
 

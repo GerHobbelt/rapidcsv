@@ -20,20 +20,21 @@ int main()
   {
     rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0));
 
-    std::vector<int> ints;
+    std::tuple<int, long, unsigned int> ints;
     std::vector<std::string> strs;
 
-    ints = doc.GetRow<int>(0);
-    unittest::ExpectEqual(size_t, ints.size(), 3);
-    unittest::ExpectEqual(int, ints.at(0), 3);
-    unittest::ExpectEqual(int, ints.at(1), 9);
-    unittest::ExpectEqual(int, ints.at(2), 81);
+    ints = doc.GetRow<int, long, unsigned int>(0);
+    unittest::ExpectEqual(size_t, std::tuple_size<decltype(ints)>{}, 3);
+    unittest::ExpectEqual(int, std::get<0>(ints), 3);
+    unittest::ExpectEqual(long, std::get<1>(ints), 9);
+    unittest::ExpectEqual(unsigned int, std::get<2>(ints), 81);
 
-    strs = doc.GetRow<std::string>("2");
+    strs = doc.GetRow_VecStr("2");
     unittest::ExpectEqual(size_t, strs.size(), 3);
     unittest::ExpectEqual(std::string, strs.at(0), "4");
     unittest::ExpectEqual(std::string, strs.at(1), "16");
     unittest::ExpectEqual(std::string, strs.at(2), "256");
+
   }
   catch (const std::exception& ex)
   {

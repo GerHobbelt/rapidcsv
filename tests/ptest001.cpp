@@ -17,16 +17,12 @@ int main()
       timer.Start();
 
       rapidcsv::Document doc("../tests/msft.csv", rapidcsv::LabelParams(0, 0));
-      const std::vector<double>& column = doc.GetColumn<double>("Close");
-      const std::vector<double>& row = doc.GetRow<double>("2016-05-23");
-      const double cell = doc.GetCell<double>("Close", "2016-05-23");
+      [[maybe_unused]] 	const std::vector<double> column = doc.GetColumn<double>("Close");
+      [[maybe_unused]] 	const std::tuple<float, float, float, float, unsigned long, float>
+             row = doc.GetRow<float, float, float, float, unsigned long, float>("2016-05-23");
+      [[maybe_unused]] 	const double cell = doc.GetCell<double>("Close", "2016-05-23");
 
       timer.Stop();
-
-      // dummy usage of variables
-      (void) column;
-      (void) row;
-      (void) cell;
     }
 
     timer.ReportMedian();
