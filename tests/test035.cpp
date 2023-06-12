@@ -45,7 +45,7 @@ int main()
     unittest::ExpectEqual(int, doc.GetCell<int COMMA &ConvertFromStr_m100_ToVal>(2, 1), 0);
     unittest::ExpectEqual(int, doc.GetCell<int COMMA &ConvertFromStr_m100_ToVal>(3, 1), 1);
 
-    doc.SetCell<int, &ConvertFromVal_d100_ToStr>(0, 0, 12345);
+    doc.SetCell<int, int, &ConvertFromVal_d100_ToStr>(0, 0, 12345);
     unittest::ExpectEqual(std::string, doc.GetCell<std::string>(0, 0), "123.45");
   }
   catch (const std::exception& ex)

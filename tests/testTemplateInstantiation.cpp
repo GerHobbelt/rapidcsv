@@ -83,9 +83,9 @@ int main()
     seppar.mQuotedLinebreaks = true;
     rapidcsv::Document doc(path, rapidcsv::LabelParams(-1, -1), seppar);
 
-    doc.GetCell<char COMMA rapidcsv::ConvertFromStr<char COMMA rapidcsv::S2T_Format_StreamAsIs> >(3, 0);
-    doc.GetCell<int, rapidcsv::ConvertFromStr<int, rapidcsv::S2T_Format_StreamAsIs> >(3, 1);
-    doc.GetCell<unsigned int COMMA rapidcsv::ConvertFromStr<unsigned int COMMA rapidcsv::S2T_Format_StreamAsIs> >(3, 2);
+    doc.GetCell< rapidcsv::ConvertFromStr<char COMMA rapidcsv::S2T_Format_StreamAsIs> >(3, 0);
+    doc.GetCell< rapidcsv::ConvertFromStr<int, rapidcsv::S2T_Format_StreamAsIs> >(3, 1);
+    doc.GetCell< rapidcsv::ConvertFromStr<unsigned int COMMA rapidcsv::S2T_Format_StreamAsIs> >(3, 2);
     doc.GetCell<std::string>(3, 3);
   }
   catch (const std::exception& ex)

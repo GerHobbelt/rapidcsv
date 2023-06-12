@@ -1245,7 +1245,8 @@ namespace rapidcsv
       // we are left with std::format() alternative
       //WINDOWS
       std::string_view fmt_view{fmt};
-      oss << std::vformat(fmt_view, val);  // for now , no support for abbrev, offset_sec
+      std::make_format_args val_fmt_arg{val};
+      oss << std::vformat(fmt_view, val_fmt_arg);  // for now , no support for abbrev, offset_sec
   #endif
 #else
       // gcc and clang does not support the required functionality here

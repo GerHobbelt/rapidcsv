@@ -32,10 +32,10 @@ int main()
     //doc.GetCell<long long, rapidcsv::ConvertFromStr_fNaN<long long> >(1, 0); // will not compile as 'long long' doesnot support has_signaling_NaN
     //doc.GetCell<unsigned int, rapidcsv::ConvertFromStr_fNaN<unsigned int> >(2, 0); // will not compile as 'unsigned int' doesnot support has_signaling_NaN
 
-    doc.GetCell<double, rapidcsv::ConvertFromStr_fNaN<double> >(0, 1);
-    unittest::ExpectTrue(std::isnan(doc.GetCell<double COMMA rapidcsv::ConvertFromStr_fNaN<double> >(0, 1)));
-    unittest::ExpectTrue(std::isnan(doc.GetCell<long double COMMA rapidcsv::ConvertFromStr_fNaN<long double> >(1, 1)));
-    unittest::ExpectTrue(std::isnan(doc.GetCell<float COMMA rapidcsv::ConvertFromStr_fNaN<float> >(2, 1)));
+    doc.GetCell< rapidcsv::ConvertFromStr_fNaN<double> >(0, 1);
+    unittest::ExpectTrue(std::isnan(doc.GetCell< rapidcsv::ConvertFromStr_fNaN<double> >(0, 1)));
+    unittest::ExpectTrue(std::isnan(doc.GetCell< rapidcsv::ConvertFromStr_fNaN<long double> >(1, 1)));
+    unittest::ExpectTrue(std::isnan(doc.GetCell< rapidcsv::ConvertFromStr_fNaN<float> >(2, 1)));
   }
   catch (const std::exception& ex)
   {

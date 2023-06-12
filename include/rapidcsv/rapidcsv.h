@@ -492,11 +492,10 @@ namespace rapidcsv
     }
 
     template< c_NOT_T2Sconverter T >
-    inline void
-    SetColumn(const c_sizet_or_string auto& pColumnNameIdx,
-                   const std::vector<typename ConvertFromVal<T>::input_type>& pColumn)
+    inline void SetColumn(const c_sizet_or_string auto& pColumnNameIdx,
+                          const std::vector<typename ConvertFromVal<T>::input_type>& pColumn)
     {
-      SetColumn<ConvertFromVal<T>>(pColumnNameIdx, pColumn);;
+      SetColumn<ConvertFromVal<T>>(pColumnNameIdx, pColumn);
     }
 
     /**
@@ -937,7 +936,7 @@ namespace rapidcsv
      *          CONV_S2T = &ConvertFromStr_gNaN<T>::ToVal, then R = std::variant<T, gNaN> .
      */
     // TODO function and unit tests  for ARGS...
-    template< typename T, c_S2Tconverter S2Tconv = ConvertFromStr<T> >
+    template< c_S2Tconverter S2Tconv >
     typename S2Tconv::return_type
     GetCell(const c_sizet_or_string auto& pColumnNameIdx,
             const c_sizet_or_string auto& pRowNameIdx) const
@@ -951,6 +950,14 @@ namespace rapidcsv
       return S2Tconv::ToVal(_mData.at(dataRowIdx).at(dataColumnIdx));
     }
 
+    template< c_NOT_S2Tconverter T >
+    inline typename ConvertFromStr<T>::return_type
+    GetCell(const c_sizet_or_string auto& pColumnNameIdx,
+            const c_sizet_or_string auto& pRowNameIdx) const
+    {
+      return GetCell<ConvertFromStr<T>>(pColumnNameIdx,pRowNameIdx);
+    }
+
     template< typename T, auto (*CONV_S2T)(const std::string&) >
     inline typename std::invoke_result_t< decltype(CONV_S2T),
                                           const std::string&
@@ -958,9 +965,8 @@ namespace rapidcsv
     GetCell(const c_sizet_or_string auto& pColumnNameIdx,
             const c_sizet_or_string auto& pRowNameIdx) const
     {
-      return GetCell<T, S2TwrapperFunction<T, CONV_S2T> >(pColumnNameIdx, pRowNameIdx);
+      return GetCell< S2TwrapperFunction<T, CONV_S2T> >(pColumnNameIdx, pRowNameIdx);
     }
-
 
     /**
      * @brief   Set cell either by it's index or name.
@@ -971,9 +977,10 @@ namespace rapidcsv
      * @param   pCell                 cell data.
      */
     // TODO function and unit tests  for ARGS...
-    template<typename T, c_T2Sconverter T2Sconv = ConvertFromVal<T> >
+    template< c_T2Sconverter T2Sconv >
     void SetCell(const c_sizet_or_string auto& pColumnNameIdx,
-                 const c_sizet_or_string auto& pRowNameIdx, const typename T2Sconv::input_type& pCell)
+                 const c_sizet_or_string auto& pRowNameIdx,
+                 const typename T2Sconv::input_type& pCell)
     {
       const size_t pColumnIdx = GetColumnIdx(pColumnNameIdx);
       const size_t pRowIdx = GetRowIdx(pRowNameIdx);
@@ -999,14 +1006,22 @@ namespace rapidcsv
       _mData.at(dataRowIdx).at(dataColumnIdx) = T2Sconv::ToStr(pCell);
     }
 
-    // TODO std::string (*CONV_T2S)(const auto&) :: auto -> R
-    template<typename T,
-             std::string (*CONV_T2S)(const T&) >
-    void SetCell(const c_sizet_or_string auto& pColumnNameIdx,
-                 const c_sizet_or_string auto& pRowNameIdx, const T& pCell)   // T -> R
+    template< c_NOT_T2Sconverter T >
+    inline void SetCell(const c_sizet_or_string auto& pColumnNameIdx,
+                        const c_sizet_or_string auto& pRowNameIdx,
+                        const typename ConvertFromVal<T>::input_type& pCell)
     {
-      using T2Swrap = T2SwrapperFunction<T, T, CONV_T2S>;  //  doesn't work -> T2SwrapperFunction<T, CONV_T2S>;
-      SetCell<T, T2Swrap >(pColumnNameIdx, pRowNameIdx, pCell);
+      SetCell<ConvertFromVal<T>>(pColumnNameIdx, pRowNameIdx, pCell);
+    }
+
+
+    template<typename T, typename R, std::string (*CONV_T2S)(const R&) >
+    void SetCell(const c_sizet_or_string auto& pColumnNameIdx,
+                 const c_sizet_or_string auto& pRowNameIdx,
+                 const R& pCell)
+    {
+      using T2Swrap = T2SwrapperFunction<T, R, CONV_T2S>;  //  doesn't work -> T2SwrapperFunction<T, CONV_T2S>;
+      SetCell< T2Swrap >(pColumnNameIdx, pRowNameIdx, pCell);
     }
 
     /**

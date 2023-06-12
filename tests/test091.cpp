@@ -39,10 +39,8 @@ template<rapidcsv::c_floating_point T>
 using T2S_Format_ldp = rapidcsv::T2S_Format_StreamDecimalPrecision<T, getLowerDecimalPrecision<T>() >;
 
 template<rapidcsv::c_floating_point T>
-struct functionAddress_lDP {
-  constexpr static std::string (*CONV_T2S)(const T&) =
-                          &rapidcsv::ConvertFromVal<T, T2S_Format_ldp<T> >::ToStr;
-};
+using ConvertFromVal_lDP = rapidcsv::ConvertFromVal<T, T2S_Format_ldp<T> >;
+
 
 const float f1 = 3.14159f;
 const float f2 = 3.1415926535f;
@@ -138,17 +136,17 @@ int test_b()
     {
       rapidcsv::Document doc1(path, rapidcsv::LabelParams(0, 0));
 
-      doc1.SetCell<float, *functionAddress_lDP<float>::CONV_T2S>("A", "f", f1);
-      doc1.SetCell<float, *functionAddress_lDP<float>::CONV_T2S>("B", "f", f2);
-      doc1.SetCell<float, *functionAddress_lDP<float>::CONV_T2S>("C", "f", f3);
+      doc1.SetCell< ConvertFromVal_lDP<float> >("A", "f", f1);
+      doc1.SetCell< ConvertFromVal_lDP<float> >("B", "f", f2);
+      doc1.SetCell< ConvertFromVal_lDP<float> >("C", "f", f3);
 
-      doc1.SetCell<double, *functionAddress_lDP<double>::CONV_T2S>("A", "d", d1);
-      doc1.SetCell<double, *functionAddress_lDP<double>::CONV_T2S>("B", "d", d2);
-      doc1.SetCell<double, *functionAddress_lDP<double>::CONV_T2S>("C", "d", d3);
+      doc1.SetCell< ConvertFromVal_lDP<double> >("A", "d", d1);
+      doc1.SetCell< ConvertFromVal_lDP<double> >("B", "d", d2);
+      doc1.SetCell< ConvertFromVal_lDP<double> >("C", "d", d3);
 
-      doc1.SetCell<long double, *functionAddress_lDP<long double>::CONV_T2S>("A", "ld", ld1);
-      doc1.SetCell<long double, *functionAddress_lDP<long double>::CONV_T2S>("B", "ld", ld2);
-      doc1.SetCell<long double, *functionAddress_lDP<long double>::CONV_T2S>("C", "ld", ld3);
+      doc1.SetCell< ConvertFromVal_lDP<long double> >("A", "ld", ld1);
+      doc1.SetCell< ConvertFromVal_lDP<long double> >("B", "ld", ld2);
+      doc1.SetCell< ConvertFromVal_lDP<long double> >("C", "ld", ld3);
 
       doc1.Save();
     }
