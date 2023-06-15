@@ -25,11 +25,11 @@ int main()
     unittest::ExpectEqual(std::string, doc.GetColumnName(2), "C");
 
     ExpectExceptionMsg(doc.GetColumn<int>(2), std::out_of_range,
-                       "include/rapidcsv/rapidcsv.h:418 Document::GetColumn() # requested column index 2 >= 2 (number of columns on row index 1)");
+                       "include/rapidcsv/rapidcsv.h : Document::GetColumn() # requested column index 2 >= 2 (number of columns on row index 1)");
     ExpectExceptionMsg(doc.GetColumn<int>("C"), std::out_of_range,
-                       "include/rapidcsv/rapidcsv.h:418 Document::GetColumn() # requested column index 2 >= 2 (number of columns on row index 1)");
+                       "include/rapidcsv/rapidcsv.h : Document::GetColumn() # requested column index 2 >= 2 (number of columns on row index 1)");
     ExpectExceptionMsg(doc.GetColumn<int>(3), std::out_of_range,
-                       "include/rapidcsv/rapidcsv.h:418 Document::GetColumn() # requested column index 3 >= 3 (number of columns on row index 0)");
+                       "include/rapidcsv/rapidcsv.h : Document::GetColumn() # requested column index 3 >= 3 (number of columns on row index 0)");
   }
   catch (const std::exception& ex)
   {

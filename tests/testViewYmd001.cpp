@@ -65,14 +65,14 @@ int main()
     unittest::ExpectEqual(std::string, viewdoc1.GetViewCell<std::string>("Adj Close", "1986-03-18"), "0.067374");
 
     rdb::year_month_day tDate{rdb::year{1986}, rdb::month{3}, rdb::day{19} };
-    rapidcsv::RowIndex<rdb::year_month_day> riDate(tDate);
-    unittest::ExpectEqual(double, viewdoc1.GetDocCell<double>("Open", riDate), 28.75);
-    unittest::ExpectEqual(unsigned long, viewdoc1.GetDocCell<unsigned long>("Volume", riDate), 47894400);
-    unittest::ExpectEqual(long double, viewdoc1.GetDocCell<long double>("Adj Close", riDate), 0.066202L);
+    rapidcsv::SortKeyFactory<decltype(spA)>::t_sortKey riDate{tDate};
+    unittest::ExpectEqual(double, viewdoc1.GetOrderedCell<double>("Open", riDate), 28.75);
+    unittest::ExpectEqual(unsigned long, viewdoc1.GetOrderedCell<unsigned long>("Volume", riDate), 47894400);
+    unittest::ExpectEqual(long double, viewdoc1.GetOrderedCell<long double>("Adj Close", riDate), 0.066202L);
 
     /////  Filter + Sort
-    const rapidcsv::SortParams<rdb::year_month_day> spD(0, rapidcsv::e_SortOrder::DESCEND);
-    rapidcsv::FilterSortDocument<isYear2016, rdb::year_month_day> viewdoc2(doc, spD);
+    const rapidcsv::SortParams<rdb::year_month_day, rapidcsv::e_SortOrder::DESCEND> spD(0);
+    rapidcsv::FilterSortDocument<isYear2016, decltype(spD)> viewdoc2(doc, spD);
 
     unittest::ExpectEqual(size_t, viewdoc2.GetViewRowCount(), 252);
 
@@ -93,10 +93,10 @@ int main()
     unittest::ExpectEqual(std::string, viewdoc2.GetViewCell<std::string>("Adj Close", "2016-12-27"), "62.898675");
 
     rdb::year_month_day tDate2{rdb::year{2016}, rdb::month{12}, rdb::day{23} };
-    rapidcsv::RowIndex<rdb::year_month_day> riDate2(tDate2);
-    unittest::ExpectEqual(double, viewdoc2.GetDocCell<double>("Open", riDate2), 63.450001);
-    unittest::ExpectEqual(unsigned long, viewdoc2.GetDocCell<unsigned long>("Volume", riDate2), 12403800);
-    unittest::ExpectEqual(long double, viewdoc2.GetDocCell<long double>("Adj Close", riDate2), 62.858919L);
+    rapidcsv::SortKeyFactory<decltype(spD)>::t_sortKey riDate2{tDate2};
+    unittest::ExpectEqual(double, viewdoc2.GetOrderedCell<double>("Open", riDate2), 63.450001);
+    unittest::ExpectEqual(unsigned long, viewdoc2.GetOrderedCell<unsigned long>("Volume", riDate2), 12403800);
+    unittest::ExpectEqual(long double, viewdoc2.GetOrderedCell<long double>("Adj Close", riDate2), 62.858919L);
   }
   catch (const std::exception& ex)
   {

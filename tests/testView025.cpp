@@ -72,8 +72,8 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(2), "256");
 
     ////  Filter + Sort
-    const rapidcsv::SortParams<int> spD(0, rapidcsv::e_SortOrder::DESCEND);
-    rapidcsv::FilterSortDocument<isFirstCellPositive, int> viewdoc2(doc, spD);
+    const rapidcsv::SortParams<int, rapidcsv::e_SortOrder::DESCEND> spD(0);
+    rapidcsv::FilterSortDocument<isFirstCellPositive, decltype(spD)> viewdoc2(doc, spD);
 
     ints = viewdoc2.GetViewColumn<int>(0);
     unittest::ExpectEqual(size_t, ints.size(), 4);

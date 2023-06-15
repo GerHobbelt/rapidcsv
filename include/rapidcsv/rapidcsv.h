@@ -76,14 +76,14 @@ namespace rapidcsv
     {
       if (mColumnNameIdx < -1)
       {
-        std::string errStr = std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+
+        std::string errStr = std::string(__RAPIDCSV_FILE__)+": LabelParams(constructor) :"+
           " invalid column name index " + std::to_string(mColumnNameIdx) + " < -1";
         throw std::out_of_range(errStr);
       }
 
       if (mRowNameIdx < -1)
       {
-        const std::string errStr = std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+
+        std::string errStr = std::string(__RAPIDCSV_FILE__)+": LabelParams(constructor) :"+
           " invalid row name index " + std::to_string(mRowNameIdx) + " < -1";
         throw std::out_of_range(errStr);
       }
@@ -216,7 +216,6 @@ namespace rapidcsv
   public:
 
     using t_dataRow = std::vector<std::string>;
-    typedef bool (* f_EvalBoolExpr)(const t_dataRow& dataRow);
 
     /**
      * @brief   Constructor
@@ -370,7 +369,7 @@ namespace rapidcsv
       }
       if (columnIdx < 0)
       {
-        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+" column not found: " + pColumnName);
+        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+": Document::GetColumnIdx(pColumnName) : column not found: " + pColumnName);
       }
       return static_cast<size_t>(columnIdx);
     }
@@ -415,8 +414,8 @@ namespace rapidcsv
           typename S2Tconv::return_type val = S2Tconv::ToVal(cellStrVal);
           column.push_back(val);
         } else {
-          const std::string errStr = std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+
-            " Document::GetColumn() # requested column index " +
+          const std::string errStr = std::string(__RAPIDCSV_FILE__)+
+            " : Document::GetColumn() # requested column index " +
             std::to_string(pColumnIdx) + " >= " +
             std::to_string(itRow->size() - _getDataColumnIndex(0).dataIdx) +
             " (number of columns on row index " + std::to_string(rowIdx-_getDataColumnIndex(0).dataIdx) + ")";
@@ -613,7 +612,7 @@ namespace rapidcsv
      * @brief   Get number of data columns (excluding label columns).
      * @returns column count.
      */
-    size_t GetColumnCount() const
+    inline size_t GetColumnCount() const
     {
       const size_t firstRowSize = ((_mData.size() > 0) ? _mData.at(0).size() : 0);
       const size_t firstDataColumnIndex = _getDataColumnIndex(0).dataIdx;
@@ -645,7 +644,7 @@ namespace rapidcsv
       }
       if (rowIdx < 0)
       {
-        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+" row not found: " + pRowName);
+        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+": Document::GetRowIdx(pRowName) row not found: " + pRowName);
       }
       return static_cast<size_t>(rowIdx);
     }
@@ -659,14 +658,14 @@ namespace rapidcsv
      *          CONV_S2T = &ConvertFromStr_gNaN<T>::ToVal, then R = std::variant<T, gNaN> .
      */
     // TODO function and unit tests  for ARGS...
-    template< c_S2Tconverter ... S2Tconv >
-    std::tuple<typename S2Tconv::return_type ...>
+    template< typename ... T_C >
+    std::tuple<typename t_S2Tconv<T_C>::return_type ...>
     GetRow(const c_sizet_or_string auto& pRowNameIdx) const
     {
       const size_t pRowIdx = GetRowIdx(pRowNameIdx);
       const size_t dataRowIdx = _getDataRowIndex(pRowIdx).dataIdx;
 
-      assert(sizeof...(S2Tconv) <= _mData.at(dataRowIdx).size());
+      assert(sizeof...(T_C) <= _mData.at(dataRowIdx).size());
 
       size_t colIdx = _getDataColumnIndex(0).dataIdx;
       const t_dataRow& rowData = _mData.at(dataRowIdx);
@@ -674,20 +673,13 @@ namespace rapidcsv
 
       //https://stackoverflow.com/questions/65261797/varadic-template-to-tuple-is-reversed
       // work around for make_tuple
-      std::tuple<typename S2Tconv::return_type...> result = std::tuple<typename S2Tconv::return_type...>();
+      std::tuple<typename t_S2Tconv<T_C>::return_type...> result;
       auto write_tuple = [&rowData,&colIdx] (auto&... wrt_result) -> void
       {
-        ( (wrt_result = S2Tconv::ToVal(rowData.at(colIdx++))), ... );  // comma operator ensures the element order is from left to right
+        ( (wrt_result = t_S2Tconv<T_C>::ToVal(rowData.at(colIdx++))), ... );  // comma operator ensures the element order is from left to right
       };
       std::apply(write_tuple, result);
       return result;
-    }
-
-    template< c_NOT_S2Tconverter ... T >
-    inline std::tuple<typename ConvertFromStr<T>::return_type ...>
-    GetRow(const c_sizet_or_string auto& pRowNameIdx) const
-    {
-      return GetRow<ConvertFromStr<T> ... >(pRowNameIdx);
     }
 
 /*
@@ -702,7 +694,7 @@ namespace rapidcsv
     template< typename ... T, auto ... (*CONV_S2T)(const std::string&) >
     inline std::tuple< typename std::invoke_result_t< decltype(CONV_S2T),
                                                       const std::string&
-                                                   >...
+                                                    >...
                      >
     GetRow(const c_sizet_or_string auto& pRowNameIdx) const
     {
@@ -731,13 +723,13 @@ namespace rapidcsv
      * @param   pRowNameIdx           row-name or zero-based row index.
      * @param   pRow                  vector of row data.
      */
-    template< c_T2Sconverter ... T2Sconv >
+    template< typename ... T_C >
     void SetRow(const c_sizet_or_string auto& pRowNameIdx,
-                const std::tuple<typename T2Sconv::input_type ...>& pRow)
+                const std::tuple<typename t_T2Sconv<T_C>::input_type ...>& pRow)
     {
       const size_t pRowIdx = GetRowIdx(pRowNameIdx);
       const size_t dataRowIdx = _getDataRowIndex(pRowIdx).dataIdx;
-      _resizeTable(dataRowIdx, sizeof...(T2Sconv) );
+      _resizeTable(dataRowIdx, sizeof...(T_C) );
 
       size_t colIdx = _getDataColumnIndex(0).dataIdx;
       t_dataRow& rowData = _mData.at(dataRowIdx);
@@ -745,16 +737,9 @@ namespace rapidcsv
       //https://stackoverflow.com/questions/42494715/c-transform-a-stdtuplea-a-a-to-a-stdvector-or-stddeque
       auto read_tuple = [&rowData,&colIdx] (auto&&... rowElem) -> void
       {
-        ( (rowData.at(colIdx++) = T2Sconv::ToStr(rowElem)) , ... );
+        ( (rowData.at(colIdx++) = t_T2Sconv<T_C>::ToStr(rowElem)) , ... );
       };
       std::apply(read_tuple, pRow);
-    }
-
-    template< c_NOT_T2Sconverter ... T >
-    inline void SetRow(const c_sizet_or_string auto& pRowNameIdx,
-                       const std::tuple<typename ConvertFromVal<T>::input_type ...>& pRow)
-    {
-      SetRow< ConvertFromVal<T> ... >(pRowNameIdx, pRow);
     }
 
     /*
@@ -792,7 +777,7 @@ namespace rapidcsv
      * @brief   Remove row either by it's index or name.
      * @param   pRowNameIdx           row-name or zero-based row-index.
      */
-    void RemoveRow(const c_sizet_or_string auto& pRowNameIdx)
+    inline void RemoveRow(const c_sizet_or_string auto& pRowNameIdx)
     {
       const size_t pRowIdx = GetRowIdx(pRowNameIdx);
       const ssize_t dataRowIdx = static_cast<ssize_t>(_getDataRowIndex(pRowIdx).dataIdx);
@@ -808,26 +793,26 @@ namespace rapidcsv
      * @param   pRow                  vector of row data (optional argument).
      * @param   pRowName              row label name (optional argument).
      */
-    template< c_T2Sconverter ... T2Sconv >
+    template< typename ... T_C >
     void InsertRow(const size_t pRowIdx,
-                   const std::tuple<typename T2Sconv::input_type ...>& pRow
-                                = std::tuple<typename T2Sconv::input_type ...>(),
+                   const std::tuple<typename t_T2Sconv<T_C>::input_type ...>& pRow
+                                = std::tuple<typename t_T2Sconv<T_C>::input_type ...>(),
                    const std::string& pRowName = std::string())
     {
       const size_t rowIdx = _getDataRowIndex(pRowIdx).dataIdx;
 
       t_dataRow row;
-      if constexpr (sizeof...(T2Sconv) == 0)
+      if constexpr (sizeof...(T_C) == 0)
       {
         row.resize(_getDataColumnCount());
       } else {
-        row.resize(_getDataColumnIndex(sizeof...(T2Sconv)).dataIdx);
+        row.resize(_getDataColumnIndex(sizeof...(T_C)).dataIdx);
         size_t colIdx = _getDataColumnIndex(0).dataIdx;
 
         //https://stackoverflow.com/questions/42494715/c-transform-a-stdtuplea-a-a-to-a-stdvector-or-stddeque
         auto read_tuple = [&row,&colIdx] (auto&&... rowElem) -> void
         {
-          ( (row.at(colIdx++) = T2Sconv::ToStr(rowElem)) , ... );
+          ( (row.at(colIdx++) = t_T2Sconv<T_C>::ToStr(rowElem)) , ... );
         };
         std::apply(read_tuple, pRow);
       }
@@ -847,15 +832,6 @@ namespace rapidcsv
       }
 
       _updateRowNames();
-    }
-
-    template< c_NOT_T2Sconverter ... T >
-    void InsertRow(const size_t pRowIdx,
-                   const std::tuple<typename ConvertFromVal<T>::input_type ...>& pRow
-                                = std::tuple<typename ConvertFromVal<T>::input_type ...>(),
-                   const std::string& pRowName = std::string())
-    {
-      InsertRow< ConvertFromVal<T> ... >(pRowIdx, pRow, pRowName);
     }
 
     /*
@@ -919,7 +895,7 @@ namespace rapidcsv
      * @brief   Get number of data rows (excluding label rows).
      * @returns row count.
      */
-    size_t GetRowCount() const
+    inline size_t GetRowCount() const
     {
       const size_t dataRowSize = _mData.size();
       const size_t firstDataRowIndex = _getDataRowIndex(0).dataIdx;
@@ -936,8 +912,8 @@ namespace rapidcsv
      *          CONV_S2T = &ConvertFromStr_gNaN<T>::ToVal, then R = std::variant<T, gNaN> .
      */
     // TODO function and unit tests  for ARGS...
-    template< c_S2Tconverter S2Tconv >
-    typename S2Tconv::return_type
+    template< typename T_C >
+    typename t_S2Tconv<T_C>::return_type
     GetCell(const c_sizet_or_string auto& pColumnNameIdx,
             const c_sizet_or_string auto& pRowNameIdx) const
     {
@@ -947,15 +923,7 @@ namespace rapidcsv
       const size_t dataColumnIdx = _getDataColumnIndex(pColumnIdx).dataIdx;
       const size_t dataRowIdx = _getDataRowIndex(pRowIdx).dataIdx;
 
-      return S2Tconv::ToVal(_mData.at(dataRowIdx).at(dataColumnIdx));
-    }
-
-    template< c_NOT_S2Tconverter T >
-    inline typename ConvertFromStr<T>::return_type
-    GetCell(const c_sizet_or_string auto& pColumnNameIdx,
-            const c_sizet_or_string auto& pRowNameIdx) const
-    {
-      return GetCell<ConvertFromStr<T>>(pColumnNameIdx,pRowNameIdx);
+      return t_S2Tconv<T_C>::ToVal(_mData.at(dataRowIdx).at(dataColumnIdx));
     }
 
     template< typename T, auto (*CONV_S2T)(const std::string&) >
@@ -977,10 +945,10 @@ namespace rapidcsv
      * @param   pCell                 cell data.
      */
     // TODO function and unit tests  for ARGS...
-    template< c_T2Sconverter T2Sconv >
+    template< typename T_C >
     void SetCell(const c_sizet_or_string auto& pColumnNameIdx,
                  const c_sizet_or_string auto& pRowNameIdx,
-                 const typename T2Sconv::input_type& pCell)
+                 const typename t_T2Sconv<T_C>::input_type& pCell)
     {
       const size_t pColumnIdx = GetColumnIdx(pColumnNameIdx);
       const size_t pRowIdx = GetRowIdx(pRowNameIdx);
@@ -1003,22 +971,13 @@ namespace rapidcsv
         }
       }
 
-      _mData.at(dataRowIdx).at(dataColumnIdx) = T2Sconv::ToStr(pCell);
+      _mData.at(dataRowIdx).at(dataColumnIdx) = t_T2Sconv<T_C>::ToStr(pCell);
     }
-
-    template< c_NOT_T2Sconverter T >
-    inline void SetCell(const c_sizet_or_string auto& pColumnNameIdx,
-                        const c_sizet_or_string auto& pRowNameIdx,
-                        const typename ConvertFromVal<T>::input_type& pCell)
-    {
-      SetCell<ConvertFromVal<T>>(pColumnNameIdx, pRowNameIdx, pCell);
-    }
-
 
     template<typename T, typename R, std::string (*CONV_T2S)(const R&) >
-    void SetCell(const c_sizet_or_string auto& pColumnNameIdx,
-                 const c_sizet_or_string auto& pRowNameIdx,
-                 const R& pCell)
+    inline void SetCell(const c_sizet_or_string auto& pColumnNameIdx,
+                        const c_sizet_or_string auto& pRowNameIdx,
+                        const R& pCell)
     {
       using T2Swrap = T2SwrapperFunction<T, R, CONV_T2S>;  //  doesn't work -> T2SwrapperFunction<T, CONV_T2S>;
       SetCell< T2Swrap >(pColumnNameIdx, pRowNameIdx, pCell);
@@ -1029,14 +988,15 @@ namespace rapidcsv
      * @param   pColumnIdx            zero-based column index.
      * @returns column name.
      */
-    std::string GetColumnName(const size_t pColumnIdx) const
+    inline std::string GetColumnName(const size_t pColumnIdx) const
     {
-      const size_t dataColumnIdx = _getDataColumnIndex(pColumnIdx).dataIdx;
       if (_mLabelParams.mColumnNameIdx < 0)
       {
-        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+" column name row index < 0: " + std::to_string(_mLabelParams.mColumnNameIdx));
+        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+": Document::GetColumnName(pColumnIdx="+std::to_string(pColumnIdx)
+              +") column name row index < 0: _mLabelParams.mColumnNameIdx=" + std::to_string(_mLabelParams.mColumnNameIdx));
       }
 
+      const size_t dataColumnIdx = _getDataColumnIndex(pColumnIdx).dataIdx;
       return _mData.at(static_cast<size_t>(_mLabelParams.mColumnNameIdx)).at(dataColumnIdx);
     }
 
@@ -1049,7 +1009,8 @@ namespace rapidcsv
     {
       if (_mLabelParams.mColumnNameIdx < 0)
       {
-        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+" column name row index < 0: " + std::to_string(_mLabelParams.mColumnNameIdx));
+        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+": Document::SetColumnName(pColumnIdx="+std::to_string(pColumnIdx)
+              +") column name row index < 0: _mLabelParams.mColumnNameIdx=" + std::to_string(_mLabelParams.mColumnNameIdx));
       }
 
       const size_t dataColumnIdx = _getDataColumnIndex(pColumnIdx).dataIdx;
@@ -1074,7 +1035,7 @@ namespace rapidcsv
      * @brief   Get column names
      * @returns vector of column names.
      */
-    std::vector<std::string> GetColumnNames() const
+    inline std::vector<std::string> GetColumnNames() const
     {
       if (_mLabelParams.mColumnNameIdx >= 0)
       {
@@ -1091,14 +1052,15 @@ namespace rapidcsv
      * @param   pRowIdx               zero-based column index.
      * @returns row name.
      */
-    std::string GetRowName(const size_t pRowIdx) const
+    inline std::string GetRowName(const size_t pRowIdx) const
     {
-      const size_t dataRowIdx = _getDataRowIndex(pRowIdx).dataIdx;
       if (_mLabelParams.mRowNameIdx < 0)
       {
-        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+" row name column index < 0: " + std::to_string(_mLabelParams.mRowNameIdx));
+        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+": Document::GetRowName(mRowIdx="+std::to_string(pRowIdx)
+              +") row name column index < 0: _mLabelParams.mRowNameIdx=" + std::to_string(_mLabelParams.mRowNameIdx));
       }
 
+      const size_t dataRowIdx = _getDataRowIndex(pRowIdx).dataIdx;
       return _mData.at(dataRowIdx).at(static_cast<size_t>(_mLabelParams.mRowNameIdx));
     }
 
@@ -1109,12 +1071,14 @@ namespace rapidcsv
      */
     void SetRowName(size_t pRowIdx, const std::string& pRowName)
     {
-      const size_t dataRowIdx = _getDataRowIndex(pRowIdx).dataIdx;
-      _mRowNames[pRowName] = dataRowIdx;
       if (_mLabelParams.mRowNameIdx < 0)
       {
-        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+":"+std::to_string(__LINE__)+" row name column index < 0: " + std::to_string(_mLabelParams.mRowNameIdx));
+        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+": Document::SetRowName(mRowIdx="+std::to_string(pRowIdx)
+              +") row name column index < 0: _mLabelParams.mRowNameIdx=" + std::to_string(_mLabelParams.mRowNameIdx));
       }
+
+      const size_t dataRowIdx = _getDataRowIndex(pRowIdx).dataIdx;
+      _mRowNames[pRowName] = dataRowIdx;
 
       // increase table size if necessary:
       if (dataRowIdx >= _mData.size())
@@ -1134,7 +1098,7 @@ namespace rapidcsv
      * @brief   Get row names
      * @returns vector of row names.
      */
-    std::vector<std::string> GetRowNames() const
+    inline std::vector<std::string> GetRowNames() const
     {
       std::vector<std::string> rownames;
       if (_mLabelParams.mRowNameIdx >= 0)

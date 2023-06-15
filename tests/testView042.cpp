@@ -39,8 +39,8 @@ int main()
 
     rapidcsv::Document doc2(path, rapidcsv::LabelParams(-1, -1));
     /////  Filter + Sort
-    const rapidcsv::SortParams<int> spD(1, rapidcsv::e_SortOrder::DESCEND);
-    rapidcsv::FilterSortDocument<isFirstCellPositive, int> viewdoc2(doc2, spD);
+    const rapidcsv::SortParams<int, rapidcsv::e_SortOrder::DESCEND> spD(1);
+    rapidcsv::FilterSortDocument<isFirstCellPositive, decltype(spD)> viewdoc2(doc2, spD);
 
     unittest::ExpectEqual(size_t, doc2.GetColumnCount(), 4);
     unittest::ExpectEqual(size_t, viewdoc2.GetViewRowCount(), 4);

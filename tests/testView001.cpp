@@ -76,8 +76,10 @@ int main()
     unittest::ExpectEqual(std::string, viewdoc1.GetViewCell<std::string>(2, 6), "6561");
 
     /////  Filter + Sort
-    const rapidcsv::SortParams<int> spD(1, rapidcsv::e_SortOrder::DESCEND);
-    rapidcsv::FilterSortDocument<isFirstCellPositive, int> viewdoc2(doc, spD);
+    const rapidcsv::SortParams<int, rapidcsv::e_SortOrder::DESCEND> spD(1);
+    // the below code does not compile as 'int' here initializes to default SortParams<int, rapidcsv::e_SortOrder::ASCEND>
+    //rapidcsv::FilterSortDocument<isFirstCellPositive, int> viewdoc2(doc, spD);
+    rapidcsv::FilterSortDocument<isFirstCellPositive, decltype(spD)> viewdoc2(doc, spD);
 
     unittest::ExpectEqual(size_t, viewdoc2.GetViewRowCount(), 4);
 
@@ -96,6 +98,7 @@ int main()
     unittest::ExpectEqual(std::string, viewdoc2.GetViewCell<std::string>(0, 2), "5");
     unittest::ExpectEqual(std::string, viewdoc2.GetViewCell<std::string>(1, 2), "25");
     unittest::ExpectEqual(std::string, viewdoc2.GetViewCell<std::string>(2, 2), "625");
+
   }
   catch (const std::exception& ex)
   {

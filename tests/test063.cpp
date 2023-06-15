@@ -51,8 +51,7 @@ int main()
     using t_raw100multi = rapidcsv::S2TwrapperFunction<int, ToVal>;
     using t_wrp100multi = rapidcsv::S2TwrapperFunction<StrVal, ToStrVal>;
 
-    std::tuple<int, long, int, StrVal> row1 = doc.GetRow< rapidcsv::ConvertFromStr<int>,
-                                                          rapidcsv::ConvertFromStr<long>,
+    std::tuple<int, long, int, StrVal> row1 = doc.GetRow< int, long,
                                                           t_raw100multi, t_wrp100multi >(0);
 
     unittest::ExpectEqual(int, std::get<0>(row1),  1);
@@ -70,8 +69,7 @@ int main()
     unittest::ExpectEqual(int, doc.GetCell<StrVal COMMA ToStrVal>("B", "1").val, 1000);
 
     std::tuple<int, StrVal, float, double> row2 = doc.GetRow< t_raw100multi, t_wrp100multi,
-                                                              rapidcsv::ConvertFromStr<float>,
-                                                              rapidcsv::ConvertFromStr<double> >("2");
+                                                              float, double >("2");
     unittest::ExpectEqual(int, std::get<0>(row2),  10);
     unittest::ExpectEqual(int, std::get<1>(row2).val,  1);
     unittest::ExpectEqual(float, std::get<2>(row2),  0.001f);
@@ -82,8 +80,7 @@ int main()
 
     std::tuple< float, double, float,
                 rapidcsv::ConvertFromStr_gNaN<double>::return_type > row3 =
-                       doc.GetRow< rapidcsv::ConvertFromStr<float>,
-                                   rapidcsv::ConvertFromStr<double>,
+                       doc.GetRow< float, double,
                                    rapidcsv::ConvertFromStr_fNaN<float>,
                                    rapidcsv::ConvertFromStr_gNaN<double> >("3");
 
@@ -96,8 +93,7 @@ int main()
 
     std::tuple< float, double, float,
                 rapidcsv::ConvertFromStr_gNaN<double>::return_type > row4 =
-                       doc.GetRow< rapidcsv::ConvertFromStr<float>,
-                                   rapidcsv::ConvertFromStr<double>,
+                       doc.GetRow< float, double,
                                    rapidcsv::ConvertFromStr_fNaN<float>,
                                    rapidcsv::ConvertFromStr_gNaN<double> >("4");
 

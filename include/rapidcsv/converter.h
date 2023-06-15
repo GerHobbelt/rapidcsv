@@ -21,7 +21,6 @@
 #include <limits>
 #include <type_traits>
 #include <string>
-#include <string_view>
 #include <sstream>
 #include <iomanip>
 #include <utility>
@@ -31,6 +30,11 @@
 
 #if  USE_CHRONO == 1
   #include <chrono>
+  #if  DUSE_CHRONO_TOSTREAM != 1
+    //#include <string_view>
+    //#include <format>
+    #include <cstring>
+  #endif
 #else
   #include <date/date.h>
 #endif
@@ -110,6 +114,9 @@ namespace rapidcsv
   template <typename T>
   concept c_char = is_char<T>::value;
 
+  // std::integral is true for 'bool' and 'char'.
+  // Conversion for 'bool' and 'char' is different from other 'integral-s'.
+  // Hence need for a 'concept' to segregate from 'bool' and 'char'
   template<typename T>
   struct is_integer_type
   {
@@ -123,6 +130,7 @@ namespace rapidcsv
   //template <typename T>
   //concept c_std_integral = is_integral_v<T>;
 
+  // Going with the flow, and just wrapping up floating_point
   template<typename T>
   concept c_floating_point = std::is_floating_point_v<T>;
 
@@ -131,6 +139,9 @@ namespace rapidcsv
 
   template<typename T>
   concept c_number_type = std::is_arithmetic_v<T> && (!is_char<T>::value);
+
+  template<typename T>
+  concept c_NOT_string = (!std::is_same_v<T, std::string>);
   // ]=============================================================]   common helpers
 
 
@@ -364,7 +375,7 @@ namespace rapidcsv
   struct is_S2Tconverter : std::false_type {};
 
   template <typename CFS>
-  struct is_S2Tconverter< CFS, std::void_t< decltype(CFS::ToVal),      // check for the presence of member   CFS::ToVal
+  struct is_S2Tconverter< CFS, std::void_t< decltype(CFS::ToVal),      // check for the presence of 'static' member function CFS::ToVal
                                             typename CFS::value_type,  // check for the presence of type-def CFS::value_type
                                             typename CFS::return_type  // check for the presence of type-def CFS::return_type
                                           >
@@ -399,6 +410,11 @@ namespace rapidcsv
 
 
   // [=============================================================[ ConvertFromStr
+
+  // https://stackoverflow.com/questions/68058640/using-concepts-to-select-class-template-specialization?rq=3
+  template<typename T, typename S2T_FORMAT = S2T_Format_StreamAsIs >
+  struct _ConvertFromStr;
+
     // https://eli.thegreenplace.net/2014/perfect-forwarding-and-universal-references-in-c/
   /**
    * @brief     Convertor class implementation for any types, FROM string using 'std::istringstream'.
@@ -407,8 +423,8 @@ namespace rapidcsv
    * @tparam  T                     'type' converted to, from string data.
    * @tparam  S2T_FORMAT            Class which encapsulates conversion parameters/logic such as 'Locale'.
    */
-  template<typename T, typename S2T_FORMAT = S2T_Format_StreamAsIs >
-  struct _ConvertFromStr
+  template< c_NOT_string T, c_formatISS S2T_FORMAT >
+  struct _ConvertFromStr<T, S2T_FORMAT>
   {
     using value_type  = T;
     using return_type = T;
@@ -435,11 +451,7 @@ namespace rapidcsv
      * @returns Numerical value if conversion succeeds.
      *          Else 'std::invalid_argument' on conversion failure.
      */
-    inline static
-    typename std::enable_if_t< is_formatISS<S2T_FORMAT>::value
-                                 && (!std::is_same_v<T, std::string>),
-                               T
-                             >
+    inline static T
     ToVal(const std::string& str)
     {
       using S2T_FORMAT_STREAM = S2T_FORMAT;
@@ -450,8 +462,8 @@ namespace rapidcsv
       if (iss.fail() || iss.bad()) // || iss.eof())
       {
         std::ostringstream eoss;
-        eoss << __RAPIDCSV_FILE__ << ":" << __LINE__ << " ";
-        eoss << "ERROR : rapidcsv :: in function 'T _ConvertFromStr<T,S2T_FORMAT_STREAM>::ToVal(const std::string& str)' ::: str='";
+        eoss << __RAPIDCSV_FILE__ << " : ";
+        eoss << "ERROR : rapidcsv :: in function 'T _ConvertFromStr<c_NOT_string T, c_formatISS S2T_FORMAT>::ToVal(const std::string& str)' ::: str='";
         eoss << str << "'  istringstream-conversion failed...";
         eoss << std::boolalpha << "   iss.fail() = " << iss.fail()
                                << " : iss.bad() = " << iss.bad()
@@ -618,8 +630,8 @@ namespace rapidcsv
       if(str.length()>1)
       {
         std::ostringstream eoss;
-        eoss << __RAPIDCSV_FILE__ << ":" << __LINE__ << " ";
-        eoss << "ERROR : rapidcsv :: in function 'T _ConvertFromStr<T,S2T_Format_WorkAround>::ToVal(const std::string& str)' ::: for T=char-type-(un)signed, str='";
+        eoss << __RAPIDCSV_FILE__ << " : ";
+        eoss << "ERROR : rapidcsv :: in function 'T _ConvertFromStr<c_char T,S2T_Format_WorkAround>::ToVal(const std::string& str)' ::: for T=char-type-(un)signed, str='";
         eoss << str << "' which violates expected rule # ( str.length()==1 )";
         throw std::invalid_argument(eoss.str());
       }
@@ -655,7 +667,7 @@ namespace rapidcsv
       if(val > 1)
       {
         std::ostringstream eoss;
-        eoss << __RAPIDCSV_FILE__ << ":" << __LINE__ << " ";
+        eoss << __RAPIDCSV_FILE__ << " : ";
         eoss << "ERROR : rapidcsv :: in function 'T _ConvertFromStr<bool,S2T_Format_WorkAround>::ToVal(const std::string& str)' ::: str='";
         eoss << str << "' which violates expected rule # ( val==0 || val==1 )";
         throw std::invalid_argument(eoss.str());
@@ -701,8 +713,8 @@ namespace rapidcsv
       if (iss.fail() || iss.bad() ) // || !iss.eof())
       {
         std::ostringstream eoss;
-        eoss << __RAPIDCSV_FILE__ << ":" << __LINE__ << " ";
-        eoss << "ERROR : rapidcsv :: in function 'T _ConvertFromStr<datelib::year_month_day, S2T_FORMAT_STREAM>::ToVal(const std::string& str)' ::: str='";
+        eoss << __RAPIDCSV_FILE__ << " : ";
+        eoss << "ERROR : rapidcsv :: in function 'T _ConvertFromStr<datelib::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)' ::: str='";
         eoss << str << "'  istringstream-conversion failed...";
         eoss << std::boolalpha << "   iss.fail() = " << iss.fail()
                                << " : iss.bad() = " << iss.bad()
@@ -845,6 +857,14 @@ namespace rapidcsv
    */
   template<c_number_type T, typename S2T_FORMAT = typename S2T_DefaultFormat<T>::type >
   using ConvertFromStr_gNaN = _ConvertFromStr_gNaN<T, S2T_FORMAT >;
+
+
+
+  template< typename T_C >  // T_C :: T -> can be type such as int, double etc ;  XOR  C -> can be type of 'S2Tconverter'
+  using t_S2Tconv = std::conditional_t< is_S2Tconverter< T_C >::value ,
+                                          T_C ,
+                                          ConvertFromStr< T_C >
+                                      >;
   // ]=============================================================] ConvertFromStr
 
 
@@ -1015,6 +1035,11 @@ namespace rapidcsv
 
 
   // [=============================================================[ ConvertFromVal
+
+  // https://stackoverflow.com/questions/68058640/using-concepts-to-select-class-template-specialization?rq=3
+  template<typename T, typename T2S_FORMAT = T2S_Format_StreamAsIs >
+  struct _ConvertFromVal;
+
   /**
    * @brief     Convertor class implementation for any types, TO string using 'std::ostringstream'.
    *            Only intended for converter internal usage, but exposed externally (thru type-alias 'ConvertFromVal')
@@ -1022,8 +1047,8 @@ namespace rapidcsv
    * @tparam  T                     'type' converted from, to string data.
    * @tparam  T2S_FORMAT            Class which encapsulates conversion parameters/logic such as 'Locale' (optional argument).
    */
-  template<typename T, typename T2S_FORMAT = T2S_Format_StreamAsIs >
-  struct _ConvertFromVal
+  template<c_NOT_string T, c_formatOSS T2S_FORMAT >
+  struct _ConvertFromVal<T,T2S_FORMAT>
   {
     using value_type = T;
     using input_type = T;
@@ -1034,11 +1059,7 @@ namespace rapidcsv
      * @returns Output string if conversion succeeds.
      *          Else 'std::invalid_argument' on conversion failure.
      */
-    inline static
-    typename std::enable_if_t< is_formatOSS<T2S_FORMAT>::value
-                                 && (!std::is_same_v<T, std::string>),
-                               std::string
-                             >
+    inline static std::string
     ToStr(const T& val)
     {
       using T2S_FORMAT_STREAM = T2S_FORMAT;
@@ -1049,7 +1070,7 @@ namespace rapidcsv
       {
         std::ostringstream eoss;
         eoss << __RAPIDCSV_FILE__ << ":" << __LINE__ << " ";
-        eoss << "ERROR : rapidcsv :: in function 'std::string _ConvertFromVal<T, T2S_FORMAT_STREAM>::ToStr(const T& val)' ::: ";
+        eoss << "ERROR : rapidcsv :: in function 'std::string _ConvertFromVal<c_NOT_string T, c_formatOSS T2S_FORMAT>::ToStr(const T& val)' ::: ";
         try {
           eoss << "val='" << val << "'";
         } catch (...) {} // do-nothing on error
@@ -1233,23 +1254,102 @@ namespace rapidcsv
     {
       std::ostringstream oss;
       T2S_FORMAT_YMD::streamUpdate(oss);
+
 #if  USE_CHRONO == 1
   #if  DUSE_CHRONO_TOSTREAM == 1
       // As of writing this code, no compiler supports chrono::to_stream() yet.
-      // This code hereis for future reference once compiler starts supporting.
+      // This code here is for future reference once compiler starts supporting.
       // refer https://omegaup.com/docs/cpp/en/cpp/chrono/local_t/to_stream.html
+      // no OS in particular
       std::chrono::to_stream(oss, fmt, val, abbrev, offset_sec); // does not compile
   #else
       // msvc supports only from_stream and not to_stream.
       // date-lib is not compatible with msvc (min/max macro clash), therefore
       // we are left with std::format() alternative
       //WINDOWS
+      /*  this does not work
       std::string_view fmt_view{fmt};
       std::make_format_args val_fmt_arg{val};
       oss << std::vformat(fmt_view, val_fmt_arg);  // for now , no support for abbrev, offset_sec
+      */
+      // due to limitations of underlying libs, forced to brute force
+      // The conversion here handles a limited sub-set of conversion specifiers
+
+      std::function<void(char)> write;
+      write = [&oss,&write,&val] (char convSpecifier) -> void
+      {
+        switch(convSpecifier)
+        {
+          case 'Y' :
+            oss << std::setfill('0') << std::setw(4) << static_cast<int>(val.year()); break;
+          case 'm':
+            oss << std::setfill('0') << std::setw(2) << static_cast<unsigned>(val.month()); break;
+          case 'd':
+            oss << std::setfill('0') << std::setw(2) << static_cast<unsigned>(val.day()); break;
+          case 'F': //  "%Y-%m-%d"
+            write('Y'); oss << '-'; write('m'); oss << '-'; write('d'); break;
+          case 'D': //  "%m/%d/%y"
+            write('m'); oss << '/'; write('d'); oss << '/'; write('y'); break;
+          case 'y' :
+            oss << std::setfill('0') << std::setw(2) << (static_cast<int>(val.year()) % 100); break;
+          case 'b' :
+            switch(static_cast<unsigned>(val.month()))
+            {
+              case  1: oss << "Jan"; break; case  2: oss << "Feb"; break; case  3: oss << "Mar"; break;
+              case  4: oss << "Apr"; break; case  5: oss << "May"; break; case  6: oss << "Jun"; break;
+              case  7: oss << "Jul"; break; case  8: oss << "Aug"; break; case  9: oss << "Sep"; break;
+              case 10: oss << "Oct"; break; case 11: oss << "Nov"; break; case 12: oss << "Dec"; break;
+              default:
+                oss << '%' << convSpecifier;
+            }
+            break;
+          case 'B' :
+            switch(static_cast<unsigned>(val.month()))
+            {
+              case  1: oss << "Janary";  break; case  2: oss << "February"; break; case  3: oss << "March";     break;
+              case  4: oss << "April";   break; case  5: oss << "May";      break; case  6: oss << "June";      break;
+              case  7: oss << "July";    break; case  8: oss << "August";   break; case  9: oss << "September"; break;
+              case 10: oss << "October"; break; case 11: oss << "November"; break; case 12: oss << "December";  break;
+              default:
+                oss << '%' << convSpecifier;
+            }
+            break;
+          default:
+            oss << '%' << convSpecifier;
+        }
+      };
+
+      if (strlen(fmt)>1)
+      {
+        enum _ParseState { READ, REPLACE };
+        _ParseState state = _ParseState::READ;
+        char present = fmt[0];
+        if( '%' == present )
+          state = _ParseState::REPLACE;
+        for(size_t iii = 1; iii < strlen(fmt); ++iii)
+        {
+          present = fmt[iii];
+          if(_ParseState::REPLACE == state)
+          {
+            write(present);
+            state = _ParseState::READ;
+          } else {
+            if( '%' == present )
+            {
+              state = _ParseState::REPLACE;
+            } else {
+              oss << present;
+              //state = _ParseState::READ;
+            }
+          }
+        }
+      } else {
+        if (strlen(fmt)==1)
+          oss << fmt[1];
+      }
   #endif
 #else
-      // gcc and clang does not support the required functionality here
+      // gcc and clang does not support the required 'chrono' functionality as of writing this code
       // UNIX-like , macOS
       using CS = std::chrono::seconds;
       date::fields<CS> fds{val};
@@ -1259,7 +1359,7 @@ namespace rapidcsv
       {
         std::ostringstream eoss;
         eoss << __RAPIDCSV_FILE__ << ":" << __LINE__ << " ";
-        eoss << "ERROR : rapidcsv :: in function 'std::string _ConvertFromVal<datelib::year_month_date, T2S_FORMAT_STREAM>::ToStr(const datelib::year_month_date& val)' ::: ";
+        eoss << "ERROR : rapidcsv :: in function 'std::string _ConvertFromVal<datelib::year_month_date, T2S_FORMAT_YMD>::ToStr_args(const datelib::year_month_date& val)' ::: ";
         try {
           eoss << "year{" << val.year() << "}-month{" << val.month() << "}-day{" << val.day() << "}' : val.ok()=" << val.ok() << " format='" << fmt << "'";
         } catch (...) {} // do-nothing on error
@@ -1304,6 +1404,35 @@ namespace rapidcsv
 
   template<typename T, typename T2S_FORMAT = typename T2S_DefaultFormat<T>::type >
   using ConvertFromVal_gNaN = _ConvertFromVal_gNaN<T, T2S_FORMAT >;
+
+
+
+  template< typename T_C >  // T_C :: T -> can be type such as int, double etc ;  XOR  C -> can be type of 'T2Sconverter'
+  using t_T2Sconv = std::conditional_t< is_T2Sconverter< T_C >::value ,
+                                          T_C ,
+                                          ConvertFromVal< T_C >
+                                      >;
+
+  template< typename ... T_C >
+  struct ConvertFromTuple
+  {
+    inline static
+    std::string ToStr(std::tuple<typename t_S2Tconv<T_C>::return_type ...> const& theTuple)
+    {
+      std::stringstream ss;
+      std::apply
+      (
+        [&ss] (typename t_S2Tconv<T_C>::return_type const&... tupleArgs)
+        {
+          ss << '[';
+          std::size_t n{0};
+          ((ss << tupleArgs << (++n != sizeof...(T_C) ? ", " : "")), ...);
+          ss << ']';
+        }, theTuple
+      );
+      return ss.str();
+    }
+  };
   // ]=============================================================] ConvertFromVal
 
 }

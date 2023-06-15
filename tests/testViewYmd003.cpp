@@ -90,8 +90,8 @@ int main()
     unittest::ExpectEqual(long double, adjClose.at(3), 0.067374L);
 
     ////  Filter + Sort
-    const rapidcsv::SortParams<rdb::year_month_day> spD(0, rapidcsv::e_SortOrder::DESCEND);
-    rapidcsv::FilterSortDocument<isYear2016, rdb::year_month_day> viewdoc2(doc, spD);
+    const rapidcsv::SortParams<rdb::year_month_day, rapidcsv::e_SortOrder::DESCEND> spD(0);
+    rapidcsv::FilterSortDocument<isYear2016, decltype(spD)> viewdoc2(doc, spD);
 
     tradingDate = viewdoc2.GetViewColumn<rdb::year_month_day>("Date");
     unittest::ExpectEqual(size_t, tradingDate.size(), 252);

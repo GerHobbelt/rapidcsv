@@ -314,7 +314,6 @@ if(RAPIDCSV_BUILD_TESTS)
   add_unit_test(test093)
   add_unit_test(test094)
 
-#[========[
   add_unit_test(testView001)
   add_unit_test(testView003)
   add_unit_test(testView005)
@@ -333,7 +332,6 @@ if(RAPIDCSV_BUILD_TESTS)
   add_unit_test(testViewYmd001)
   add_unit_test(testViewYmd003)
   add_unit_test(testViewYmd005)
-#]========]
 
   # perf tests
   add_perf_test(ptest001)
