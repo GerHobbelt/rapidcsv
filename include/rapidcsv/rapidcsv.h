@@ -665,7 +665,12 @@ namespace rapidcsv
       const size_t pRowIdx = GetRowIdx(pRowNameIdx);
       const size_t dataRowIdx = _getDataRowIndex(pRowIdx).dataIdx;
 
-      assert(sizeof...(T_C) <= _mData.at(dataRowIdx).size());
+      if( _mData.at(dataRowIdx).size() < sizeof...(T_C) )
+      {
+        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+": Document::GetRow(pRowNameIdx) :: ERROR >> row-size("+
+                std::to_string(_mData.at(dataRowIdx).size()) + ") less than tuple-size("+
+                std::to_string(sizeof...(T_C)) + ")");
+      }
 
       size_t colIdx = _getDataColumnIndex(0).dataIdx;
       const t_dataRow& rowData = _mData.at(dataRowIdx);
