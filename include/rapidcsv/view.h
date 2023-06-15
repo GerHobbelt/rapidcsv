@@ -39,7 +39,7 @@ namespace rapidcsv
 
   public:
     using S2Tconv_type = t_S2Tconv<T_C>;
-    using return_type = S2Tconv_type::return_type;
+    using return_type = typename S2Tconv_type::return_type;
 
     constexpr static e_SortOrder sortOrder = SORT_ORDER;
 
