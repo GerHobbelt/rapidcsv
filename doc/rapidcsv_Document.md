@@ -5,7 +5,10 @@ Class representing a CSV document.
 ---
 
 ```c++
-Document (const std::string & pPath = std::string(), const LabelParams & pLabelParams = LabelParams(), const SeparatorParams & pSeparatorParams = SeparatorParams(), const LineReaderParams & pLineReaderParams = LineReaderParams())
+Document (const std::string & pPath = std::string(),
+          const LabelParams & pLabelParams = LabelParams(),
+          const SeparatorParams & pSeparatorParams = SeparatorParams(),
+          const LineReaderParams & pLineReaderParams = LineReaderParams())
 ```
 Constructor. 
 
@@ -18,7 +21,10 @@ Constructor.
 ---
 
 ```c++
-Document (std::istream & pStream, const LabelParams & pLabelParams = LabelParams(), const SeparatorParams & pSeparatorParams = SeparatorParams(), const LineReaderParams & pLineReaderParams = LineReaderParams())
+Document (std::istream & pStream,
+          const LabelParams & pLabelParams = LabelParams(),
+          const SeparatorParams & pSeparatorParams = SeparatorParams(),
+          const LineReaderParams & pLineReaderParams = LineReaderParams())
 ```
 Constructor. 
 
@@ -38,90 +44,89 @@ Clears loaded Document data.
 ---
 
 ```c++
-template<typename T , int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0> T GetCell (const size_t pColumnIdx, const size_t pRowIdx, f_ConvFuncToVal< T > pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal)
+template<typename T_C >
+t_S2Tconv<T_C>::return_type
+GetCell (const c_sizet_or_string auto & pColumnNameIdx,
+         const c_sizet_or_string auto & pRowNameIdx)
 ```
-Get cell by index. 
+Get cell either by it's index or name.
+
+**Template Parameters**
+- `T_C`    T can be data-type such as int, double etc ; <br>
+            XOR C -> Conversion class statisfying concept 'c_S2Tconverter'. 
 
 **Parameters**
-- `pColumnIdx` zero-based column index. 
-- `pRowIdx` zero-based row index. 
-- `pConvertToVal` conversion function (optional argument). 
+- `pColumnNameIdx` column-name or zero-based column-index. 
+- `pRowNameIdx` column-name or zero-based row-index. 
 
 **Returns:**
-- cell data. 
+- cell data of type R. By default, R is usually same type as T. <br>
+  Else if *`C = ConvertFromStr_gNaN<T>`*, then *`R = std::variant<T, std::string>`*. <br>
+  On conversion success variant has the converted value, else the string value which caused failure during conversion. 
 
 ---
 
 ```c++
-template<typename T , int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0> T GetCell (const std::string & pColumnName, const std::string & pRowName, f_ConvFuncToVal< T > pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal)
+template<typename T , auto(*)(const std::string &) CONV_S2T>
+std::invoke_result_t< decltype(CONV_S2T), const std::string& >
+GetCell (const c_sizet_or_string auto & pColumnNameIdx,
+         const c_sizet_or_string auto & pRowNameIdx)
 ```
-Get cell by name. 
+Get cell either by it's index or name. 
+Template Parameters:
+- `T`             'type' converted to, from string data, using conversion function. 
+- `CONV_S2T`      conversion function. 
 
 **Parameters**
-- `pColumnName` column label name. 
-- `pRowName` row label name. 
-- `pConvertToVal` conversion function (optional argument). 
+- `pColumnNameIdx` column-name or zero-based column-index. 
+- `pRowNameIdx` column-name or zero-based row-index. 
 
 **Returns:**
-- cell data. 
+- cell data of type R. By default, R is usually same type as T. <br>
+  Else if CONV_S2T similar to function *`ConvertFromStr_gNaN<T>::ToVal`*, then *`R = std::variant<T, std::string>`*. <br>
+  On conversion success variant has the converted value, else the string value which caused failure during conversion. 
 
 ---
 
 ```c++
-template<typename T , int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0> T GetCell (const std::string & pColumnName, const size_t pRowIdx, f_ConvFuncToVal< T > pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal)
+template<typename T_C >
+std::vector<typename t_S2Tconv<T_C>::return_type>
+GetColumn (const c_sizet_or_string auto & pColumnNameIdx)
 ```
-Get cell by column name and row index. 
+Get column either by it's index or name.
+
+**Template Parameters**
+- `T_C`    T can be data-type such as int, double etc ; <br>
+            XOR C -> Conversion class statisfying concept 'c_S2Tconverter'. 
 
 **Parameters**
-- `pColumnName` column label name. 
-- `pRowIdx` zero-based row index. 
-- `pConvertToVal` conversion function (optional argument). 
+- `pColumnNameIdx` column-name or zero-based column-index. 
 
 **Returns:**
-- cell data. 
+- *`vector<R>`* of column data. By default, R is usually same type as T. <br>
+  Else if *`C = ConvertFromStr_gNaN<T>`*, then *`R = std::variant<T, std::string>`*. <br>
+  On conversion success variant has the converted value, else the string value which caused failure during conversion. 
 
 ---
 
 ```c++
-template<typename T , int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0> T GetCell (const size_t pColumnIdx, const std::string & pRowName, f_ConvFuncToVal< T > pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal)
+template<typename T , auto(*)(const std::string &) CONV_S2T>
+std::vector< typename std::invoke_result_t< decltype(CONV_S2T), const std::string& > >
+GetColumn (const c_sizet_or_string auto & pColumnNameIdx)
 ```
-Get cell by column index and row name. 
+Get column either by it's index or name.
+
+**Template Parameters**
+- `T`                     'type' converted to, from string data, using conversion function. 
+- `CONV_S2T`               conversion function. 
 
 **Parameters**
-- `pColumnIdx` zero-based column index. 
-- `pRowName` row label name. 
-- `pConvertToVal` conversion function (optional argument). 
+- `pColumnNameIdx` column-name or zero-based column-index. 
 
 **Returns:**
-- cell data. 
-
----
-
-```c++
-template<typename T , int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0> std::vector<T> GetColumn (const size_t pColumnIdx, f_ConvFuncToVal< T > pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal)
-```
-Get column by index. 
-
-**Parameters**
-- `pColumnIdx` zero-based column index. 
-- `pConvertToVal` conversion function (optional argument). 
-
-**Returns:**
-- vector of column data. 
-
----
-
-```c++
-template<typename T , int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0> std::vector<T> GetColumn (const std::string & pColumnName, f_ConvFuncToVal< T > pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal)
-```
-Get column by name. 
-
-**Parameters**
-- `pColumnName` column label name. 
-- `pConvertToVal` conversion function (optional argument). 
-
-**Returns:**
-- vector of column data. 
+- *`vector<R>`* of column data. By default, R is usually same type as T. <br>
+  Else if CONV_S2T is similar to function *`ConvertFromStr_gNaN<T>::ToVal`*, then *`R = std::variant<T, std::string>`*. <br>
+  On conversion success variant has the converted value, else the string value which caused failure during conversion. 
 
 ---
 
@@ -136,7 +141,7 @@ Get number of data columns (excluding label columns).
 ---
 
 ```c++
-ssize_t GetColumnIdx (const std::string & pColumnName)
+size_t GetColumnIdx (const std::string & pColumnName)
 ```
 Get column index by name. 
 
@@ -172,30 +177,36 @@ Get column names.
 ---
 
 ```c++
-template<typename T , int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0> std::vector<T> GetRow (const size_t pRowIdx, f_ConvFuncToVal< T > pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal)
+template<typename ... T_C>
+std::tuple<typename t_S2Tconv<T_C>::return_type ...>
+GetRow (const c_sizet_or_string auto & pRowNameIdx)
 ```
-Get row by index. 
+Get row either by it's index or name.
+
+**Template Parameters**
+- `T_C`    T can be data-type such as int, double etc ; <br>
+            XOR C -> Conversion class statisfying concept 'c_S2Tconverter'. 
 
 **Parameters**
-- `pRowIdx` zero-based row index. 
-- `pConvertToVal` conversion function (optional argument). 
+- `pRowNameIdx` row-name or zero-based row index. 
 
 **Returns:**
-- vector of row data. 
+- *`tuple<R...>`* of row data. By default, R is usually same type as T. <br>
+  Else if *`C = ConvertFromStr_gNaN<T>`*, then *`R = std::variant<T, std::string>`*. 
 
 ---
 
 ```c++
-template<typename T , int USE_NUMERIC_LOCALE = 1, int USE_NAN = 0> std::vector<T> GetRow (const std::string & pRowName, f_ConvFuncToVal< T > pConvertToVal = ConverterToVal<T,USE_NUMERIC_LOCALE,USE_NAN>::ToVal)
+std::vector<std::string>
+GetRow_VecStr (const c_sizet_or_string auto & pRowNameIdx)
 ```
-Get row by name. 
+Get row either by it's index or name. 
 
 **Parameters**
-- `pRowName` row label name. 
-- `pConvertToVal` conversion function (optional argument). 
+- `pRowNameIdx` row-name or zero-based row index. 
 
 **Returns:**
-- vector of row data. 
+- *`vector<std::string>`* of row data 
 
 ---
 
@@ -210,7 +221,7 @@ Get number of data rows (excluding label rows).
 ---
 
 ```c++
-ssize_t GetRowIdx (const std::string & pRowName)
+size_t GetRowIdx (const std::string & pRowName)
 ```
 Get row index by name. 
 
@@ -246,33 +257,109 @@ Get row names.
 ---
 
 ```c++
-template<typename T , int USE_NUMERIC_LOCALE = 0> void InsertColumn (const size_t pColumnIdx, const std::vector< T > & pColumn = std::vector<T>(), const std::string & pColumnName = std::string(), f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+template<typename T_C >
+void InsertColumn (const size_t pColumnIdx,
+                   const std::vector< typename t_T2Sconv< T_C >::input_type > & pColumn
+                       = std::vector< typename t_T2Sconv< T_C >::input_type>(),
+                   const std::string & pColumnName = std::string())
 ```
-Insert column at specified index. 
+Insert column at specified index.
+
+**Template Parameters**
+- `T_C`    T can be data-type such as int, double etc ; <br>
+            XOR C -> Conversion class statisfying concept 'c_T2Sconverter'. 
 
 **Parameters**
-- `pColumnIdx` zero-based column index. 
-- `pColumn` vector of column data (optional argument). 
-- `pColumnName` column label name (optional argument). 
-- `pConvertToStr` conversion function (optional argument). 
+- `pColumnIdx`      zero-based column index. 
+- `pColumn`         *`vector<R>`* of column data (optional argument). By default, R is usually same type as T. <br>
+                    Else if *`C = ConvertFromVal_gNaN<T>`*, then *`R = std::variant<T, std::string>`*. <br>
+                    On conversion success variant has the converted value, else the string value which caused failure during conversion. 
+- `pColumnName`     column label name (optional argument).
 
 ---
 
 ```c++
-template<typename T , int USE_NUMERIC_LOCALE = 0> void InsertRow (const size_t pRowIdx, const std::vector< T > & pRow = std::vector<T>(), const std::string & pRowName = std::string(), f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+template<typename T , typename R , std::string(*)(const R &) CONV_T2S>
+void InsertColumn (const size_t pColumnIdx,
+                   const std::vector< R > & pColumn = std::vector<R>(),
+                   const std::string & pColumnName = std::string())
+```
+Insert column at specified index. 
+Template Parameters:
+- `T` 'type' converted from, to string data, using conversion function. 
+- `R` can be T or *`std::variant<T, std::string>`*. <br>
+      On conversion success variant has the converted value, else the string value which caused failure during conversion. 
+- `CONV_T2S` conversion function. 
+
+**Parameters**
+- `pColumnIdx` zero-based column index. 
+- `pColumn` *`vector<R>`* of column data (optional argument). By default, R is usually same type as T. <br>
+            Else if CONV_T2S is similar to function *`ConvertFromVal_gNaN<T>::ToStr`*, then *`R = std::variant<T, std::string>`*. <br>
+            On conversion success variant has the converted value, else the string value which caused failure during conversion. 
+- `pColumnName` column label name (optional argument) 
+
+---
+
+```c++
+template<typename T , std::string(*)(const T &) CONV_T2S>
+void InsertColumn (const size_t pColumnIdx,
+                   const std::vector< T > & pColumn = std::vector<T>(),
+                   const std::string & pColumnName = std::string())
+```
+Insert column at specified index.
+
+**Template Parameters**
+- `T`            'type' converted from, to string data, using conversion function. 
+- `CONV_T2S`     conversion function. 
+
+**Parameters**
+- `pColumnIdx`         zero-based column index. 
+- `pColumn`            *`vector<T>`* of column data (optional argument). 
+- `pColumnName`        column label name (optional argument) 
+
+---
+
+```c++
+template<typename ... T_C>
+void InsertRow (const size_t pRowIdx,
+                const std::tuple< typename t_T2Sconv< T_C >::input_type ... > & pRow
+                    = std::tuple< typename t_T2Sconv< T_C >::input_type ...>(),
+                const std::string & pRowName = std::string())
+```
+Insert row at specified index.
+
+**Template Parameters:**
+- `T_C`    T can be data-type such as int, double etc ; <br>
+            XOR C -> Conversion class statisfying concept 'c_T2Sconverter'. 
+
+**Parameters**
+- `pRowIdx`         zero-based row index. 
+- `pRow`            *`tuple<R...>`* of row data. By default, R is usually same type as T. <br>
+                    Else if *`C = ConvertFromVal_gNaN<T>`*, then *`R = std::variant<T, std::string>`*. <br>
+                    On conversion success variant has the converted value, else the string value which caused failure during conversion. 
+- `pRowName`        row label name (optional argument). 
+
+---
+
+```c++
+void InsertRow_VecStr (const size_t pRowIdx,
+                       const std::vector< std::string > & pRow = std::vector< std::string >(),
+                       const std::string & pRowName = std::string())
 ```
 Insert row at specified index. 
 
 **Parameters**
-- `pRowIdx` zero-based row index. 
-- `pRow` vector of row data (optional argument). 
-- `pRowName` row label name (optional argument). 
-- `pConvertToStr` conversion function (optional argument). 
+- `pRowIdx`         zero-based row index. 
+- `pRow`            *`vector<string>`* of row data (optional argument). 
+- `pRowName`        row label name (optional argument). 
 
 ---
 
 ```c++
-void Load (const std::string & pPath, const LabelParams & pLabelParams = LabelParams(), const SeparatorParams & pSeparatorParams = SeparatorParams(), const LineReaderParams & pLineReaderParams = LineReaderParams())
+void Load (const std::string & pPath,
+           const LabelParams & pLabelParams = LabelParams(),
+           const SeparatorParams & pSeparatorParams = SeparatorParams(),
+           const LineReaderParams & pLineReaderParams = LineReaderParams())
 ```
 Read Document data from file. 
 
@@ -285,7 +372,10 @@ Read Document data from file.
 ---
 
 ```c++
-void Load (std::istream & pStream, const LabelParams & pLabelParams = LabelParams(), const SeparatorParams & pSeparatorParams = SeparatorParams(), const LineReaderParams & pLineReaderParams = LineReaderParams())
+void Load (std::istream & pStream,
+           const LabelParams & pLabelParams = LabelParams(),
+           const SeparatorParams & pSeparatorParams = SeparatorParams(),
+           const LineReaderParams & pLineReaderParams = LineReaderParams())
 ```
 Read Document data from stream. 
 
@@ -298,42 +388,22 @@ Read Document data from stream.
 ---
 
 ```c++
-void RemoveColumn (const size_t pColumnIdx)
+void RemoveColumn (const c_sizet_or_string auto & pColumnNameIdx)
 ```
-Remove column by index. 
+Remove column either by it's index or name. 
 
 **Parameters**
-- `pColumnIdx` zero-based column index. 
+- `pColumnNameIdx` column-name or zero-based column-index. 
 
 ---
 
 ```c++
-void RemoveColumn (const std::string & pColumnName)
+void RemoveRow (const c_sizet_or_string auto & pRowNameIdx)
 ```
-Remove column by name. 
+Remove row either by it's index or name. 
 
 **Parameters**
-- `pColumnName` column label name. 
-
----
-
-```c++
-void RemoveRow (const size_t pRowIdx)
-```
-Remove row by index. 
-
-**Parameters**
-- `pRowIdx` zero-based row index. 
-
----
-
-```c++
-void RemoveRow (const std::string & pRowName)
-```
-Remove row by name. 
-
-**Parameters**
-- `pRowName` row label name. 
+- `pRowNameIdx` row-name or zero-based row-index. 
 
 ---
 
@@ -358,78 +428,125 @@ Write Document data to stream.
 ---
 
 ```c++
-template<typename T , int USE_NUMERIC_LOCALE = 0> void SetCell (const size_t pColumnIdx, const size_t pRowIdx, const T & pCell, f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+template<typename T_C >
+void SetCell (const c_sizet_or_string auto & pColumnNameIdx,
+              const c_sizet_or_string auto & pRowNameIdx,
+              const typename t_T2Sconv< T_C >::input_type & pCell)
 ```
-Set cell by index. 
+Set cell either by it's index or name.
+
+**Template Parameters**
+- `T_C`    T can be data-type such as int, double etc ; <br>
+            XOR C -> Conversion class statisfying concept 'c_T2Sconverter'. 
 
 **Parameters**
-- `pRowIdx` zero-based row index. 
-- `pColumnIdx` zero-based column index. 
-- `pCell` cell data. 
-- `pConvertToStr` conversion function (optional argument). 
+- `pColumnNameIdx` column-name or zero-based column-index. 
+- `pRowNameIdx` column-name or zero-based row-index. 
+- `pCell` cell data. By default, R is usually same type as T. <br>
+            Else if *`C = ConvertFromVal_gNaN<T>`*, then *`R = std::variant<T, std::string>`*. <br>
+            On conversion success variant has the converted value, else the string value which caused failure during conversion. 
 
 ---
 
 ```c++
-template<typename T , int USE_NUMERIC_LOCALE = 0> void SetCell (const std::string & pColumnName, const std::string & pRowName, const T & pCell, f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+template<typename T , typename R , std::string(*)(const R &) CONV_T2S>
+void SetCell (const c_sizet_or_string auto & pColumnNameIdx,
+              const c_sizet_or_string auto & pRowNameIdx,
+              const R & pCell)
 ```
-Set cell by name. 
+Set cell either by it's index or name.
+
+**Template Parameters**
+- `T` 'type' converted from, to string data, using conversion function. 
+- `R` can be T or *`std::variant<T, std::string>`*. <br>
+      On conversion success variant has the converted value, else the string value which caused failure during conversion. 
+- `CONV_T2S` conversion function. 
 
 **Parameters**
-- `pColumnName` column label name. 
-- `pRowName` row label name. 
-- `pCell` cell data. 
-- `pConvertToStr` conversion function (optional argument). 
+- `pColumnNameIdx` column-name or zero-based column-index. 
+- `pRowNameIdx` column-name or zero-based row-index. 
+- `pCell` cell data. By default, R is usually same type as T. <br>
+            Else if CONV_T2S is similar to function *`ConvertFromVal_gNaN<T>::ToStr`*, then *`R = std::variant<T, std::string>`*. <br>
+            On conversion success variant has the converted value, else the string value which caused failure during conversion. 
 
 ---
 
 ```c++
-template<typename T , int USE_NUMERIC_LOCALE = 0> void SetCell (const std::string & pColumnName, const size_t pRowIdx, const T & pCell, f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+template<typename T , std::string(*)(const T &) CONV_T2S>
+void SetCell (const c_sizet_or_string auto & pColumnNameIdx,
+              const c_sizet_or_string auto & pRowNameIdx, const T & pCell)
 ```
-Set cell by name. 
+Set cell either by it's index or name.
+
+**Template Parameters**
+- `T` 'type' converted from, to string data, using conversion function. 
+- `CONV_T2S` conversion function. 
 
 **Parameters**
-- `pColumnName` column label name. 
-- `pRowIdx` zero-based row index. 
-- `pCell` cell data. 
-- `pConvertToStr` conversion function (optional argument). 
+- `pColumnNameIdx` column-name or zero-based column-index. 
+- `pRowNameIdx` column-name or zero-based row-index. 
+- `pCell` cell data. By default, R is usually same type as T. <br>
+            Else if CONV_T2S is similar to function *`ConvertFromVal_gNaN<T>::ToStr`*, then *`R = std::variant<T, std::string>`*. <br>
+            On conversion success variant has the converted value, else the string value which caused failure during conversion. 
 
 ---
 
 ```c++
-template<typename T , int USE_NUMERIC_LOCALE = 0> void SetCell (const size_t pColumnIdx, const std::string & pRowName, const T & pCell, f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+template<typename T_C >
+void SetColumn (const c_sizet_or_string auto & pColumnNameIdx,
+                const std::vector< typename t_T2Sconv< T_C >::input_type > & pColumn)
 ```
-Set cell by name. 
+Set column either by it's index or name.
+
+**Template Parameters**
+- `T_C`    T can be data-type such as int, double etc ; <br>
+            XOR C -> Conversion class statisfying concept 'c_T2Sconverter'. 
 
 **Parameters**
-- `pColumnIdx` zero-based column index. 
-- `pRowName` row label name. 
-- `pCell` cell data. 
-- `pConvertToStr` conversion function (optional argument). 
+- `pColumnNameIdx`     column-name or zero-based column-index. 
+- `pColumn`            *`vector<R>`* of column data. By default, R is usually same type as T. <br>
+                       Else if *`C = ConvertFromVal_gNaN<T>`*, then *`R = std::variant<T, std::string>`*. <br>
+                       On conversion success variant has the converted value, else the string value which caused failure during conversion. 
 
 ---
 
 ```c++
-template<typename T , int USE_NUMERIC_LOCALE = 0> void SetColumn (const size_t pColumnIdx, const std::vector< T > & pColumn, f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+template<typename T , typename R , std::string(*)(const R &) CONV_T2S>
+void SetColumn (const c_sizet_or_string auto & pColumnNameIdx,
+                const std::vector< R > & pColumn)
 ```
-Set column by index. 
+Set column either by it's index or name.
+
+**Template Parameters**
+- `T` 'type' converted from, to string data, using conversion function. 
+- `R` can be T or *`std::variant<T, std::string>`*. <br>
+      On conversion success variant has the converted value, else the string value which caused failure during conversion. 
+- `CONV_T2S` conversion function. 
 
 **Parameters**
-- `pColumnIdx` zero-based column index. 
-- `pColumn` vector of column data. 
-- `pConvertToStr` conversion function (optional argument). 
+- `pColumnNameIdx` column-name or zero-based column-index. 
+- `pColumn` *`vector<R>`* of column data. By default, R usually is same type as T. <br>
+            Else if CONV_T2S is similar to function *`ConvertFromVal_gNaN<T>`*, then *`R = std::variant<T, std::string>`*. <br>
+            On conversion success variant has the converted value, else the string value which caused failure during conversion. 
 
 ---
 
 ```c++
-template<typename T , int USE_NUMERIC_LOCALE = 0> void SetColumn (const std::string & pColumnName, const std::vector< T > & pColumn, f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+template<typename T , std::string(*)(const T &) CONV_T2S>
+void SetColumn (const c_sizet_or_string auto & pColumnNameIdx,
+                const std::vector< T > & pColumn)
 ```
-Set column by name. 
+Set column either by it's index or name.
+
+**Template Parameters**
+- `T` 'type' converted from, to string data, using conversion function. 
+- `CONV_T2S` conversion function. 
 
 **Parameters**
-- `pColumnName` column label name. 
-- `pColumn` vector of column data. 
-- `pConvertToStr` conversion function (optional argument). 
+- `pColumnNameIdx` column-name or zero-based column-index. 
+- `pColumn` *`vector<R>`* of column data. By default, R usually is same type as T. <br>
+            Else if CONV_T2S is similar to function *`ConvertFromVal_gNaN<T>:ToStr`*, then *`R = std::variant<T, std::string>`*. <br>
+            On conversion success variant has the converted value, else the string value which caused failure during conversion. 
 
 ---
 
@@ -445,26 +562,33 @@ Set column name.
 ---
 
 ```c++
-template<typename T , int USE_NUMERIC_LOCALE = 0> void SetRow (const size_t pRowIdx, const std::vector< T > & pRow, f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+template<typename ... T_C>
+void SetRow (const c_sizet_or_string auto & pRowNameIdx,
+             const std::tuple< typename t_T2Sconv< T_C >::input_type ... > & pRow)
 ```
-Set row by index. 
+Set row either by it's index or name. 
+
+**Template Parameters**
+- `T_C`    T can be data-type such as int, double etc ; <br>
+            XOR C -> Conversion class statisfying concept 'c_T2Sconverter'. 
 
 **Parameters**
-- `pRowIdx` zero-based row index. 
-- `pRow` vector of row data. 
-- `pConvertToStr` conversion function (optional argument). 
+- `pRowNameIdx` row-name or zero-based row index. 
+- `pRow` *`tuple<R...>`* of row data. By default, R is usually same type as T. <br>
+            Else if *`C = ConvertFromVal_gNaN<T>`*, then *`R = std::variant<T, std::string>`*. <br>
+            On conversion success variant has the converted value, else the string value which caused failure during conversion. 
 
 ---
 
 ```c++
-template<typename T , int USE_NUMERIC_LOCALE = 0> void SetRow (const std::string & pRowName, const std::vector< T > & pRow, f_ConvFuncToStr< T > pConvertToStr = ConverterToStr<T,USE_NUMERIC_LOCALE>::ToStr)
+void SetRow_VecStr (const c_sizet_or_string auto & pRowNameIdx,
+                    const std::vector< std::string > & pRow)
 ```
-Set row by name. 
+Set row either by it's index or name. 
 
 **Parameters**
-- `pRowName` row label name. 
-- `pRow` vector of row data. 
-- `pConvertToStr` conversion function (optional argument). 
+- `pRowNameIdx` row-name or zero-based row index. 
+- `pRow` *`vector<string>`* of row data. 
 
 ---
 

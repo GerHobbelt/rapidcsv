@@ -440,7 +440,7 @@ Rapidcsv uses [doxygenmd](https://github.com/d99kris/doxygenmd) to generate
 its Markdown API documentation:
 
 ```bash
-doxygenmd include doc
+doxygenmd include/rapidcsv doc
 ```
 
 Rapidcsv uses Uncrustify to ensure consistent code formatting:
