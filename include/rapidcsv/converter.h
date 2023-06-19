@@ -432,6 +432,13 @@ namespace rapidcsv
   // [=============================================================[ ConvertFromStr
 
   // https://stackoverflow.com/questions/68058640/using-concepts-to-select-class-template-specialization?rq=3
+  /**
+   * @brief     Convertor class implementation for any (no-string)type's, FROM string; using 'std::istringstream'.
+   *            Only declaration here. There are several specialized implementations.
+   * @tparam  T                     'type' converted to, from string data.
+   * @tparam  S2T_FORMAT            Class which encapsulates conversion parameters/directives such as using 'Locale'.
+   *                                Default's to 'S2T_Format_StreamAsIs'.
+   */
   template<typename T, typename S2T_FORMAT = S2T_Format_StreamAsIs >
   struct _ConvertFromStr;
 
@@ -440,13 +447,19 @@ namespace rapidcsv
    * @brief     Convertor class implementation for any (no-string)type's, FROM string; using 'std::istringstream'.
    *            Only intended for converter internal usage, but exposed externally (thru type-alias 'ConvertFromStr')
    *            to allow specialization for custom datatype conversions.
-   * @tparam  T                     'type' converted to, from string data. (Not Applicable: string to string)
+   * @tparam  T                     'type' converted to, from string data. (Not Applicable for 'string to string' conversion.)
    * @tparam  S2T_FORMAT            Class which encapsulates conversion parameters/directives such as using 'Locale'.
    */
   template< c_NOT_string T, c_formatISS S2T_FORMAT >
   struct _ConvertFromStr<T, S2T_FORMAT>
   {
+    /**
+     * @brief   'type' definition being declared for.
+     */
     using value_type  = T;
+    /**
+     * @brief   'type' definition returned by the convertor.
+     */
     using return_type = T;
 
     /**
@@ -488,7 +501,13 @@ namespace rapidcsv
   template <c_integer_type T>
   struct _ConvertFromStr<T, S2T_Format_std_StoT >
   {
+    /**
+     * @brief   'type' definition being declared for.
+     */
     using value_type  = T;
+    /**
+     * @brief   'type' definition returned by the convertor.
+     */
     using return_type = T;
 
     // TODO unit tests
@@ -568,7 +587,13 @@ namespace rapidcsv
   template<c_floating_point T>
   struct _ConvertFromStr<T, S2T_Format_std_StoT >
   {
+    /**
+     * @brief   'type' definition being declared for.
+     */
     using value_type  = T;
+    /**
+     * @brief   'type' definition returned by the convertor.
+     */
     using return_type = T;
 
     // TODO unit tests
@@ -614,7 +639,13 @@ namespace rapidcsv
   template<>
   struct _ConvertFromStr<std::string, S2T_Format_WorkAround>
   {
+    /**
+     * @brief   'type' definition being declared for.
+     */
     using value_type  = std::string;
+    /**
+     * @brief   'type' definition returned by the convertor.
+     */
     using return_type = std::string;
 
     /**
@@ -634,7 +665,13 @@ namespace rapidcsv
   template<c_char T>
   struct _ConvertFromStr< T, S2T_Format_WorkAround >
   {
+    /**
+     * @brief   'type' definition being declared for.
+     */
     using value_type  = T;
+    /**
+     * @brief   'type' definition returned by the convertor.
+     */
     using return_type = T;
 
     // TODO unit tests
@@ -670,7 +707,13 @@ namespace rapidcsv
   template<>
   struct _ConvertFromStr<bool, S2T_Format_WorkAround>
   {
+    /**
+     * @brief   'type' definition being declared for.
+     */
     using value_type  = bool;
+    /**
+     * @brief   'type' definition returned by the convertor.
+     */
     using return_type = bool;
 
     // TODO unit tests
@@ -704,7 +747,13 @@ namespace rapidcsv
   template<c_formatYMDiss S2T_FORMAT_YMD>
   struct _ConvertFromStr< datelib::year_month_day, S2T_FORMAT_YMD>
   {
+    /**
+     * @brief   'type' definition being declared for.
+     */
     using value_type  = datelib::year_month_day;
+    /**
+     * @brief   'type' definition returned by the convertor.
+     */
     using return_type = datelib::year_month_day;
 
     // TODO unit tests
@@ -762,7 +811,13 @@ namespace rapidcsv
   template<c_signaling_NaN T, typename S2T_FORMAT >
   struct _ConvertFromStr_fNaN
   {
+    /**
+     * @brief   'type' definition being declared for.
+     */
     using value_type  = T;
+    /**
+     * @brief   'type' definition returned by the convertor.
+     */
     using return_type = T;
 
     // this implimentation works only for floating types
@@ -816,7 +871,13 @@ namespace rapidcsv
   template<c_NOT_string T, typename S2T_FORMAT = S2T_Format_StreamAsIs >
   struct _ConvertFromStr_gNaN
   {
+    /**
+     * @brief   'type' definition being declared for.
+     */
     using value_type  = T;
+    /**
+     * @brief   'type' definition returned by the convertor.
+     */
     using return_type = std::variant<T, std::string>;
 
     /**
@@ -828,7 +889,7 @@ namespace rapidcsv
      *          Else on conversion failure, the underlying string value that caused failure.
      */
     inline static return_type
-    ToVal(const std::string& str)// noexcept
+    ToVal(const std::string& str)
     {
       try
       {
@@ -1064,6 +1125,13 @@ namespace rapidcsv
   // [=============================================================[ ConvertFromVal
 
   // https://stackoverflow.com/questions/68058640/using-concepts-to-select-class-template-specialization?rq=3
+  /**
+   * @brief     Convertor class implementation for any types, TO string using 'std::ostringstream'.
+   *            Only declaration here. There are several specialized implementations.
+   * @tparam  T                     'type' converted from, to string data. (Not Applicable: string to string)
+   * @tparam  T2S_FORMAT            Class which encapsulates conversion parameters/directives such as 'Locale'.
+   *                                Default's to 'T2S_Format_StreamAsIs'.
+   */
   template<typename T, typename T2S_FORMAT = T2S_Format_StreamAsIs >
   struct _ConvertFromVal;
 
@@ -1077,7 +1145,13 @@ namespace rapidcsv
   template<c_NOT_string T, c_formatOSS T2S_FORMAT >
   struct _ConvertFromVal<T,T2S_FORMAT>
   {
+    /**
+     * @brief   'type' definition being declared for.
+     */
     using value_type = T;
+    /**
+     * @brief   'type' definition expected by the convertor.
+     */
     using input_type = T;
 
     /**
@@ -1121,7 +1195,13 @@ namespace rapidcsv
   template<c_integer_type T>
   struct _ConvertFromVal<T, T2S_Format_std_TtoS >
   {
+    /**
+     * @brief   'type' definition being declared for.
+     */
     using value_type = T;
+    /**
+     * @brief   'type' definition expected by the convertor.
+     */
     using input_type = T;
 
     /**
@@ -1142,7 +1222,13 @@ namespace rapidcsv
   template<c_floating_point T>
   struct _ConvertFromVal<T, T2S_Format_std_TtoS >
   {
+    /**
+     * @brief   'type' definition being declared for.
+     */
     using value_type = T;
+    /**
+     * @brief   'type' definition expected by the convertor.
+     */
     using input_type = T;
 
     inline static
@@ -1190,7 +1276,13 @@ namespace rapidcsv
   template<>
   struct _ConvertFromVal<std::string, T2S_Format_WorkAround>
   {
+    /**
+     * @brief   'type' definition being declared for.
+     */
     using value_type = std::string;
+    /**
+     * @brief   'type' definition expected by the convertor.
+     */
     using input_type = std::string;
 
     /**
@@ -1210,7 +1302,13 @@ namespace rapidcsv
   template<c_char T>
   struct _ConvertFromVal<T, T2S_Format_WorkAround>
   {
+    /**
+     * @brief   'type' definition being declared for.
+     */
     using value_type = T;
+    /**
+     * @brief   'type' definition expected by the convertor.
+     */
     using input_type = T;
 
     // TODO unit tests
@@ -1234,7 +1332,13 @@ namespace rapidcsv
   template<>
   struct _ConvertFromVal<bool, T2S_Format_WorkAround>
   {
+    /**
+     * @brief   'type' definition being declared for.
+     */
     using value_type = bool;
+    /**
+     * @brief   'type' definition expected by the convertor.
+     */
     using input_type = bool;
 
     // TODO unit tests
@@ -1258,7 +1362,13 @@ namespace rapidcsv
   template<c_formatYMDoss T2S_FORMAT_YMD>
   struct _ConvertFromVal< datelib::year_month_day, T2S_FORMAT_YMD>
   {
+    /**
+     * @brief   'type' definition being declared for.
+     */
     using value_type = datelib::year_month_day;
+    /**
+     * @brief   'type' definition expected by the convertor.
+     */
     using input_type = datelib::year_month_day;
 
     /**
@@ -1418,14 +1528,20 @@ namespace rapidcsv
   template<c_NOT_string T, typename T2S_FORMAT = T2S_Format_StreamAsIs >
   struct _ConvertFromVal_gNaN
   {
+    /**
+     * @brief   'type' definition being declared for.
+     */
     using value_type = T;
+    /**
+     * @brief   'type' definition expected by the convertor. 'variant' can be either T or string(for invalid value)
+     */
     using input_type = std::variant<T, std::string>;
 
     /**
      * @brief   Converts integer datatype to string.
      * @param   val                 A std::variant<T, std::string> , holding either
      *                              numerical-value or raw string.
-     * @returns string holding a integer represenation or raw-string of the variant<> type.
+     * @returns string holding a integer represenation or raw-string of the variant<T,string> type.
      *          Else throws error on conversion failure.
      */
     inline static std::string
@@ -1475,7 +1591,7 @@ namespace rapidcsv
      * @brief   Converts variable holding 'tuple' value to string.
      *          The output string has the format "[ ele0, ele1, ele2 ...]".
      *          Each element of the tuple is converted to string using 't_T2Sconv<T_C>::ToStr(...)'
-     * @param   val                 input tuple.
+     * @param   theTuple                 input tuple.
      * @returns string.
      */
     inline static std::string

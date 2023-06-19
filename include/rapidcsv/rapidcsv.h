@@ -401,7 +401,7 @@ namespace rapidcsv
      *                                XOR  C -> Conversion class statisfying concept 'c_S2Tconverter'.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @returns 'vector<R>' of column data. By default, R is usually same type as T.
-     *          Else if 'C = ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *          Else if 'C ≃ ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value,
      *          else the string value which caused failure during conversion.
      */
@@ -440,7 +440,7 @@ namespace rapidcsv
      * @tparam  CONV_S2T              conversion function.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @returns 'vector<R>' of column data. By default, R is usually same type as T.
-     *          Else if CONV_S2T is similar to function 'ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
+     *          Else if 'CONV_S2T ≃ ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value,
      *          else the string value which caused failure during conversion.
      */
@@ -460,7 +460,7 @@ namespace rapidcsv
      *                                XOR  C -> Conversion class statisfying concept 'c_T2Sconverter'.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pColumn               'vector<R>' of column data. By default, R is usually same type as T.
-     *                                Else if 'C = ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *                                Else if 'C ≃ ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      */
@@ -503,7 +503,7 @@ namespace rapidcsv
      * @tparam  CONV_T2S              conversion function.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pColumn               'vector<R>' of column data. By default, R usually is same type as T.
-     *                                Else if CONV_T2S is similar to function 'ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *                                Else if 'CONV_T2S ≃ ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      */
@@ -521,7 +521,7 @@ namespace rapidcsv
      * @tparam  CONV_T2S              conversion function.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pColumn               'vector<R>' of column data. By default, R usually is same type as T.
-     *                                Else if CONV_T2S is similar to function 'ConvertFromVal_gNaN<T>:ToStr', then 'R = std::variant<T, std::string>'.
+     *                                Else if 'CONV_T2S ≃ ConvertFromVal_gNaN<T>:ToStr', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      */
@@ -555,7 +555,7 @@ namespace rapidcsv
      *                                XOR  C -> Conversion class statisfying concept 'c_T2Sconverter'.
      * @param   pColumnIdx            zero-based column index.
      * @param   pColumn               'vector<R>' of column data (optional argument). By default, R is usually same type as T.
-     *                                Else if 'C = ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *                                Else if 'C ≃ ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      * @param   pColumnName           column label name (optional argument)
@@ -614,7 +614,7 @@ namespace rapidcsv
      * @tparam  CONV_T2S              conversion function.
      * @param   pColumnIdx            zero-based column index.
      * @param   pColumn               'vector<R>' of column data (optional argument). By default, R is usually same type as T.
-     *                                Else if CONV_T2S is similar to function 'ConvertFromVal_gNaN<T>::ToStr', then 'R = std::variant<T, std::string>'
+     *                                Else if 'CONV_T2S ≃ ConvertFromVal_gNaN<T>::ToStr', then 'R = std::variant<T, std::string>'
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      * @param   pColumnName           column label name (optional argument)
@@ -694,7 +694,7 @@ namespace rapidcsv
      *                                XOR  C -> Conversion class statisfying concept 'c_S2Tconverter'.
      * @param   pRowNameIdx           row-name or zero-based row index.
      * @returns 'tuple<R...>' of row data. By default, R is usually same type as T.
-     *          Else if 'C = ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *          Else if 'C ≃ ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
      */
     template< typename ... T_C >
     std::tuple<typename t_S2Tconv<T_C>::return_type ...>
@@ -765,7 +765,7 @@ namespace rapidcsv
      *                                XOR  C -> Conversion class statisfying concept 'c_T2Sconverter'.
      * @param   pRowNameIdx           row-name or zero-based row index.
      * @param   pRow                  'tuple<R...>' of row data. By default, R is usually same type as T.
-     *                                Else if 'C = ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.`
+     *                                Else if 'C ≃ ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.`
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      */
@@ -837,7 +837,7 @@ namespace rapidcsv
      *                                XOR  C -> Conversion class statisfying concept 'c_T2Sconverter'.
      * @param   pRowIdx               zero-based row index.
      * @param   pRow                  'tuple<R...>' of row data. By default, R is usually same type as T.
-     *                                Else if 'C = ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *                                Else if 'C ≃ ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      * @param   pRowName              row label name (optional argument).
@@ -959,7 +959,7 @@ namespace rapidcsv
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pRowNameIdx           column-name or zero-based row-index.
      * @returns cell data of type R. By default, R is usually same type as T.
-     *          Else if 'C = ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *          Else if 'C ≃ ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value,
      *          else the string value which caused failure during conversion.
      */
@@ -985,7 +985,7 @@ namespace rapidcsv
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pRowNameIdx           column-name or zero-based row-index.
      * @returns cell data of type R. By default, R is usually same type as T.
-     *          Else if CONV_S2T similar to function 'ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
+     *          Else if 'CONV_S2T ≃ ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value,
      *          else the string value which caused failure during conversion.
      */
@@ -1007,7 +1007,7 @@ namespace rapidcsv
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pRowNameIdx           column-name or zero-based row-index.
      * @param   pCell                 cell data. By default, R is usually same type as T.
-     *                                Else if 'C = ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *                                Else if 'C ≃ ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      */
@@ -1051,7 +1051,7 @@ namespace rapidcsv
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pRowNameIdx           column-name or zero-based row-index.
      * @param   pCell                 cell data. By default, R is usually same type as T.
-     *                                Else if CONV_T2S is similar to function 'ConvertFromVal_gNaN<T>::ToStr', then 'R = std::variant<T, std::string>'.
+     *                                Else if 'CONV_T2S ≃ ConvertFromVal_gNaN<T>::ToStr', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      */
@@ -1072,7 +1072,7 @@ namespace rapidcsv
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pRowNameIdx           column-name or zero-based row-index.
      * @param   pCell                 cell data. By default, R is usually same type as T.
-     *                                Else if CONV_T2S is similar to function 'ConvertFromVal_gNaN<T>::ToStr', then 'R = std::variant<T, std::string>'.
+     *                                Else if 'CONV_T2S ≃ ConvertFromVal_gNaN<T>::ToStr', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      */

@@ -52,7 +52,7 @@ namespace rapidcsv
 
     /**
      * @brief   Constructor
-     * @param   pPathrawDataColumnIndex                Specifies the column index in CSV file.
+     * @param   rawDataColumnIndex                Specifies the column index in CSV file.
      */
     SortParams(const size_t rawDataColumnIndex) :
         _rawDataColumnIndex(rawDataColumnIndex)
@@ -105,12 +105,12 @@ namespace rapidcsv
      * @returns tuple representing indexed-key to data-row.
      */
     inline static t_sortKey
-    createSortKey(const Document::t_dataRow& rowData, const SPtypes& ... sp)
+    createSortKey(const Document::t_dataRow& pRowData, const SPtypes& ... sp)
     {
       t_sortKey result;
-      auto write_tuple = [&rowData, sp ... ] (auto&... wrt_result) -> void
+      auto write_tuple = [&pRowData, sp ... ] (auto&... wrt_result) -> void
       {
-        ( (wrt_result = sp.getValue(rowData)), ... );  // comma operator ensures the element order is from left to right
+        ( (wrt_result = sp.getValue(pRowData)), ... );  // comma operator ensures the element order is from left to right
       };
       std::apply(write_tuple, result);
       return result;
@@ -363,7 +363,6 @@ namespace rapidcsv
     /**
      * @brief   Get row by name.
      * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index removing filtered rows).
-     * @param   pConvertToVal         conversion function (optional argument).
      * @returns vector<string> of row data from view.
      *          'out_of_range' error is thrown for invalid or filtered-out 'pRowName_ViewRowIdx'.
      */
@@ -399,7 +398,7 @@ namespace rapidcsv
      * @brief   Get cell by column index and row-name/zero-based-row-view-index.
      * @tparam  T_C                   T can be data-type such as int, double etc ;
      *                                XOR  C -> Conversion class statisfying concept 'c_S2Tconverter'.
-     * @param   pColumnIdx            zero-based column index.
+     * @param   pColumnNameIdx        column-name or zero-based column index.
      * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index removing filtered rows).
      * @returns cell data.
      */
@@ -417,7 +416,7 @@ namespace rapidcsv
      * @brief   Get cell by column index and row-name/zero-based-row-view-index.
      * @tparam  T                     'type' converted to, from string data, using conversion function.
      * @tparam  CONV_S2T              conversion function.
-     * @param   pColumnIdx            zero-based column index.
+     * @param   pColumnNameIdx        column-name or zero-based column index.
      * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index removing filtered rows).
      * @returns cell data.
      */
