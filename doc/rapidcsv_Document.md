@@ -57,7 +57,7 @@ Get cell either by it's index or name.
 
 **Parameters**
 - `pColumnNameIdx` column-name or zero-based column-index. 
-- `pRowNameIdx` column-name or zero-based row-index. 
+- `pRowNameIdx` row-name or zero-based row-index. 
 
 **Returns:**
 - cell data of type R. By default, R is usually same type as T. <br>
@@ -79,7 +79,7 @@ Template Parameters:
 
 **Parameters**
 - `pColumnNameIdx` column-name or zero-based column-index. 
-- `pRowNameIdx` column-name or zero-based row-index. 
+- `pRowNameIdx` row-name or zero-based row-index. 
 
 **Returns:**
 - cell data of type R. By default, R is usually same type as T. <br>
@@ -141,7 +141,7 @@ Get number of data columns (excluding label columns).
 ---
 
 ```c++
-size_t GetColumnIdx (const std::string & pColumnName)
+ssize_t GetColumnIdx (const std::string & pColumnName)
 ```
 Get column index by name. 
 
@@ -221,7 +221,7 @@ Get number of data rows (excluding label rows).
 ---
 
 ```c++
-size_t GetRowIdx (const std::string & pRowName)
+ssize_t GetRowIdx (const std::string & pRowName)
 ```
 Get row index by name. 
 
@@ -441,7 +441,7 @@ Set cell either by it's index or name.
 
 **Parameters**
 - `pColumnNameIdx` column-name or zero-based column-index. 
-- `pRowNameIdx` column-name or zero-based row-index. 
+- `pRowNameIdx` row-name or zero-based row-index. 
 - `pCell` cell data. By default, R is usually same type as T. <br>
                Else if *`C ≃ ConvertFromVal_gNaN<T>`*, then *`R = std::variant<T, std::string>`*. <br>
                On conversion success variant has the converted value, else the string value which caused failure during conversion. 
@@ -464,7 +464,7 @@ Set cell either by it's index or name.
 
 **Parameters**
 - `pColumnNameIdx` column-name or zero-based column-index. 
-- `pRowNameIdx` column-name or zero-based row-index. 
+- `pRowNameIdx` row-name or zero-based row-index. 
 - `pCell` cell data. By default, R is usually same type as T. <br>
                Else if *`CONV_T2S ≃ ConvertFromVal_gNaN<T>::ToStr`*, then *`R = std::variant<T, std::string>`*. <br>
                 On conversion success variant has the converted value, else the string value which caused failure during conversion. 
@@ -484,7 +484,7 @@ Set cell either by it's index or name.
 
 **Parameters**
 - `pColumnNameIdx` column-name or zero-based column-index. 
-- `pRowNameIdx` column-name or zero-based row-index. 
+- `pRowNameIdx` row-name or zero-based row-index. 
 - `pCell` cell data. By default, R is usually same type as T. <br>
                Else if *`CONV_T2S ≃ ConvertFromVal_gNaN<T>::ToStr`*, then *`R = std::variant<T, std::string>`*. <br>
                On conversion success variant has the converted value, else the string value which caused failure during conversion. 

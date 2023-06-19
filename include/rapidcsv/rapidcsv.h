@@ -2,7 +2,7 @@
  * rapidcsv.h
  *
  * URL:      https://github.com/panchaBhuta/rapidcsv_FilterSort
- * Version:  v2.02.fs-8.75
+ * Version:  v2.02.fs-8.77
  *
  * Copyright (C) 2022-2023 Gautam Dhar
  * All rights reserved.
@@ -13,7 +13,7 @@
  * ***********************************************************************************
  *
  * URL:      https://github.com/d99kris/rapidcsv
- * Version:  8.75
+ * Version:  8.77
  *
  * Copyright (C) 2017-2023 Kristofer Berggren
  * All rights reserved.
@@ -541,9 +541,9 @@ namespace rapidcsv
     {
       const size_t pColumnIdx = GetColumnIdx(pColumnNameIdx);
       const ssize_t dataColumnIdx = static_cast<ssize_t>(_getDataColumnIndex(pColumnIdx).dataIdx);
-      for (auto itRow = _mData.begin(); itRow != _mData.end(); ++itRow)  // + static_cast<ssize_t>(_getDataRowIndex(0).dataIdx)
+      for (auto itCell = _mData.begin(); itCell != _mData.end(); ++itCell)  // + static_cast<ssize_t>(_getDataRowIndex(0).dataIdx)
       {
-        itRow->erase(itRow->begin() + dataColumnIdx);
+        itCell->erase(itCell->begin() + dataColumnIdx);
       }
 
       _updateColumnNames();
@@ -957,7 +957,7 @@ namespace rapidcsv
      * @tparam  T_C                   T can be data-type such as int, double etc ;
      *                                XOR  C -> Conversion class statisfying concept 'c_S2Tconverter'.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
-     * @param   pRowNameIdx           column-name or zero-based row-index.
+     * @param   pRowNameIdx           row-name or zero-based row-index.
      * @returns cell data of type R. By default, R is usually same type as T.
      *          Else if 'C ≃ ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value,
@@ -983,7 +983,7 @@ namespace rapidcsv
      * @tparam  T                     'type' converted to, from string data, using conversion function.
      * @tparam  CONV_S2T              conversion function.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
-     * @param   pRowNameIdx           column-name or zero-based row-index.
+     * @param   pRowNameIdx           row-name or zero-based row-index.
      * @returns cell data of type R. By default, R is usually same type as T.
      *          Else if 'CONV_S2T ≃ ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value,
@@ -1005,7 +1005,7 @@ namespace rapidcsv
      * @tparam  T_C                   T can be data-type such as int, double etc ;
      *                                XOR  C -> Conversion class statisfying concept 'c_T2Sconverter'.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
-     * @param   pRowNameIdx           column-name or zero-based row-index.
+     * @param   pRowNameIdx           row-name or zero-based row-index.
      * @param   pCell                 cell data. By default, R is usually same type as T.
      *                                Else if 'C ≃ ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,
@@ -1049,7 +1049,7 @@ namespace rapidcsv
      *                                else the string value which caused failure during conversion.
      * @tparam  CONV_T2S              conversion function.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
-     * @param   pRowNameIdx           column-name or zero-based row-index.
+     * @param   pRowNameIdx           row-name or zero-based row-index.
      * @param   pCell                 cell data. By default, R is usually same type as T.
      *                                Else if 'CONV_T2S ≃ ConvertFromVal_gNaN<T>::ToStr', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,
@@ -1070,7 +1070,7 @@ namespace rapidcsv
      * @tparam  T                     'type' converted from, to string data, using conversion function.
      * @tparam  CONV_T2S              conversion function.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
-     * @param   pRowNameIdx           column-name or zero-based row-index.
+     * @param   pRowNameIdx           row-name or zero-based row-index.
      * @param   pCell                 cell data. By default, R is usually same type as T.
      *                                Else if 'CONV_T2S ≃ ConvertFromVal_gNaN<T>::ToStr', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,

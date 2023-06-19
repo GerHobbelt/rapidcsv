@@ -313,6 +313,7 @@ if(RAPIDCSV_BUILD_TESTS)
   add_unit_test(test092)
   add_unit_test(test093)
   add_unit_test(test094)
+  add_unit_test(test095)
 
   add_unit_test(testView001)
   add_unit_test(testView003)
