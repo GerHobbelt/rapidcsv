@@ -211,6 +211,14 @@ namespace rapidcsv
     const size_t dataIdx;
   };
 
+
+  /**
+   * @brief       To restrict a type to either numeric or string value.
+   *              This mechanism reduces code duplicity of getter and setter functions,
+   *              i.e 'Get...(c_sizet_or_string nameIdx, ...)' 
+   *              and 'Set...(c_sizet_or_string nameIdx, ...)' 
+   *              Instead of 'function-overload', we have 'variable-type-overload'.
+   */
   template <typename SI>
   concept c_sizet_or_string = std::is_convertible_v<SI,size_t> ||
                               std::is_convertible_v<SI,std::string>;
@@ -355,6 +363,10 @@ namespace rapidcsv
       _mHasUtf8BOM = false;
     }
 
+    /*
+     *   To support getter and setter functions with variable of concept-type 'c_sizet_or_string',
+     *   overloaded GetColumnIdx(numeric-type) is needed.
+     */
     constexpr size_t GetColumnIdx(const size_t pColumnIdx) const
     {
       return pColumnIdx;
@@ -657,6 +669,10 @@ namespace rapidcsv
       return (firstRowSize > firstDataColumnIndex) ? (firstRowSize - firstDataColumnIndex) : 0;
     }
 
+    /*
+     *   To support getter and setter functions with variable of concept-type 'c_sizet_or_string',
+     *   overloaded GetRowIdx(numeric-type) is needed.
+     */
     constexpr size_t GetRowIdx(const size_t& pRowIdx) const
     {
       return pRowIdx;

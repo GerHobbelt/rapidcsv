@@ -36,7 +36,7 @@ using T2S_Format_hdp = rapidcsv::T2S_Format_StreamDecimalPrecision<T, getHigherD
 namespace rapidcsv
 {
   template<>
-  struct _ConvertFromStr<int, format_num>
+  struct ConvertFromStr<int, format_num>
   // struct ConvertFromStr<int, format_num>  #As ConvertFromStr is
   // template-alias-declarations cannot override it
   {
@@ -48,13 +48,13 @@ namespace rapidcsv
 
 
   template<c_floating_point T>
-  struct _ConvertFromVal<T, format_num>
+  struct ConvertFromVal<T, format_num>
   // struct ConvertFromStr<int, format_num>  #As ConvertFromStr is
   // template-alias-declarations cannot override it
   {
     static std::string ToStr(const T& val)
     {
-      std::cout << "call from -> static std::string _ConvertFromVal<T, format_num>::ToStr(const T& val);" << std::endl;
+      std::cout << "call from -> static std::string ConvertFromVal<T, format_num>::ToStr(const T& val);" << std::endl;
       std::ostringstream oss;
       oss.precision( std::numeric_limits<T>::digits10 + 1 );
       oss << std::fixed;
@@ -129,7 +129,7 @@ int main()
   std::cout << "-------------   case 1 ::     long-double -> string -> int" << std::endl;
   std::cout << "                      step1.  long-double -> string" << std::endl;
 
-  // call to -> static std::string _ConvertFromVal<T, format_num> >::ToStr(const T& val);
+  // call to -> static std::string ConvertFromVal<T, format_num> >::ToStr(const T& val);
   const std::string strLongDouble1 = rapidcsv::ConvertFromVal<long double,
                                                               format_num
                                                             >::ToStr(orgLongDouble);

@@ -141,7 +141,7 @@ Get number of data columns (excluding label columns).
 ---
 
 ```c++
-ssize_t GetColumnIdx (const std::string & pColumnName)
+size_t GetColumnIdx (const std::string & pColumnName)
 ```
 Get column index by name. 
 
@@ -221,7 +221,7 @@ Get number of data rows (excluding label rows).
 ---
 
 ```c++
-ssize_t GetRowIdx (const std::string & pRowName)
+size_t GetRowIdx (const std::string & pRowName)
 ```
 Get row index by name. 
 
