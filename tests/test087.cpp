@@ -52,9 +52,9 @@ int main()
       // Note: 'ExceptEqual' is a macro-function; comma in "<float, rapidcsv::S2T_Format_StreamAsIs::ToVal>" messes up the call.
       // Using macro-variable 'COMMA' is a workaround "<float COMMA rapidcsv::S2T_Format_StreamAsIs::ToVal>".
       // doc.GetCell<float , &rapidcsv::ConvertFromStr<float , rapidcsv::S2T_Format_StreamAsIs>::ToVal>("A", "2");
-      unittest::ExpectEqual(float, doc.GetCell<float COMMA &rapidcsv::ConvertFromStr<float COMMA rapidcsv::S2T_Format_StreamAsIs>::ToVal>("A", "2"), 0.1f);
-      unittest::ExpectEqual(float, doc.GetCell<float COMMA &rapidcsv::ConvertFromStr<float COMMA rapidcsv::S2T_Format_StreamAsIs>::ToVal>("B", "2"), 0.01f);
-      unittest::ExpectEqual(float, doc.GetCell<float COMMA &rapidcsv::ConvertFromStr<float COMMA rapidcsv::S2T_Format_StreamAsIs>::ToVal>("C", "2"), 0.001f);
+      unittest::ExpectEqual(float, doc.GetCell<&rapidcsv::ConvertFromStr<float COMMA rapidcsv::S2T_Format_StreamAsIs>::ToVal>("A", "2"), 0.1f);
+      unittest::ExpectEqual(float, doc.GetCell<&rapidcsv::ConvertFromStr<float COMMA rapidcsv::S2T_Format_StreamAsIs>::ToVal>("B", "2"), 0.01f);
+      unittest::ExpectEqual(float, doc.GetCell<&rapidcsv::ConvertFromStr<float COMMA rapidcsv::S2T_Format_StreamAsIs>::ToVal>("C", "2"), 0.001f);
     }
   }
   catch (const std::exception& ex)

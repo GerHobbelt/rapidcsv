@@ -144,6 +144,27 @@ namespace rapidcsv
 
   template<typename T>
   concept c_NOT_string = (!std::is_same_v<T, std::string>);
+
+
+  template<typename T> struct is_variant : std::false_type {};
+  template<typename ...Args>
+  struct is_variant<std::variant<Args...>> : std::true_type {};
+  template<typename ...Args>
+  concept c_variant = is_variant<Args...>::value;
+  template<typename ...Args>
+  concept c_NOT_variant = !is_variant<Args...>::value;
+
+  template <typename T>
+  struct InferValueType {
+    using value_type = T;
+  };
+  template <typename ...Args>
+  struct InferValueType<std::variant<Args...>> {
+    using value_type = typename std::tuple_element_t< 0,
+                                                      std::tuple<Args...>  // 
+                                                    >;
+  };
+
   // ]=============================================================]   common helpers
 
 
@@ -914,21 +935,45 @@ namespace rapidcsv
     }
   };
 
-
   /**
    * @brief   If a 'type-C' satisfies concept 'c_S2Tconverter', then use that 'type-C';   else
    *          assume it's a 'type-T' and bumped up using 'ConvertFromStr< type-T >' to create
    *          a class staisfying concept 'c_S2Tconverter'.
    *          This mechanism enables template-converter-algorithm' to handle both 'type-C' and
-   *          'type-T' using the same code base, (i.e. reduces code duplicity).
-   * @tparam  T_C                   T can be data-type such as int, double etc ;
-   *                                XOR  C -> Conversion class statisfying concept 'c_S2Tconverter'.
+   *          'type-T' using the same code base, (i.e. reduces code duplicity of Getters and Setters functions).
+   * @tparam  T_C                   T can be data-type such as int, double etc; xOR
+   *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
    */
   template< typename T_C >
-  using t_S2Tconv = std::conditional_t< is_S2Tconverter< T_C >::value ,
-                                          T_C ,
-                                          ConvertFromStr< T_C >
-                                      >;
+  struct t_S2Tconv;
+
+  template< c_NOT_S2Tconverter T >
+  struct t_S2Tconv<T> {
+    using conv_type = ConvertFromStr< T >;
+  };
+
+  template< c_S2Tconverter C >
+  struct t_S2Tconv<C> {
+    using conv_type = C;
+  };
+
+  template< typename T_C >
+  using t_S2Tconv_c = t_S2Tconv<T_C>::conv_type;
+
+  template< auto (*CONV_S2T)(const std::string&) >
+  struct f_S2Tconv
+  {
+  private:
+    using _return_type = typename std::invoke_result_t< decltype(CONV_S2T),
+                                                        const std::string& >;
+    using _value_type  = typename InferValueType<_return_type>::value_type;
+  public:
+    using conv_type = S2TwrapperFunction< _value_type, CONV_S2T >;
+  };
+
+  template< auto (*CONV_S2T)(const std::string&) >
+  using f_S2Tconv_c = f_S2Tconv<CONV_S2T>::conv_type;
+
   // ]=============================================================] ConvertFromStr
 
 
@@ -1502,6 +1547,19 @@ namespace rapidcsv
   };
 
 
+  template< typename T_C >
+  struct t_T2Sconv;
+
+  template< c_NOT_T2Sconverter T >
+  struct t_T2Sconv<T> {
+    using conv_type = ConvertFromVal< T >;
+  };
+
+  template< c_T2Sconverter C >
+  struct t_T2Sconv<C> {
+    using conv_type = C;
+  };
+
   /**
    * @brief   If a 'type-C' satisfies concept 'c_T2Sconverter', then use that 'type-C';   else
    *          assume it's a 'type-T' and bumped up using 'ConvertFromVal< type-T >' to create
@@ -1512,10 +1570,26 @@ namespace rapidcsv
    *                                XOR  C -> Conversion class statisfying concept 'c_T2Sconverter'.
    */
   template< typename T_C >
-  using t_T2Sconv = std::conditional_t< is_T2Sconverter< T_C >::value ,
-                                          T_C ,
-                                          ConvertFromVal< T_C >
-                                      >;
+  using t_T2Sconv_c = t_T2Sconv< T_C >::conv_type;
+
+
+  // refer : https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0127r1.html
+  template<auto CONV_T2S >
+  struct f_T2Sconv;
+
+  template< typename T_V, std::string (*CONV_T2S)(const T_V&) >
+  struct f_T2Sconv<CONV_T2S>
+  {
+  private:
+    using _input_type = T_V;
+    using _value_type  = typename InferValueType<_input_type>::value_type;
+  public:
+    using conv_type = T2SwrapperFunction< _value_type, _input_type, CONV_T2S >;
+  };
+
+  //template< typename T_V, std::string (*CONV_T2S)(const T_V&) >
+  template<auto CONV_T2S >
+  using f_T2Sconv_c = f_T2Sconv<CONV_T2S>::conv_type;
 
 
   /**
@@ -1535,16 +1609,16 @@ namespace rapidcsv
      * @returns string.
      */
     inline static std::string
-    ToStr(std::tuple<typename t_T2Sconv<T_C>::input_type ...> const& theTuple)
+    ToStr(std::tuple<typename t_T2Sconv_c<T_C>::input_type ...> const& theTuple)
     {
       std::stringstream ss;
       std::apply
       (
-        [&ss] (typename t_T2Sconv<T_C>::input_type const&... tupleArgs)
+        [&ss] (typename t_T2Sconv_c<T_C>::input_type const&... tupleArgs)
         {
           ss << '[';
           std::size_t n{0};
-          ((ss << t_T2Sconv<T_C>::ToStr(tupleArgs) << (++n != sizeof...(T_C) ? ", " : "")), ...);
+          ((ss << t_T2Sconv_c<T_C>::ToStr(tupleArgs) << (++n != sizeof...(T_C) ? ", " : "")), ...);
           //((ss << tupleArgs << (++n != sizeof...(T_C) ? ", " : "")), ...);
           ss << ']';
         }, theTuple

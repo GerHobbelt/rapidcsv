@@ -13,7 +13,7 @@ int main()
 {
   rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(0, 0));
 
-  std::vector<int> close = doc.GetColumn<int, &ToVal >("Close");
+  std::vector<int> close = doc.GetColumn< &ToVal >("Close");
   std::cout << "close[0]  = " << close[0] << std::endl;
   std::cout << "close[1]  = " << close[1] << std::endl;
 }

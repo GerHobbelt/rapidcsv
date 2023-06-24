@@ -1,6 +1,11 @@
 Rapidcsv (FilterSort)
 =====================
 
+<img src="images/RefactoringInProgress.jpg" width="500">
+
+## Documentation is **NOT** updated to latest changes.
+
+
 | **Linux** | **Mac** | **Windows** |
 |-----------|---------|-------------|
 | [![Linux](https://github.com/panchaBhuta/rapidcsv_FilterSort/workflows/Linux/badge.svg)](https://github.com/panchaBhuta/rapidcsv_FilterSort/actions?query=workflow%3ALinux) | [![macOS](https://github.com/panchaBhuta/rapidcsv_FilterSort/workflows/macOS/badge.svg)](https://github.com/panchaBhuta/rapidcsv_FilterSort/actions?query=workflow%3AmacOS) | [![Windows](https://github.com/panchaBhuta/rapidcsv_FilterSort/workflows/Windows/badge.svg)](https://github.com/panchaBhuta/rapidcsv_FilterSort/actions?query=workflow%3AWindows) |

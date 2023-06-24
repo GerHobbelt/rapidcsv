@@ -45,7 +45,7 @@ namespace rapidcsv
     const size_t      _rawDataColumnIndex;
 
   public:
-    using S2Tconv_type = t_S2Tconv<T_C>;
+    using S2Tconv_type = t_S2Tconv_c<T_C>;
     using return_type = typename S2Tconv_type::return_type;
 
     constexpr static e_SortOrder sortOrder = SORT_ORDER;
@@ -236,13 +236,13 @@ namespace rapidcsv
      *          else the string value which caused failure during conversion.
      */
     template< typename T_C >
-    std::vector<typename t_S2Tconv<T_C>::return_type>
+    std::vector<typename t_S2Tconv_c<T_C>::return_type>
     GetViewColumn(const c_sizet_or_string auto& pColumnNameIdx) const
     {
       const size_t pColumnIdx = _document.GetColumnIdx(pColumnNameIdx);
       const size_t dataColumnIdx = _document._getDataColumnIndex(pColumnIdx).dataIdx;
       const size_t firstRowIdx = _document._getDataRowIndex(0).dataIdx;
-      std::vector<typename t_S2Tconv<T_C>::return_type> column;
+      std::vector<typename t_S2Tconv_c<T_C>::return_type > column;
       for (auto itViewRowIdx = _mapViewRowIdx2RowIdx.begin();
            itViewRowIdx != _mapViewRowIdx2RowIdx.end(); ++itViewRowIdx)
       {
@@ -251,7 +251,7 @@ namespace rapidcsv
         if (dataColumnIdx < row.size())
         {
           const std::string& cellStrVal = row.at(dataColumnIdx);
-          typename t_S2Tconv<T_C>::return_type val = t_S2Tconv<T_C>::ToVal(cellStrVal);
+          typename t_S2Tconv_c<T_C>::return_type val = t_S2Tconv_c<T_C>::ToVal(cellStrVal);
           column.push_back(val);
         } else {
           const std::string errStr = std::string(__RAPIDCSV_FILE__)+" : _ViewDocument::GetViewColumn()"+
@@ -277,14 +277,11 @@ namespace rapidcsv
      *          On conversion success variant has the converted value, 
      *          else the string value which caused failure during conversion.
      */
-    template< typename T, auto (*CONV_S2T)(const std::string&) >
-    inline std::vector< typename std::invoke_result_t< decltype(CONV_S2T),
-                                                       const std::string&
-                                                     >
-                      >
+    template< auto (*CONV_S2T)(const std::string&) >
+    inline std::vector< typename f_S2Tconv_c< CONV_S2T >::return_type >
     GetViewColumn(const c_sizet_or_string auto& pColumnNameIdx) const
     {
-      return GetViewColumn< S2TwrapperFunction<T, CONV_S2T> >(pColumnNameIdx);
+      return GetViewColumn< f_S2Tconv_c< CONV_S2T > >(pColumnNameIdx);
     }
 
     /**
@@ -353,11 +350,11 @@ namespace rapidcsv
      *          If 'pRowName_ViewRowIdx' belongs to a filtered out row, then 'out_of_range' error is thrown.
      */
     template< typename ... T_C >
-    inline std::tuple<typename t_S2Tconv<T_C>::return_type ...>
+    inline std::tuple<typename t_S2Tconv_c<T_C>::return_type ...>
     GetViewRow(const c_sizet_or_string auto& pRowName_ViewRowIdx) const
     {
       const size_t docRowIdx = GetDocumentRowIdx(pRowName_ViewRowIdx);
-      return _document.GetRow< t_S2Tconv<T_C> ... >(docRowIdx);
+      return _document.GetRow< t_S2Tconv_c<T_C> ... >(docRowIdx);
     }
 
     /**
@@ -403,13 +400,13 @@ namespace rapidcsv
      * @returns cell data.
      */
     template< typename T_C >
-    inline typename t_S2Tconv<T_C>::return_type
+    inline typename t_S2Tconv_c<T_C>::return_type
     GetViewCell(const c_sizet_or_string auto& pColumnNameIdx,
 	              const c_sizet_or_string auto& pRowName_ViewRowIdx) const
     {
       const size_t pColumnIdx = _document.GetColumnIdx(pColumnNameIdx);
       const size_t docRowIdx  = GetDocumentRowIdx(pRowName_ViewRowIdx);
-      return _document.GetCell< t_S2Tconv<T_C> >(pColumnIdx, docRowIdx);
+      return _document.GetCell< t_S2Tconv_c<T_C> >(pColumnIdx, docRowIdx);
     }
 
     /**
@@ -525,7 +522,7 @@ namespace rapidcsv
      *          If 'pRowName_ViewRowIdx' belongs to a filtered out row, then 'out_of_range' error is thrown.
      */
     template< typename ... T_C >
-    std::tuple<typename t_S2Tconv<T_C>::return_type ...>
+    std::tuple<typename t_S2Tconv_c<T_C>::return_type ...>
     GetOrderedRow(const typename SortKeyFactory<SPtypes ...>::t_sortKey& pRowKey) const
     {
       size_t docRowIdx;
@@ -536,7 +533,7 @@ namespace rapidcsv
               +" rowKey not found in 'sortedKeyMap'. For pRowKey="
               +ConvertFromTuple<typename SPtypes::S2Tconv_type::return_type ...>::ToStr(pRowKey) + " : ERROR: " + err.what());
       }
-      return _document.GetRow< t_S2Tconv<T_C> ... >(docRowIdx);
+      return _document.GetRow< t_S2Tconv_c<T_C> ... >(docRowIdx);
     }
 
     /**
@@ -592,7 +589,7 @@ namespace rapidcsv
      *          If 'pRowKey' belongs to a filtered out row, then 'out_of_range' error is thrown.
      */
     template< typename T_C >
-    typename t_S2Tconv<T_C>::return_type
+    typename t_S2Tconv_c<T_C>::return_type
     GetOrderedCell(const c_sizet_or_string auto& pColumnNameIdx,
 	                 const t_sortKey& pRowKey) const
     {
@@ -605,7 +602,7 @@ namespace rapidcsv
               +" rowKey not found in 'sortedKeyMap'. For pRowKey="
               +ConvertFromTuple<typename SPtypes::S2Tconv_type::return_type ...>::ToStr(pRowKey) + " : ERROR: " + err.what());
       }
-      return _document.GetCell< t_S2Tconv<T_C> >(pColumnIdx, docRowIdx);
+      return _document.GetCell< t_S2Tconv_c<T_C> >(pColumnIdx, docRowIdx);
     }
 
     /**

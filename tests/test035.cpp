@@ -35,17 +35,17 @@ int main()
   {
     rapidcsv::Document doc(path, rapidcsv::LabelParams(-1, -1));
 
-    unittest::ExpectEqual(int, doc.GetCell<int COMMA &ConvertFromStr_m100_ToVal>(0, 0), 100);
-    unittest::ExpectEqual(int, doc.GetCell<int COMMA &ConvertFromStr_m100_ToVal>(1, 0), 1000);
-    unittest::ExpectEqual(int, doc.GetCell<int COMMA &ConvertFromStr_m100_ToVal>(2, 0), 10000);
-    unittest::ExpectEqual(int, doc.GetCell<int COMMA &ConvertFromStr_m100_ToVal>(3, 0), 100000);
+    unittest::ExpectEqual(int, doc.GetCell<&ConvertFromStr_m100_ToVal>(0, 0), 100);
+    unittest::ExpectEqual(int, doc.GetCell<&ConvertFromStr_m100_ToVal>(1, 0), 1000);
+    unittest::ExpectEqual(int, doc.GetCell<&ConvertFromStr_m100_ToVal>(2, 0), 10000);
+    unittest::ExpectEqual(int, doc.GetCell<&ConvertFromStr_m100_ToVal>(3, 0), 100000);
 
-    unittest::ExpectEqual(int, doc.GetCell<int COMMA &ConvertFromStr_m100_ToVal>(0, 1), 10);
-    unittest::ExpectEqual(int, doc.GetCell<int COMMA &ConvertFromStr_m100_ToVal>(1, 1), 1);
-    unittest::ExpectEqual(int, doc.GetCell<int COMMA &ConvertFromStr_m100_ToVal>(2, 1), 0);
-    unittest::ExpectEqual(int, doc.GetCell<int COMMA &ConvertFromStr_m100_ToVal>(3, 1), 1);
+    unittest::ExpectEqual(int, doc.GetCell<&ConvertFromStr_m100_ToVal>(0, 1), 10);
+    unittest::ExpectEqual(int, doc.GetCell<&ConvertFromStr_m100_ToVal>(1, 1), 1);
+    unittest::ExpectEqual(int, doc.GetCell<&ConvertFromStr_m100_ToVal>(2, 1), 0);
+    unittest::ExpectEqual(int, doc.GetCell<&ConvertFromStr_m100_ToVal>(3, 1), 1);
 
-    doc.SetCell<int, &ConvertFromVal_d100_ToStr>(0, 0, 12345);
+    doc.SetCell<&ConvertFromVal_d100_ToStr>(0, 0, 12345);
     unittest::ExpectEqual(std::string, doc.GetCell<std::string>(0, 0), "123.45");
   }
   catch (const std::exception& ex)

@@ -43,9 +43,9 @@ int main()
     unittest::ExpectEqual(rdb::year_month_day, doc.GetCell<rdb::year_month_day>("D", "2"),
                           rdb::year_month_day{rdb::year{1997} COMMA rdb::month{7} COMMA rdb::day{23} });
 
-    unittest::ExpectEqual(rdb::year_month_day, doc.GetCell<rdb::year_month_day COMMA To_dmY >("E", "1"),
+    unittest::ExpectEqual(rdb::year_month_day, doc.GetCell< To_dmY >("E", "1"),
                           rdb::year_month_day{rdb::year{2020} COMMA rdb::month{12} COMMA rdb::day{27} });
-    unittest::ExpectEqual(rdb::year_month_day, doc.GetCell<rdb::year_month_day COMMA To_dmY >("E", "2"),
+    unittest::ExpectEqual(rdb::year_month_day, doc.GetCell< To_dmY >("E", "2"),
                           rdb::year_month_day{rdb::year{1980} COMMA rdb::month{2} COMMA rdb::day{28} });
 
   }

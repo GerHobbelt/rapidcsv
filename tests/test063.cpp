@@ -43,10 +43,10 @@ int main()
     rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0));
 
     // ToVal
-    unittest::ExpectEqual(int, doc.GetCell<int COMMA ToVal>(0, 0), 100);
-    unittest::ExpectEqual(int, doc.GetCell<int COMMA ToVal>(1, "1"), 1000);
-    unittest::ExpectEqual(int, doc.GetCell<int COMMA ToVal>("A", 0), 100);
-    unittest::ExpectEqual(int, doc.GetCell<int COMMA ToVal>("B", "1"), 1000);
+    unittest::ExpectEqual(int, doc.GetCell<ToVal>(0, 0), 100);
+    unittest::ExpectEqual(int, doc.GetCell<ToVal>(1, "1"), 1000);
+    unittest::ExpectEqual(int, doc.GetCell<ToVal>("A", 0), 100);
+    unittest::ExpectEqual(int, doc.GetCell<ToVal>("B", "1"), 1000);
 
     using t_raw100multi = rapidcsv::S2TwrapperFunction<int, ToVal>;
     using t_wrp100multi = rapidcsv::S2TwrapperFunction<StrVal, ToStrVal>;
@@ -59,14 +59,14 @@ int main()
     unittest::ExpectEqual(int, std::get<2>(row1),  10000);
     unittest::ExpectEqual(int, std::get<3>(row1).val,  100000);
 
-    unittest::ExpectEqual(int, doc.GetColumn<int COMMA ToVal>(0).at(0), 100);
-    unittest::ExpectEqual(int, doc.GetColumn<int COMMA ToVal>("B").at(0), 1000);
+    unittest::ExpectEqual(int, doc.GetColumn<&ToVal>(0).at(0), 100);
+    unittest::ExpectEqual(int, doc.GetColumn<&ToVal>("B").at(0), 1000);
 
     // ToStrVal
-    unittest::ExpectEqual(int, doc.GetCell<StrVal COMMA ToStrVal>(0, 0).val, 100);
-    unittest::ExpectEqual(int, doc.GetCell<StrVal COMMA ToStrVal>(1, "1").val, 1000);
-    unittest::ExpectEqual(int, doc.GetCell<StrVal COMMA ToStrVal>("A", 0).val, 100);
-    unittest::ExpectEqual(int, doc.GetCell<StrVal COMMA ToStrVal>("B", "1").val, 1000);
+    unittest::ExpectEqual(int, doc.GetCell<ToStrVal>(0, 0).val, 100);
+    unittest::ExpectEqual(int, doc.GetCell<ToStrVal>(1, "1").val, 1000);
+    unittest::ExpectEqual(int, doc.GetCell<ToStrVal>("A", 0).val, 100);
+    unittest::ExpectEqual(int, doc.GetCell<ToStrVal>("B", "1").val, 1000);
 
     std::tuple<int, StrVal, float, double> row2 = doc.GetRow< t_raw100multi, t_wrp100multi,
                                                               float, double >("2");
@@ -75,8 +75,8 @@ int main()
     unittest::ExpectEqual(float, std::get<2>(row2),  0.001f);
     unittest::ExpectEqual(double, std::get<3>(row2),  0.006);
 
-    unittest::ExpectEqual(int, doc.GetColumn<StrVal COMMA ToStrVal>(0).at(0).val, 100);
-    unittest::ExpectEqual(int, doc.GetColumn<StrVal COMMA ToStrVal>("B").at(0).val, 1000);
+    unittest::ExpectEqual(int, doc.GetColumn<&ToStrVal>(0).at(0).val, 100);
+    unittest::ExpectEqual(int, doc.GetColumn<&ToStrVal>("B").at(0).val, 1000);
 
     std::tuple< float, double, float,
                 rapidcsv::ConvertFromStr_gNaN<double>::return_type > row3 =
