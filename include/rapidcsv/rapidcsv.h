@@ -692,14 +692,9 @@ namespace rapidcsv
       const t_dataRow& rowData = _mData.at(dataRowIdx);
       //return std::make_tuple(S2Tconv::ToVal(rowData.at(colIdx++)) ...);  on ubuntu the tuple elements order gets reversed
 
-      //https://stackoverflow.com/questions/65261797/varadic-template-to-tuple-is-reversed
-      // work around for make_tuple
-      std::tuple<typename t_S2Tconv_c<T_C>::return_type...> result;
-      auto write_tuple = [&rowData,&colIdx] (auto&&... wrt_result) -> void
-      {
-        ( (wrt_result = t_S2Tconv_c<T_C>::ToVal(rowData.at(colIdx++))), ... );  // comma operator ensures the element order is from left to right
-      };
-      std::apply(write_tuple, result);
+      using _t_tuple_result = std::tuple<typename t_S2Tconv_c<T_C>::return_type...>;
+      _t_tuple_result result;
+      GetTuple< t_S2Tconv_c<T_C>... >(rowData,colIdx,result);
       return result;
     }
 
@@ -747,12 +742,7 @@ namespace rapidcsv
       size_t colIdx = _getDataColumnIndex(0).dataIdx;
       t_dataRow& rowData = _mData.at(dataRowIdx);
 
-      //https://stackoverflow.com/questions/42494715/c-transform-a-stdtuplea-a-a-to-a-stdvector-or-stddeque
-      auto read_tuple = [&rowData,&colIdx] (auto&&... rowElem) -> void
-      {
-        ( (rowData.at(colIdx++) = t_T2Sconv_c<T_C>::ToStr(rowElem)) , ... );
-      };
-      std::apply(read_tuple, pRow);
+      SetTuple< t_T2Sconv_c<T_C>... >(pRow,colIdx,rowData);
     }
 
     // TODO unit tests
@@ -815,20 +805,15 @@ namespace rapidcsv
     {
       const size_t rowIdx = _getDataRowIndex(pRowIdx).dataIdx;
 
-      t_dataRow row;
+      t_dataRow rowData;
       if constexpr (sizeof...(T_C) == 0)
       {
-        row.resize(_getDataColumnCount());
+        rowData.resize(_getDataColumnCount());
       } else {
-        row.resize(_getDataColumnIndex(sizeof...(T_C)).dataIdx);
+        rowData.resize(_getDataColumnIndex(sizeof...(T_C)).dataIdx);
         size_t colIdx = _getDataColumnIndex(0).dataIdx;
 
-        //https://stackoverflow.com/questions/42494715/c-transform-a-stdtuplea-a-a-to-a-stdvector-or-stddeque
-        auto read_tuple = [&row,&colIdx] (auto&&... rowElem) -> void
-        {
-          ( (row.at(colIdx++) = t_T2Sconv_c<T_C>::ToStr(rowElem)) , ... );
-        };
-        std::apply(read_tuple, pRow);
+        SetTuple< t_T2Sconv_c<T_C>... >(pRow,colIdx,rowData);
       }
 
       while (rowIdx > _getDataRowCount())
@@ -838,7 +823,7 @@ namespace rapidcsv
         _mData.push_back(tempRow);
       }
 
-      _mData.insert(_mData.begin() + static_cast<ssize_t>(rowIdx), row);
+      _mData.insert(_mData.begin() + static_cast<ssize_t>(rowIdx), rowData);
 
       if (!pRowName.empty())
       {

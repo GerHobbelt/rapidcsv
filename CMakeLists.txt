@@ -10,41 +10,44 @@ set (CMAKE_CXX_STANDARD 20)
 #]==============================================]
 try_compile(USE_CHRONO_LIB
             SOURCES  "${CMAKE_CURRENT_SOURCE_DIR}/tests/checkChrono_fromStream.cpp"
-            CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
+            #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
             COMPILE_DEFINITIONS "-DUSE_CHRONO=1"
             CXX_STANDARD "${CMAKE_CXX_STANDARD}"
             CXX_STANDARD_REQUIRED True
            )
 if(USE_CHRONO_LIB)
-  message(STATUS "'checkChrono_fromStream' succeded")
+  message(STATUS "'checkChrono_fromStream' SUCCEDED")
   try_compile(IS_CHRONO_TOSTREAM
               SOURCES  "${CMAKE_CURRENT_SOURCE_DIR}/tests/checkChrono_toStream.cpp"
-              CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
+              #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
               COMPILE_DEFINITIONS "-DUSE_CHRONO=1"
               CXX_STANDARD "${CMAKE_CXX_STANDARD}"
               CXX_STANDARD_REQUIRED True
-            )
+             )
   if(IS_CHRONO_TOSTREAM)
-    message(STATUS "'checkChrono_toStream' succeded")
+    message(STATUS "'checkChrono_toStream' SUCCEDED")
   else()
-    message(STATUS "'checkChrono_toStream' failed")
+    message(STATUS "'checkChrono_toStream' FAILED")
   endif()
 else()
-  message(STATUS "'checkChrono_fromStream' failed")
+  message(STATUS "'checkChrono_fromStream' FAILED")
+  message(STATUS "'checkChrono_toStream' SKIPPED")
 endif()
 
 
 if(USE_CHRONO_LIB)
-  message(STATUS "Using date-time-lib : <chrono>")
+  message(STATUS "Using DATE_TIME-lib : <chrono>")
   add_definitions(-DUSE_CHRONO=1)
   unset(DATELIB)
   if(IS_CHRONO_TOSTREAM)
+    message(STATUS "Using CHRONO_TOSTREAM : std::chrono::to_stream(...)")
     add_definitions(-DUSE_CHRONO_TOSTREAM=1)
   else()
+    message(STATUS "Using workaround CHRONO_TOSTREAM : as std::chrono::to_stream(...) fails to compile")
     add_definitions(-DUSE_CHRONO_TOSTREAM=0)
   endif()
 else()
-  message(STATUS "Using date-time-lib : <date/date.h>")
+  message(STATUS "Using DATE_TIME-lib : <date/date.h>")
   add_definitions(-DUSE_CHRONO=0)
   set(DATELIB date)
 
@@ -125,7 +128,7 @@ target_include_directories(rapidcsv INTERFACE include)
 
 
 # Install / Uninstall targets for standalone rapidcsv build
-#if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
   message(STATUS "Install/uninstall targets enabled.")
 
   # Install
@@ -139,9 +142,9 @@ target_include_directories(rapidcsv INTERFACE include)
   # Uninstall
   add_custom_target(uninstall COMMAND "${CMAKE_COMMAND}" -E remove "${CMAKE_INSTALL_PREFIX}/include/rapidcsv")
 
-#else()
-#  message(STATUS "Install/uninstall targets disabled.")
-#endif()
+else()
+  message(STATUS "Install/uninstall targets disabled.")
+endif()
 
 
 

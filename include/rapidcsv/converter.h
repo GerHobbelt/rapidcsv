@@ -958,7 +958,7 @@ namespace rapidcsv
   };
 
   template< typename T_C >
-  using t_S2Tconv_c = t_S2Tconv<T_C>::conv_type;
+  using t_S2Tconv_c = typename t_S2Tconv<T_C>::conv_type;
 
   template< auto (*CONV_S2T)(const std::string&) >
   struct f_S2Tconv
@@ -972,7 +972,50 @@ namespace rapidcsv
   };
 
   template< auto (*CONV_S2T)(const std::string&) >
-  using f_S2Tconv_c = f_S2Tconv<CONV_S2T>::conv_type;
+  using f_S2Tconv_c = typename f_S2Tconv<CONV_S2T>::conv_type;
+
+  // [===========[ workarounds in case std::apply() doesn't work as expected for a given compiler(MSVC)
+  template <size_t IDX,c_S2Tconverter ... S2Tconv>
+  struct GetTupleElement {
+    inline static void get(const std::vector<std::string>& dataVec,
+                           const size_t colIdx,
+                           std::tuple<typename S2Tconv::return_type ...>& dataTuple)
+    {
+      using _t_tuple_convertors = std::tuple< S2Tconv ...>;
+      std::get<IDX>(dataTuple) = std::tuple_element_t<IDX, _t_tuple_convertors>::ToVal(dataVec.at(IDX+colIdx));
+      GetTupleElement< (IDX -1), S2Tconv ... >::get(dataVec,colIdx,dataTuple);
+    }
+  };
+
+  template <c_S2Tconverter ... S2Tconv>
+  struct GetTupleElement<0, S2Tconv ...> {
+    inline static void get(const std::vector<std::string>& dataVec,
+                           [[maybe_unused]] const size_t colIdx,
+                           std::tuple<typename S2Tconv::return_type ...>& dataTuple)
+    {
+      using _t_tuple_convertors = std::tuple< S2Tconv ...>;
+      std::get<0>(dataTuple) = std::tuple_element_t<0, _t_tuple_convertors>::ToVal(dataVec.at(0+colIdx));
+    }
+  };
+
+  template <c_S2Tconverter ... S2Tconv>
+  inline void GetTuple(const std::vector<std::string>& dataVec,
+                       const size_t colIdx,
+                       std::tuple<typename S2Tconv::return_type ...>& dataTuple)
+  {
+    /*
+    auto write_tuple = [&dataVec,colIdx] (auto&&... wrt_result) -> void
+    {
+      //https://stackoverflow.com/questions/65261797/varadic-template-to-tuple-is-reversed
+      // work around for make_tuple
+      ( (wrt_result = t_S2Tconv_c<T_C>::ToVal(dataVec.at(colIdx++))), ... );  // comma operator ensures the element order is from left to right
+    };
+    std::apply(write_tuple, result);
+    */
+    GetTupleElement< (sizeof...(S2Tconv) -1), S2Tconv ... >::get(dataVec,colIdx,dataTuple);
+  }
+  // ]===========] workarounds in case std::apply() doesn't work as expected for a given compiler(MSVC)
+  
 
   // ]=============================================================] ConvertFromStr
 
@@ -1570,7 +1613,7 @@ namespace rapidcsv
    *                                XOR  C -> Conversion class statisfying concept 'c_T2Sconverter'.
    */
   template< typename T_C >
-  using t_T2Sconv_c = t_T2Sconv< T_C >::conv_type;
+  using t_T2Sconv_c = typename t_T2Sconv< T_C >::conv_type;
 
 
   // refer : https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0127r1.html
@@ -1589,8 +1632,49 @@ namespace rapidcsv
 
   //template< typename T_V, std::string (*CONV_T2S)(const T_V&) >
   template<auto CONV_T2S >
-  using f_T2Sconv_c = f_T2Sconv<CONV_T2S>::conv_type;
+  using f_T2Sconv_c = typename f_T2Sconv<CONV_T2S>::conv_type;
 
+
+  // [===========[ workarounds in case std::apply() doesn't work as expected for a given compiler(MSVC)
+  template <size_t IDX,c_T2Sconverter ... T2Sconv>
+  struct SetTupleElement {
+    inline static void set(const std::tuple<typename T2Sconv::input_type ...>& dataTuple,
+                           const size_t colIdx,
+                           std::vector<std::string>& dataVec)
+    {
+      using _t_tuple_convertors = std::tuple< T2Sconv ...>;
+      dataVec.at(IDX+colIdx) = std::tuple_element_t<IDX, _t_tuple_convertors>::ToStr(std::get<IDX>(dataTuple));
+      SetTupleElement< (IDX -1), T2Sconv ... >::set(dataTuple,colIdx,dataVec);
+    }
+  };
+
+  template <c_T2Sconverter ... T2Sconv>
+  struct SetTupleElement<0, T2Sconv ...> {
+    inline static void set(const std::tuple<typename T2Sconv::input_type ...>& dataTuple,
+                           [[maybe_unused]] const size_t colIdx,
+                           std::vector<std::string>& dataVec)
+    {
+      using _t_tuple_convertors = std::tuple< T2Sconv ...>;
+      dataVec.at(0+colIdx) = std::tuple_element_t<0, _t_tuple_convertors>::ToStr(std::get<0>(dataTuple));
+    }
+  };
+
+  template <c_T2Sconverter ... T2Sconv>
+  inline void SetTuple(const std::tuple<typename T2Sconv::input_type ...>& dataTuple,
+                       const size_t colIdx,
+                       std::vector<std::string>& dataVec)
+  {
+    /*
+    //https://stackoverflow.com/questions/42494715/c-transform-a-stdtuplea-a-a-to-a-stdvector-or-stddeque
+    auto read_tuple = [&rowData,colIdx] (auto&&... rowElem) -> void
+    {
+      ( (rowData.at(colIdx++) = t_T2Sconv_c<T_C>::ToStr(rowElem)) , ... );
+    };
+    std::apply(read_tuple, pRow);
+    */
+    SetTupleElement< (sizeof...(T2Sconv) -1), T2Sconv ... >::set(dataTuple,colIdx,dataVec);
+  }
+  // ]===========] workarounds in case std::apply() doesn't work as expected for a given compiler(MSVC)
 
   /**
    * @brief   Convertor class implementation for tuple type, with underlying elements(of different types)
