@@ -14,6 +14,7 @@
 #pragma once
 
 #include <functional>
+#include <filesystem>
 #include <iostream>
 #include <cfloat>
 #include <climits>
@@ -51,6 +52,8 @@
   // https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
   #define __RAPIDCSV_FILE__   (__FILE__ + RAPIDCSV_SOURCE_PATH_SIZE)
 #endif
+
+#define __RAPIDCSV_PREFERRED_PATH__    std::filesystem::path(__RAPIDCSV_FILE__).make_preferred().string()
 
 /*
  *  NUMERIC_LOCALE : Number locales are specific settings for the 1000 separators and decimals.
@@ -498,7 +501,7 @@ namespace rapidcsv
       if (iss.fail() || iss.bad()) // || iss.eof())
       {
         std::ostringstream eoss;
-        eoss << __RAPIDCSV_FILE__ << " : ";
+        eoss << __RAPIDCSV_PREFERRED_PATH__ << " : ";
         eoss << "ERROR : rapidcsv :: in function 'T _ConvertFromStr<c_NOT_string T, c_formatISS S2T_FORMAT>::ToVal(const std::string& str)' ::: str='";
         eoss << str << "'  istringstream-conversion failed...";
         eoss << std::boolalpha << "   iss.fail() = " << iss.fail()
@@ -695,7 +698,7 @@ namespace rapidcsv
       if(str.length()>1)
       {
         std::ostringstream eoss;
-        eoss << __RAPIDCSV_FILE__ << " : ";
+        eoss << __RAPIDCSV_PREFERRED_PATH__ << " : ";
         eoss << "ERROR : rapidcsv :: in function 'T _ConvertFromStr<c_char T,S2T_Format_WorkAround>::ToVal(const std::string& str)' ::: for T=char-type-(un)signed, str='";
         eoss << str << "' which violates expected rule # ( str.length()==1 )";
         throw std::invalid_argument(eoss.str());
@@ -736,7 +739,7 @@ namespace rapidcsv
       if(val > 1)
       {
         std::ostringstream eoss;
-        eoss << __RAPIDCSV_FILE__ << " : ";
+        eoss << __RAPIDCSV_PREFERRED_PATH__ << " : ";
         eoss << "ERROR : rapidcsv :: in function 'T _ConvertFromStr<bool,S2T_Format_WorkAround>::ToVal(const std::string& str)' ::: str='";
         eoss << str << "' which violates expected rule # ( val==0 || val==1 )";
         throw std::invalid_argument(eoss.str());
@@ -783,7 +786,7 @@ namespace rapidcsv
       if (iss.fail() || iss.bad() ) // || !iss.eof())
       {
         std::ostringstream eoss;
-        eoss << __RAPIDCSV_FILE__ << " : ";
+        eoss << __RAPIDCSV_PREFERRED_PATH__ << " : ";
         eoss << "ERROR : rapidcsv :: in function 'T _ConvertFromStr<datelib::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)' ::: str='";
         eoss << str << "'  istringstream-conversion failed...";
         eoss << std::boolalpha << "   iss.fail() = " << iss.fail()
@@ -997,24 +1000,22 @@ namespace rapidcsv
       std::get<0>(dataTuple) = std::tuple_element_t<0, _t_tuple_convertors>::ToVal(dataVec.at(0+colIdx));
     }
   };
+  // ]===========] workarounds in case std::apply() doesn't work as expected for a given compiler(MSVC)
 
   template <c_S2Tconverter ... S2Tconv>
   inline void GetTuple(const std::vector<std::string>& dataVec,
-                       const size_t colIdx,
+                       size_t colIdx,
                        std::tuple<typename S2Tconv::return_type ...>& dataTuple)
   {
-    /*
-    auto write_tuple = [&dataVec,colIdx] (auto&&... wrt_result) -> void
+    auto write_tuple = [&dataVec,&colIdx] (typename S2Tconv::return_type & ... wrt_result) -> void
     {
       //https://stackoverflow.com/questions/65261797/varadic-template-to-tuple-is-reversed
       // work around for make_tuple
-      ( (wrt_result = t_S2Tconv_c<T_C>::ToVal(dataVec.at(colIdx++))), ... );  // comma operator ensures the element order is from left to right
+      ( (wrt_result = S2Tconv::ToVal(dataVec.at(colIdx++))), ... );  // comma operator ensures the element order is from left to right
     };
-    std::apply(write_tuple, result);
-    */
-    GetTupleElement< (sizeof...(S2Tconv) -1), S2Tconv ... >::get(dataVec,colIdx,dataTuple);
+    std::apply(write_tuple, dataTuple);
+    //GetTupleElement< (sizeof...(S2Tconv) -1), S2Tconv ... >::get(dataVec,colIdx,dataTuple);
   }
-  // ]===========] workarounds in case std::apply() doesn't work as expected for a given compiler(MSVC)
   
 
   // ]=============================================================] ConvertFromStr
@@ -1214,8 +1215,7 @@ namespace rapidcsv
       if (oss.fail() || oss.bad()) // || oss.eof())
       {
         std::ostringstream eoss;
-        eoss << __RAPIDCSV_FILE__ << ":" << __LINE__ << " ";
-        eoss << "ERROR : rapidcsv :: in function 'std::string _ConvertFromVal<c_NOT_string T, c_formatOSS T2S_FORMAT>::ToStr(const T& val)' ::: ";
+        eoss << __RAPIDCSV_PREFERRED_PATH__ << " : ERROR : rapidcsv :: in function 'std::string _ConvertFromVal<c_NOT_string T, c_formatOSS T2S_FORMAT>::ToStr(const T& val)' ::: ";
         try {
           eoss << "val='" << val << "'";
         } catch (...) {} // do-nothing on error here.
@@ -1537,8 +1537,7 @@ namespace rapidcsv
       if (oss.fail() || oss.bad()) // || oss.eof())
       {
         std::ostringstream eoss;
-        eoss << __RAPIDCSV_FILE__ << ":" << __LINE__ << " ";
-        eoss << "ERROR : rapidcsv :: in function 'std::string _ConvertFromVal<datelib::year_month_date, T2S_FORMAT_YMD>::ToStr_args(const datelib::year_month_date& val)' ::: ";
+        eoss << __RAPIDCSV_PREFERRED_PATH__ << " : ERROR : rapidcsv :: in function 'std::string _ConvertFromVal<datelib::year_month_date, T2S_FORMAT_YMD>::ToStr_args(const datelib::year_month_date& val)' ::: ";
         try {
           eoss << "year{" << val.year() << "}-month{" << val.month() << "}-day{" << val.day() << "}' : val.ok()=" << val.ok() << " format='" << fmt << "'";
         } catch (...) {} // do-nothing on error
@@ -1658,23 +1657,21 @@ namespace rapidcsv
       dataVec.at(0+colIdx) = std::tuple_element_t<0, _t_tuple_convertors>::ToStr(std::get<0>(dataTuple));
     }
   };
+  // ]===========] workarounds in case std::apply() doesn't work as expected for a given compiler(MSVC)
 
   template <c_T2Sconverter ... T2Sconv>
   inline void SetTuple(const std::tuple<typename T2Sconv::input_type ...>& dataTuple,
-                       const size_t colIdx,
+                       size_t colIdx,
                        std::vector<std::string>& dataVec)
   {
-    /*
     //https://stackoverflow.com/questions/42494715/c-transform-a-stdtuplea-a-a-to-a-stdvector-or-stddeque
-    auto read_tuple = [&rowData,colIdx] (auto&&... rowElem) -> void
+    auto read_tuple = [&dataVec,&colIdx] (typename T2Sconv::input_type const& ... rowElem) -> void
     {
-      ( (rowData.at(colIdx++) = t_T2Sconv_c<T_C>::ToStr(rowElem)) , ... );
+      ( (dataVec.at(colIdx++) = T2Sconv::ToStr(rowElem)) , ... );
     };
-    std::apply(read_tuple, pRow);
-    */
-    SetTupleElement< (sizeof...(T2Sconv) -1), T2Sconv ... >::set(dataTuple,colIdx,dataVec);
+    std::apply(read_tuple, dataTuple);
+    //SetTupleElement< (sizeof...(T2Sconv) -1), T2Sconv ... >::set(dataTuple,colIdx,dataVec);
   }
-  // ]===========] workarounds in case std::apply() doesn't work as expected for a given compiler(MSVC)
 
   /**
    * @brief   Convertor class implementation for tuple type, with underlying elements(of different types)

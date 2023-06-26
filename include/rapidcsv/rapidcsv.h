@@ -77,14 +77,14 @@ namespace rapidcsv
     {
       if (mColumnNameIdx < -1)
       {
-        std::string errStr = std::string(__RAPIDCSV_FILE__)+": LabelParams(constructor) :"+
+        std::string errStr = __RAPIDCSV_PREFERRED_PATH__+": LabelParams(constructor) :"+
           " invalid column name index " + std::to_string(mColumnNameIdx) + " < -1";
         throw std::out_of_range(errStr);
       }
 
       if (mRowNameIdx < -1)
       {
-        std::string errStr = std::string(__RAPIDCSV_FILE__)+": LabelParams(constructor) :"+
+        std::string errStr = __RAPIDCSV_PREFERRED_PATH__+": LabelParams(constructor) :"+
           " invalid row name index " + std::to_string(mRowNameIdx) + " < -1";
         throw std::out_of_range(errStr);
       }
@@ -392,7 +392,7 @@ namespace rapidcsv
       }
       if (columnIdx < 0)
       {
-        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+": Document::GetColumnIdx(pColumnName) : column not found: " + pColumnName);
+        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+": Document::GetColumnIdx(pColumnName) : column not found: " + pColumnName);
       }
       return static_cast<size_t>(columnIdx);
     }
@@ -435,7 +435,7 @@ namespace rapidcsv
           typename t_S2Tconv_c<T_C>::return_type val = t_S2Tconv_c<T_C>::ToVal(cellStrVal);
           column.push_back(val);
         } else {
-          const std::string errStr = std::string(__RAPIDCSV_FILE__)+
+          const std::string errStr = __RAPIDCSV_PREFERRED_PATH__+
             " : Document::GetColumn() # requested column index " +
             std::to_string(pColumnIdx) + " >= " +
             std::to_string(itRow->size() - _getDataColumnIndex(0).dataIdx) +
@@ -660,7 +660,7 @@ namespace rapidcsv
       }
       if (rowIdx < 0)
       {
-        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+": Document::GetRowIdx(pRowName) row not found: " + pRowName);
+        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+": Document::GetRowIdx(pRowName) row not found: " + pRowName);
       }
       return static_cast<size_t>(rowIdx);
     }
@@ -683,7 +683,7 @@ namespace rapidcsv
 
       if( _mData.at(dataRowIdx).size() < sizeof...(T_C) )
       {
-        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+": Document::GetRow(pRowNameIdx) :: ERROR >> row-size("+
+        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+": Document::GetRow(pRowNameIdx) :: ERROR >> row-size("+
                 std::to_string(_mData.at(dataRowIdx).size()) + ") less than tuple-size("+
                 std::to_string(sizeof...(T_C)) + ")");
       }
@@ -1018,7 +1018,7 @@ namespace rapidcsv
     {
       if (_mLabelParams.mColumnNameIdx < 0)
       {
-        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+": Document::GetColumnName(pColumnIdx="+std::to_string(pColumnIdx)
+        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+": Document::GetColumnName(pColumnIdx="+std::to_string(pColumnIdx)
               +") column name row index < 0: _mLabelParams.mColumnNameIdx=" + std::to_string(_mLabelParams.mColumnNameIdx));
       }
 
@@ -1035,7 +1035,7 @@ namespace rapidcsv
     {
       if (_mLabelParams.mColumnNameIdx < 0)
       {
-        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+": Document::SetColumnName(pColumnIdx="+std::to_string(pColumnIdx)
+        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+": Document::SetColumnName(pColumnIdx="+std::to_string(pColumnIdx)
               +") column name row index < 0: _mLabelParams.mColumnNameIdx=" + std::to_string(_mLabelParams.mColumnNameIdx));
       }
 
@@ -1082,7 +1082,7 @@ namespace rapidcsv
     {
       if (_mLabelParams.mRowNameIdx < 0)
       {
-        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+": Document::GetRowName(mRowIdx="+std::to_string(pRowIdx)
+        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+": Document::GetRowName(mRowIdx="+std::to_string(pRowIdx)
               +") row name column index < 0: _mLabelParams.mRowNameIdx=" + std::to_string(_mLabelParams.mRowNameIdx));
       }
 
@@ -1099,7 +1099,7 @@ namespace rapidcsv
     {
       if (_mLabelParams.mRowNameIdx < 0)
       {
-        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+": Document::SetRowName(mRowIdx="+std::to_string(pRowIdx)
+        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+": Document::SetRowName(mRowIdx="+std::to_string(pRowIdx)
               +") row name column index < 0: _mLabelParams.mRowNameIdx=" + std::to_string(_mLabelParams.mRowNameIdx));
       }
 

@@ -56,7 +56,9 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(1), "9");
     unittest::ExpectEqual(std::string, strs.at(2), "81");
 
-    ExpectExceptionMsg(viewdoc.GetViewRow<int COMMA unsigned COMMA long>("2"), std::out_of_range, "include/rapidcsv/view.h : _ViewDocument::GetDocumentRowIdx() : row filtered out: 2");
+    std::string errMsgPre_v = (std::filesystem::path("include/rapidcsv/view.h")).make_preferred().string();
+    ExpectExceptionMsg(viewdoc.GetViewRow<int COMMA unsigned COMMA long>("2"), std::out_of_range,
+                       errMsgPre_v + " : _ViewDocument::GetDocumentRowIdx() : row filtered out: 2");
 
     /////   Sort
     const rapidcsv::SortParams<int> spA(1);
@@ -102,7 +104,8 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(1), "81");
     unittest::ExpectEqual(std::string, strs.at(2), "6561");
 
-    ExpectExceptionMsg(viewdoc.GetViewRow<int COMMA unsigned COMMA long>("2"), std::out_of_range, "include/rapidcsv/view.h : _ViewDocument::GetDocumentRowIdx() : row filtered out: 2");
+    ExpectExceptionMsg(viewdoc.GetViewRow<int COMMA unsigned COMMA long>("2"), std::out_of_range,
+                       errMsgPre_v + " : _ViewDocument::GetDocumentRowIdx() : row filtered out: 2");
 
   }
   catch (const std::exception& ex)

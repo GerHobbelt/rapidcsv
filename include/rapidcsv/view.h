@@ -254,7 +254,7 @@ namespace rapidcsv
           typename t_S2Tconv_c<T_C>::return_type val = t_S2Tconv_c<T_C>::ToVal(cellStrVal);
           column.push_back(val);
         } else {
-          const std::string errStr = std::string(__RAPIDCSV_FILE__)+" : _ViewDocument::GetViewColumn()"+
+          const std::string errStr = __RAPIDCSV_PREFERRED_PATH__+" : _ViewDocument::GetViewColumn()"+
             " # requested column index " +
             std::to_string(pColumnIdx) + " >= " +
             std::to_string(row.size() - _document._getDataColumnIndex(0).dataIdx) +
@@ -298,7 +298,7 @@ namespace rapidcsv
       ssize_t viewRowIdx = _mapRowIdx2ViewRowIdx.at(rowIdx);
       if (viewRowIdx < 0)
       {
-        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+" : _ViewDocument::GetViewRowIdx() : row filtered out: " + pRowName);
+        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+" : _ViewDocument::GetViewRowIdx() : row filtered out: " + pRowName);
       }
 
       return static_cast<size_t>(viewRowIdx);
@@ -318,7 +318,7 @@ namespace rapidcsv
       ssize_t viewRowIdx = _mapRowIdx2ViewRowIdx.at(rowIdx);
       if (viewRowIdx < 0)
       {
-        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+" : _ViewDocument::GetDocumentRowIdx() : row filtered out: " + pRowName);
+        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+" : _ViewDocument::GetDocumentRowIdx() : row filtered out: " + pRowName);
       }
 
       return rowIdx;
@@ -529,7 +529,7 @@ namespace rapidcsv
       try {
         docRowIdx  = _sortedData.at(pRowKey);
       } catch (std::out_of_range& err) {
-        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+" : FilterSortDocument::GetOrderedRow() : "
+        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+" : FilterSortDocument::GetOrderedRow() : "
               +" rowKey not found in 'sortedKeyMap'. For pRowKey="
               +ConvertFromTuple<typename SPtypes::S2Tconv_type::return_type ...>::ToStr(pRowKey) + " : ERROR: " + err.what());
       }
@@ -549,7 +549,7 @@ namespace rapidcsv
       try {
         docRowIdx  = _sortedData.at(pRowKey);
       } catch (std::out_of_range& err) {
-        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+" : FilterSortDocument::GetOrderedRow_VecStr() : "
+        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+" : FilterSortDocument::GetOrderedRow_VecStr() : "
               +" rowKey not found in 'sortedKeyMap'. For pRowKey="
               +ConvertFromTuple<typename SPtypes::S2Tconv_type::return_type ...>::ToStr(pRowKey) + " : ERROR: " + err.what());
       }
@@ -598,7 +598,7 @@ namespace rapidcsv
       try {
         docRowIdx  = _sortedData.at(pRowKey);
       } catch (std::out_of_range& err) {
-        throw std::out_of_range(std::string(__RAPIDCSV_FILE__)+" :FilterSortDocument::GetOrderedCell() : "
+        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+" :FilterSortDocument::GetOrderedCell() : "
               +" rowKey not found in 'sortedKeyMap'. For pRowKey="
               +ConvertFromTuple<typename SPtypes::S2Tconv_type::return_type ...>::ToStr(pRowKey) + " : ERROR: " + err.what());
       }

@@ -108,7 +108,8 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(4), "14653300");
     unittest::ExpectEqual(std::string, strs.at(5), "62.610426");
 
-    std::string errMsg = "include/rapidcsv/view.h : FilterSortDocument::GetOrderedRow_VecStr() :  rowKey not found in 'sortedKeyMap'. For pRowKey=[2015-12-28] : ERROR: " + mapErr;
+    std::string errMsgPre_v = (std::filesystem::path("include/rapidcsv/view.h")).make_preferred().string();
+    std::string errMsg = errMsgPre_v + " : FilterSortDocument::GetOrderedRow_VecStr() :  rowKey not found in 'sortedKeyMap'. For pRowKey=[2015-12-28] : ERROR: " + mapErr;
     rdb::year_month_day tDate3{rdb::year{2015}, rdb::month{12}, rdb::day{28} };
     rapidcsv::SortKeyFactory<decltype(spD)>::t_sortKey riDate3(tDate3);
     ExpectExceptionMsg(viewdoc2.GetOrderedRow_VecStr(riDate3), std::out_of_range, errMsg );

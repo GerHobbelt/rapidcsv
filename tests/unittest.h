@@ -59,7 +59,7 @@
     }                                                                                         \
     catch (const excp& ex)                                                                    \
     {                                                                                         \
-      if (std::string(ex.what()) == msg)                                                      \
+      if (std::string(ex.what()) == (msg))                                                    \
       {                                                                                       \
         success = true;                                                                       \
       }                                                                                       \
