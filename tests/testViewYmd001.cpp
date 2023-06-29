@@ -44,7 +44,7 @@ int main()
 
     /////   Sort
     const rapidcsv::SortParams<rdb::year_month_day> spA(0);
-    rapidcsv::SortDocument<rdb::year_month_day> viewdoc1(doc, spA);
+    rapidcsv::SortDocument viewdoc1(doc, spA);
 
     unittest::ExpectEqual(size_t, viewdoc1.GetViewRowCount(), 7804);
 

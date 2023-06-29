@@ -200,4 +200,68 @@ Converts variable holding 'year_month_day' value to string. The string has the f
 ---
 ---
 
+## function rapidcsv::SetTuple< c_T2Sconverter ... T2Sconv >
 
+```c++
+template <c_T2Sconverter ... T2Sconv>
+inline void SetTuple(const std::tuple<typename T2Sconv::input_type ...>& dataTuple,
+                      size_t colIdx,
+                      std::vector<std::string>& dataVec);
+```
+
+populate a vector of string from a tuple.
+
+**Template Parameters**
+- `T2Sconv`             converter types that satisfies concept 'c_T2Sconverter'.
+
+**Parameters**
+- `dataTuple`           values stored in the tuple after performing string-to-value conversion.
+- `colIdx`              start id of dataVec in case vector starts with the column-name.
+- `dataVec`             vector of string, having string representation of numeric values.
+
+
+---
+---
+
+## class rapidcsv::t_T2Sconv< T_C >
+
+If a 'type-C' satisfies concept 'c_T2Sconverter', then use that 'type-C'; else assume it's a 'type-T' and bumped up using 'ConvertFromVal< type-T >' to create a class staisfying concept 'c_T2Sconverter'. This mechanism enables 'template-converter-algorithm' to handle both 'type-C' and 'type-T' using the same code base, (i.e. reduces code duplicity).  
+
+```c++
+template< typename T_C >
+struct t_T2Sconv;
+```
+
+**Template Parameters**
+ - `T_C`                   T can be data-type such as int, double etc ; xOR  C -> Conversion class statisfying concept 'c_T2Sconverter'.
+
+---
+```c++
+using conv_type;
+```
+a converter alias that satisfies concept 'c_T2Sconverter'
+
+
+---
+---
+
+## class rapidcsv::f_T2Sconv< CONV_T2S >
+
+convert a function with signature 'auto (*CONV_S2T)(const std::string&)' to a converter type that satisfies concept 'c_T2Sconverter'.  
+
+```c++
+template<auto CONV_T2S >
+struct f_T2Sconv;
+```
+
+**Template Parameters**
+- `CONV_T2S`                   a function with signature 'std::string (*CONV_T2S)(const T_V&)'. T_V represents either numeric type 'T' or 'variant std::variant<T, std::string>'
+
+---
+```c++
+using conv_type;
+```
+a converter alias that satisfies concept 'c_T2Sconverter'
+
+---
+---

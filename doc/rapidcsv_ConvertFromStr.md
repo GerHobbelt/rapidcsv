@@ -262,5 +262,69 @@ Converts string holding 'year_month_day' value. The string has the format '%F' -
 - 'year_month_day'. 
 
 ---
+---
 
+## function rapidcsv::GetTuple< c_S2Tconverter ... S2Tconv >
+
+```c++
+template <c_S2Tconverter ... S2Tconv>
+inline void GetTuple(const std::vector<std::string>& dataVec,
+                    size_t colIdx,
+                    std::tuple<typename S2Tconv::return_type ...>& dataTuple)
+```
+populate a tuple from a vector of string.
+
+**Template Parameters**
+- `S2Tconv`             converter types that satisfies concept 'c_S2Tconverter'.
+
+**Parameters**
+- `dataVec`             vector of string, having string representation of numeric values.
+- `colIdx`              start id of dataVec in case vector starts with the column-name.
+- `dataTuple`           values stored in the tuple after performing string-to-value conversion.
+
+---
+---
+
+## class rapidcsv::t_S2Tconv< T_C >
+
+If a 'type-C' satisfies concept 'c_S2Tconverter', then use that 'type-C'; else assume it's a 'type-T' and bumped up using 'ConvertFromStr< type-T >' to create a class staisfying concept 'c_S2Tconverter'. This mechanism enables 'template-converter-algorithm' to handle both 'type-C' and 'type-T' using the same code base, (i.e. reduces code duplicity of Getters and Setters functions).  
+
+```c++
+template< typename T_C >
+struct t_S2Tconv;
+```
+
+**Template Parameters**
+- `T_C`                   T can be data-type such as int, double etc; xOR  C -> Conversion class statisfying concept 'c_S2Tconverter'.
+
+---
+```c++
+using conv_type;
+```
+a converter alias that satisfies concept 'c_S2Tconverter'
+
+
+---
+---
+
+## class rapidcsv::f_S2Tconv< CONV_S2T >
+
+convert a function with signature 'auto (*CONV_S2T)(const std::string&)' to a converter type that satisfies concept 'c_S2Tconverter'.
+
+```c++
+template< auto (*CONV_S2T)(const std::string&) >
+struct f_S2Tconv;
+```
+
+**Template Parameters**
+- `CONV_S2T`                   a function with signature 'T_V (*CONV_S2T)(const std::string&)'. T_V represents either numeric type 'T' or 'variant std::variant<T, std::string>'
+
+---
+```c++
+using conv_type;
+```
+a converter alias that satisfies concept 'c_S2Tconverter'
+
+---
+---
 

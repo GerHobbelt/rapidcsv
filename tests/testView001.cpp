@@ -55,7 +55,7 @@ int main()
 
     /////   Sort
     const rapidcsv::SortParams<int> spA(1);
-    rapidcsv::SortDocument<int> viewdoc1(doc, spA);
+    rapidcsv::SortDocument viewdoc1(doc, spA);
 
     unittest::ExpectEqual(size_t, viewdoc1.GetViewRowCount(), 7);
 
@@ -77,8 +77,6 @@ int main()
 
     /////  Filter + Sort
     const rapidcsv::SortParams<int, rapidcsv::e_SortOrder::DESCEND> spD(1);
-    // the below code does not compile as 'int' here initializes to default SortParams<int, rapidcsv::e_SortOrder::ASCEND>
-    //rapidcsv::FilterSortDocument<isFirstCellPositive, int> viewdoc2(doc, spD);
     rapidcsv::FilterSortDocument<isFirstCellPositive, decltype(spD)> viewdoc2(doc, spD);
 
     unittest::ExpectEqual(size_t, viewdoc2.GetViewRowCount(), 4);

@@ -104,6 +104,15 @@ int main()
     unittest::ExpectEqual(size_t, row4_cell4.index(),  1);
     unittest::ExpectEqual(std::string, std::get<std::string>(row4_cell4),  "abc");
 
+    // GetRow<>  using function address
+    std::tuple<int, int, int, int> row1_1 = doc.GetRow< &ToVal, &ToVal, &ToVal, &ToVal >(0);
+
+    unittest::ExpectEqual(int, std::get<0>(row1_1),  100);
+    unittest::ExpectEqual(int, std::get<1>(row1_1),  1000);
+    unittest::ExpectEqual(int, std::get<2>(row1_1),  10000);
+    unittest::ExpectEqual(int, std::get<3>(row1_1),  100000);
+
+
     /*
      * all sytem types are supported by default. 
      * any type conversion errors are caught at compile time.

@@ -46,13 +46,18 @@
 // usage :: SHOW( std::is_integral_v<float> );
 */
 
+//  Project path is removed from the __FILE__
+//  Resulting file-path is relative path from project-root-folder.
 #if  USE_MACROPREFIXMAP == 1
+  // the project-prefix-path is removed via compilation directive macro-prefix-map
   #define __RAPIDCSV_FILE__    __FILE__
 #else
   // https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
+  // the project-prefix-path is skipped by offsetting to length of project-prefix-path
   #define __RAPIDCSV_FILE__   (__FILE__ + RAPIDCSV_SOURCE_PATH_SIZE)
 #endif
 
+// to handle windows back-slash path seperator
 #define __RAPIDCSV_PREFERRED_PATH__    std::filesystem::path(__RAPIDCSV_FILE__).make_preferred().string()
 
 /*
@@ -161,12 +166,20 @@ namespace rapidcsv
   struct InferValueType {
     using value_type = T;
   };
+
+  template <typename T>
+  struct InferValueType<std::variant<T, std::string>> {
+    using value_type = T;
+  };
+
+  /*
   template <typename ...Args>
   struct InferValueType<std::variant<Args...>> {
     using value_type = typename std::tuple_element_t< 0,
                                                       std::tuple<Args...>  // 
                                                     >;
   };
+  */
 
   // ]=============================================================]   common helpers
 
@@ -501,8 +514,7 @@ namespace rapidcsv
       if (iss.fail() || iss.bad()) // || iss.eof())
       {
         std::ostringstream eoss;
-        eoss << __RAPIDCSV_PREFERRED_PATH__ << " : ";
-        eoss << "ERROR : rapidcsv :: in function 'T _ConvertFromStr<c_NOT_string T, c_formatISS S2T_FORMAT>::ToVal(const std::string& str)' ::: str='";
+        eoss << __RAPIDCSV_PREFERRED_PATH__ << " : ERROR : rapidcsv :: in function 'T _ConvertFromStr<c_NOT_string T, c_formatISS S2T_FORMAT>::ToVal(const std::string& str)' ::: str='";
         eoss << str << "'  istringstream-conversion failed...";
         eoss << std::boolalpha << "   iss.fail() = " << iss.fail()
                                << " : iss.bad() = " << iss.bad()
@@ -698,8 +710,7 @@ namespace rapidcsv
       if(str.length()>1)
       {
         std::ostringstream eoss;
-        eoss << __RAPIDCSV_PREFERRED_PATH__ << " : ";
-        eoss << "ERROR : rapidcsv :: in function 'T _ConvertFromStr<c_char T,S2T_Format_WorkAround>::ToVal(const std::string& str)' ::: for T=char-type-(un)signed, str='";
+        eoss << __RAPIDCSV_PREFERRED_PATH__ << " : ERROR : rapidcsv :: in function 'T _ConvertFromStr<c_char T,S2T_Format_WorkAround>::ToVal(const std::string& str)' ::: for T=char-type-(un)signed, str='";
         eoss << str << "' which violates expected rule # ( str.length()==1 )";
         throw std::invalid_argument(eoss.str());
       }
@@ -739,8 +750,7 @@ namespace rapidcsv
       if(val > 1)
       {
         std::ostringstream eoss;
-        eoss << __RAPIDCSV_PREFERRED_PATH__ << " : ";
-        eoss << "ERROR : rapidcsv :: in function 'T _ConvertFromStr<bool,S2T_Format_WorkAround>::ToVal(const std::string& str)' ::: str='";
+        eoss << __RAPIDCSV_PREFERRED_PATH__ << " : ERROR : rapidcsv :: in function 'T _ConvertFromStr<bool,S2T_Format_WorkAround>::ToVal(const std::string& str)' ::: str='";
         eoss << str << "' which violates expected rule # ( val==0 || val==1 )";
         throw std::invalid_argument(eoss.str());
       }
@@ -786,8 +796,7 @@ namespace rapidcsv
       if (iss.fail() || iss.bad() ) // || !iss.eof())
       {
         std::ostringstream eoss;
-        eoss << __RAPIDCSV_PREFERRED_PATH__ << " : ";
-        eoss << "ERROR : rapidcsv :: in function 'T _ConvertFromStr<datelib::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)' ::: str='";
+        eoss << __RAPIDCSV_PREFERRED_PATH__ << " : ERROR : rapidcsv :: in function 'T _ConvertFromStr<datelib::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)' ::: str='";
         eoss << str << "'  istringstream-conversion failed...";
         eoss << std::boolalpha << "   iss.fail() = " << iss.fail()
                                << " : iss.bad() = " << iss.bad()
@@ -942,7 +951,7 @@ namespace rapidcsv
    * @brief   If a 'type-C' satisfies concept 'c_S2Tconverter', then use that 'type-C';   else
    *          assume it's a 'type-T' and bumped up using 'ConvertFromStr< type-T >' to create
    *          a class staisfying concept 'c_S2Tconverter'.
-   *          This mechanism enables template-converter-algorithm' to handle both 'type-C' and
+   *          This mechanism enables 'template-converter-algorithm' to handle both 'type-C' and
    *          'type-T' using the same code base, (i.e. reduces code duplicity of Getters and Setters functions).
    * @tparam  T_C                   T can be data-type such as int, double etc; xOR
    *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
@@ -963,19 +972,36 @@ namespace rapidcsv
   template< typename T_C >
   using t_S2Tconv_c = typename t_S2Tconv<T_C>::conv_type;
 
+  /**
+   * @brief   convert a function with signature 'auto (*CONV_S2T)(const std::string&)'
+   *          to a converter type that satisfies concept 'c_S2Tconverter'.
+   * @tparam  CONV_S2T                   a function with signature 'T_V (*CONV_S2T)(const std::string&)'.
+   *                                     T_V represents either numeric type 'T' or 'variant std::variant<T, std::string>'
+   */
   template< auto (*CONV_S2T)(const std::string&) >
   struct f_S2Tconv
   {
   private:
+    /**
+     * @brief return type of function CONV_S2T
+     */
     using _return_type = typename std::invoke_result_t< decltype(CONV_S2T),
                                                         const std::string& >;
+    /**
+     * @brief infers the underlying data-type if _return_type is an variant instance.
+     *        or it's same as return type of CONV_S2T.
+     */
     using _value_type  = typename InferValueType<_return_type>::value_type;
   public:
+    /**
+     * @brief a converter alias that satisfies concept 'c_S2Tconverter'
+     */
     using conv_type = S2TwrapperFunction< _value_type, CONV_S2T >;
   };
 
   template< auto (*CONV_S2T)(const std::string&) >
   using f_S2Tconv_c = typename f_S2Tconv<CONV_S2T>::conv_type;
+
 
   // [===========[ workarounds in case std::apply() doesn't work as expected for a given compiler(MSVC)
   template <size_t IDX,c_S2Tconverter ... S2Tconv>
@@ -1002,11 +1028,19 @@ namespace rapidcsv
   };
   // ]===========] workarounds in case std::apply() doesn't work as expected for a given compiler(MSVC)
 
+  /**
+   * @brief   populate a tuple from a vector of string.
+   * @tparam  S2Tconv             converter types that satisfies concept 'c_S2Tconverter'.
+   * @param   dataVec             vector of string, having string representation of numeric values.
+   * @param   colIdx              start id of dataVec in case vector starts with the column-name.
+   * @param   dataTuple           values stored in the tuple after performing string-to-value conversion.
+   */
   template <c_S2Tconverter ... S2Tconv>
   inline void GetTuple(const std::vector<std::string>& dataVec,
                        size_t colIdx,
                        std::tuple<typename S2Tconv::return_type ...>& dataTuple)
   {
+    //auto write_tuple = [&dataVec,&colIdx] (auto&& ... wrt_result) -> void   # doesnot work for msvc
     auto write_tuple = [&dataVec,&colIdx] (typename S2Tconv::return_type & ... wrt_result) -> void
     {
       //https://stackoverflow.com/questions/65261797/varadic-template-to-tuple-is-reversed
@@ -1589,8 +1623,61 @@ namespace rapidcsv
   };
 
 
+  // refer : https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0127r1.html
+  /**
+   * @brief   convert a function with signature 'auto (*CONV_S2T)(const std::string&)'
+   *          to a converter type that satisfies concept 'c_T2Sconverter'.
+   * @tparam  CONV_T2S                   a function with signature 'std::string (*CONV_T2S)(const T_V&)'.
+   *                                     T_V represents either numeric type 'T' or 'variant std::variant<T, std::string>'
+   */
+  template<auto CONV_T2S >
+  struct f_T2Sconv;
+
+  template< typename T_V, std::string (*CONV_T2S)(const T_V&) >
+  struct f_T2Sconv<CONV_T2S>
+  {
+  private:
+    /**
+     * @brief input type of function CONV_T2S
+     */
+    using _input_type = T_V;
+    /**
+     * @brief infers the underlying data-type if _input_type is an variant instance.
+     *        or it's same as input type of CONV_T2S.
+     */
+    using _value_type  = typename InferValueType<_input_type>::value_type;
+  public:
+    /**
+     * @brief a converter alias that satisfies concept 'c_T2Sconverter'
+     */
+    using conv_type = T2SwrapperFunction< _value_type, _input_type, CONV_T2S >;
+  };
+
+  //template< typename T_V, std::string (*CONV_T2S)(const T_V&) >
+  template<auto CONV_T2S >
+  using f_T2Sconv_c = typename f_T2Sconv<CONV_T2S>::conv_type;
+
+
+  /**
+   * @brief   If a 'type-C' satisfies concept 'c_T2Sconverter', then use that 'type-C';   else
+   *          assume it's a 'type-T' and bumped up using 'ConvertFromVal< type-T >' to create
+   *          a class staisfying concept 'c_T2Sconverter'.
+   *          This mechanism enables 'template-converter-algorithm' to handle both 'type-C' and
+   *          'type-T' using the same code base, (i.e. reduces code duplicity).
+   * @tparam  T_C                   T can be data-type such as int, double etc ;
+   *                                xOR  C -> Conversion class statisfying concept 'c_T2Sconverter'.
+   */
   template< typename T_C >
   struct t_T2Sconv;
+  /*
+  template< typename T_C, auto ... CONV_T2S >
+  struct t_T2Sconv;
+
+  template< auto CONV_T2S >
+  struct t_T2Sconv< void, CONV_T2S > {
+    using conv_type = f_T2Sconv_c<CONV_T2S>;
+  };
+  */
 
   template< c_NOT_T2Sconverter T >
   struct t_T2Sconv<T> {
@@ -1602,36 +1689,11 @@ namespace rapidcsv
     using conv_type = C;
   };
 
-  /**
-   * @brief   If a 'type-C' satisfies concept 'c_T2Sconverter', then use that 'type-C';   else
-   *          assume it's a 'type-T' and bumped up using 'ConvertFromVal< type-T >' to create
-   *          a class staisfying concept 'c_T2Sconverter'.
-   *          This mechanism enables template-converter-algorithm' to handle both 'type-C' and
-   *          'type-T' using the same code base, (i.e. reduces code duplicity).
-   * @tparam  T_C                   T can be data-type such as int, double etc ;
-   *                                XOR  C -> Conversion class statisfying concept 'c_T2Sconverter'.
-   */
+
+
   template< typename T_C >
   using t_T2Sconv_c = typename t_T2Sconv< T_C >::conv_type;
 
-
-  // refer : https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0127r1.html
-  template<auto CONV_T2S >
-  struct f_T2Sconv;
-
-  template< typename T_V, std::string (*CONV_T2S)(const T_V&) >
-  struct f_T2Sconv<CONV_T2S>
-  {
-  private:
-    using _input_type = T_V;
-    using _value_type  = typename InferValueType<_input_type>::value_type;
-  public:
-    using conv_type = T2SwrapperFunction< _value_type, _input_type, CONV_T2S >;
-  };
-
-  //template< typename T_V, std::string (*CONV_T2S)(const T_V&) >
-  template<auto CONV_T2S >
-  using f_T2Sconv_c = typename f_T2Sconv<CONV_T2S>::conv_type;
 
 
   // [===========[ workarounds in case std::apply() doesn't work as expected for a given compiler(MSVC)
@@ -1659,12 +1721,20 @@ namespace rapidcsv
   };
   // ]===========] workarounds in case std::apply() doesn't work as expected for a given compiler(MSVC)
 
+  /**
+   * @brief   populate a vector of string from a tuple.
+   * @tparam  T2Sconv             converter types that satisfies concept 'c_T2Sconverter'.
+   * @param   dataTuple           values stored in the tuple after performing string-to-value conversion.
+   * @param   colIdx              start id of dataVec in case vector starts with the column-name.
+   * @param   dataVec             vector of string, having string representation of numeric values.
+   */
   template <c_T2Sconverter ... T2Sconv>
   inline void SetTuple(const std::tuple<typename T2Sconv::input_type ...>& dataTuple,
                        size_t colIdx,
                        std::vector<std::string>& dataVec)
   {
     //https://stackoverflow.com/questions/42494715/c-transform-a-stdtuplea-a-a-to-a-stdvector-or-stddeque
+    //auto read_tuple = [&dataVec,&colIdx] (auto&& ... rowElem) -> void   # doesnot work for msvc
     auto read_tuple = [&dataVec,&colIdx] (typename T2Sconv::input_type const& ... rowElem) -> void
     {
       ( (dataVec.at(colIdx++) = T2Sconv::ToStr(rowElem)) , ... );

@@ -9,6 +9,12 @@ bool isFirstCellPositive(const rapidcsv::Document::t_dataRow& dataRow)
   return (std::stoi(dataRow.at(1))) >= 0;
 }
 
+// Conversion function for int data to be converted to fixed-point two decimal numbers
+int ToVal(const std::string& pStr)
+{
+  return static_cast<int>(roundf(100.0f * std::stof(pStr)));
+}
+
 
 int main()
 {
@@ -50,6 +56,12 @@ int main()
     unittest::ExpectEqual(unsigned, std::get<1>(ints), 9);
     unittest::ExpectEqual(long, std::get<2>(ints), 81);
 
+    std::tuple<int, int, int> intsP = viewdoc.GetViewRow<&ToVal, &ToVal, &ToVal>(1);
+    unittest::ExpectEqual(size_t, std::tuple_size_v<decltype(intsP)>, 3);
+    unittest::ExpectEqual(int, std::get<0>(intsP), 500);
+    unittest::ExpectEqual(int, std::get<1>(intsP), 2500);
+    unittest::ExpectEqual(int, std::get<2>(intsP), 62500);
+
     strs = viewdoc.GetViewRow_VecStr(0);
     unittest::ExpectEqual(size_t, strs.size(), 3);
     unittest::ExpectEqual(std::string, strs.at(0), "3");
@@ -62,7 +74,7 @@ int main()
 
     /////   Sort
     const rapidcsv::SortParams<int> spA(1);
-    rapidcsv::SortDocument<int> viewdoc1(doc, spA);
+    rapidcsv::SortDocument viewdoc1(doc, spA);
 
     ints = viewdoc1.GetViewRow<int, unsigned, long>(1);
     unittest::ExpectEqual(size_t, std::tuple_size_v<decltype(ints)>, 3);
@@ -97,6 +109,12 @@ int main()
     unittest::ExpectEqual(int, std::get<0>(ints), 3);
     unittest::ExpectEqual(unsigned, std::get<1>(ints), 9);
     unittest::ExpectEqual(long, std::get<2>(ints), 81);
+
+    intsP = viewdoc2.GetViewRow<&ToVal, &ToVal, &ToVal>(1);
+    unittest::ExpectEqual(size_t, std::tuple_size_v<decltype(intsP)>, 3);
+    unittest::ExpectEqual(int, std::get<0>(intsP), 700);
+    unittest::ExpectEqual(int, std::get<1>(intsP), 4900);
+    unittest::ExpectEqual(int, std::get<2>(intsP), 240100);
 
     strs = viewdoc2.GetViewRow_VecStr(0);
     unittest::ExpectEqual(size_t, strs.size(), 3);

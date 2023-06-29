@@ -34,8 +34,8 @@ namespace rapidcsv
   /**
    * @brief     Class representing sort/ordering parameters of CSV document.
    * @tparam    T_C             type info of the column to be sorted.
-   *                            T -> can be data-type such as int, double etc ;
-   *                            XOR  C -> Conversion class statisfying concept 'c_S2Tconverter'.
+   *                            T -> can be data-type such as int, double etc ; xOR
+   *                            C -> Conversion class statisfying concept 'c_S2Tconverter'.
    * @tparam    SORT_ORDER      ascending or descending order. Default ascending.
    */
   template< typename T_C,
@@ -45,9 +45,18 @@ namespace rapidcsv
     const size_t      _rawDataColumnIndex;
 
   public:
+    /**
+     * @brief       Conversion class statisfying concept 'c_S2Tconverter' for a column
+     */
     using S2Tconv_type = t_S2Tconv_c<T_C>;
-    using return_type = typename S2Tconv_type::return_type;
+    /**
+     * @brief       return-type either numeric type 'T' or 'variant std::variant<T, std::string>'
+     */
+    using return_type  = typename S2Tconv_type::return_type;
 
+    /**
+     * @brief       Sort ordering for a column (ascending or descending)
+     */
     constexpr static e_SortOrder sortOrder = SORT_ORDER;
 
     /**
@@ -97,18 +106,22 @@ namespace rapidcsv
   struct SortKeyFactory
   {
     //https://stackoverflow.com/questions/10014713/build-tuple-using-variadic-templates
+    /**
+     * @brief   set of columns/keys for sorting-ordering, the csv data.
+     */
     using t_sortKey = std::tuple<typename SPtypes::return_type ...>;
 
     /**
      * @brief   create sortKey for indexing.
      * @param   pRowData                 data row. vector<string>
-     * @returns tuple representing indexed-key to data-row.
+     * @param   sp                       sorting information, one for each ordering-column.
+     * @returns tuple representing indexed-key of data-row.
      */
     inline static t_sortKey
     createSortKey(const Document::t_dataRow& pRowData, const SPtypes& ... sp)
     {
       t_sortKey result;
-      auto write_tuple = [&pRowData, sp ... ] (auto&... wrt_result) -> void
+      auto write_tuple = [&pRowData, &sp ... ] (SPtypes::return_type & ... wrt_result) -> void
       {
         ( (wrt_result = sp.getValue(pRowData)), ... );  // comma operator ensures the element order is from left to right
       };
@@ -192,15 +205,30 @@ namespace rapidcsv
   /**
    * @brief     Class representing a CSV document view. The underlying 'Document' is viewed after
    *            applying filter and/or sort on rows, based on cell values after type-conversion.
-   *            Only intended for converter internal usage, but exposed externally
-   *            to allow specialization on datatypes.
+   *            Only intended for internal usage, but exposed externally to allow specialization on datatypes.
    */
   class _ViewDocument
   {
   protected:
+    /**
+     * @brief  underlying csv document
+     */
     const Document& _document;
+    /**
+     * @brief a reference to the data structure, which derived class of _ViewDocument can use.
+    */
     const std::vector<Document::t_dataRow>& _mData;
+    /**
+     * @brief indexes of the vector represents view-row-idx.
+     *        the values of the vector are the indexes in the data-structure of '_mData'.
+     */
     std::vector< size_t> _mapViewRowIdx2RowIdx;
+    /**
+     * @brief indexes of the vector represents the index in the data-structure of '_mData'.
+     *        the values of the vector are view-row-idx.
+     *        Since some rows in '_mData' might get filtered out and in that case would be
+     *        seen in the view,  those '_mData' indexes will have value -1 to indicate filtered out data.
+     */
     std::vector<ssize_t> _mapRowIdx2ViewRowIdx;
 
     explicit _ViewDocument(const Document& document)
@@ -226,12 +254,12 @@ namespace rapidcsv
     // TODO function and unit tests  for ARGS...
     /**
      * @brief   Get column by index.
-     * @tparam  T_C                   T can be data-type such as int, double etc ;
-     *                                XOR  C -> Conversion class statisfying concept 'c_S2Tconverter'.
+     * @tparam  T_C                   T can be data-type such as int, double etc ;  xOR
+     *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
-     * @returns vector<R> of column data, excluding the elements filtered out.
+     * @returns 'vector<R>' of column data, excluding the elements filtered out.
      *          By default, R is usually same type as T.
-     *          Else if C = ConvertFromStr_gNaN<T>, then R = std::variant<T, std::string>
+     *          Else if 'C = ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value, 
      *          else the string value which caused failure during conversion.
      */
@@ -242,7 +270,7 @@ namespace rapidcsv
       const size_t pColumnIdx = _document.GetColumnIdx(pColumnNameIdx);
       const size_t dataColumnIdx = _document._getDataColumnIndex(pColumnIdx).dataIdx;
       const size_t firstRowIdx = _document._getDataRowIndex(0).dataIdx;
-      std::vector<typename t_S2Tconv_c<T_C>::return_type > column;
+      std::vector< typename t_S2Tconv_c<T_C>::return_type > column;
       for (auto itViewRowIdx = _mapViewRowIdx2RowIdx.begin();
            itViewRowIdx != _mapViewRowIdx2RowIdx.end(); ++itViewRowIdx)
       {
@@ -267,13 +295,11 @@ namespace rapidcsv
 
     /**
      * @brief   Get column either by it's index or name.
-     * @tparam  T                     'type' converted to, from string data, using conversion function.
      * @tparam  CONV_S2T              conversion function.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
-     * @returns vector<R> of column data, excluding the elements filtered out.
+     * @returns 'vector<R>' of column data, excluding the elements filtered out.
      *          By default, R is usually same type as T.
-     *          Else if CONV_S2T is similar to function ConvertFromStr_gNaN<T>::ToVal,
-     *          then R = std::variant<T, std::string>
+     *          Else if 'CONV_S2T ≃ ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value, 
      *          else the string value which caused failure during conversion.
      */
@@ -328,7 +354,7 @@ namespace rapidcsv
      * @param   pViewRowIdx              row label name.
      * @returns zero-based row index.
      *          This is the row-index as seen in the underlying CSV file.
-     *          'out_of_range' error is thrown for invalid or filtered-out 'pViewRowIdx'.
+     *          If 'pRowName' belongs to a filtered out row, then 'out_of_range' error is thrown.
      */
     inline size_t GetDocumentRowIdx(const size_t& pViewRowIdx) const
     {
@@ -342,11 +368,13 @@ namespace rapidcsv
     // TODO function and unit tests  for ARGS...
     /**
      * @brief   Get row either by it's index or name.
-     * @tparam  T_C                   T can be data-type such as int, double etc ;
-     *                                XOR  C -> Conversion class statisfying concept 'c_S2Tconverter'.
-     * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index removing filtered rows).
-     * @returns tuple<Rs> of row data. By default, R is usually same type as T.
-     *          Else if C = ConvertFromStr_gNaN<T>, then R = std::variant<T, std::string> .
+     * @tparam  T_C                   T can be data-type such as int, double etc ;  xOR
+     *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
+     * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index after removing filtered rows).
+     * @returns 'tuple<R...>' of row data. By default, R is usually same type as T.
+     *          Else if 'C = ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *          On conversion success variant has the converted value,
+     *          else the string value which caused failure during conversion.
      *          If 'pRowName_ViewRowIdx' belongs to a filtered out row, then 'out_of_range' error is thrown.
      */
     template< typename ... T_C >
@@ -358,10 +386,27 @@ namespace rapidcsv
     }
 
     /**
-     * @brief   Get row by name.
-     * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index removing filtered rows).
-     * @returns vector<string> of row data from view.
-     *          'out_of_range' error is thrown for invalid or filtered-out 'pRowName_ViewRowIdx'.
+     * @brief   Get row either by it's index or name.
+     * @tparam  CONV_S2T              conversion function of type 'R (*CONV_S2T)(const std::string&)'.
+     * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index after removing filtered rows).
+     * @returns 'tuple<R...>' of row data. By default, R is usually same type as T.
+     *          Else if 'CONV_S2T ≃ ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
+     *          On conversion success variant has the converted value,
+     *          else the string value which caused failure during conversion.
+     *          If 'pRowName_ViewRowIdx' belongs to a filtered out row, then 'out_of_range' error is thrown.
+     */
+    template< auto ... CONV_S2T >
+    inline std::tuple< typename f_S2Tconv_c< CONV_S2T >::return_type ... >
+    GetViewRow(const c_sizet_or_string auto& pRowName_ViewRowIdx) const
+    {
+      return GetViewRow< f_S2Tconv_c< CONV_S2T >... >(pRowName_ViewRowIdx);
+    }
+
+    /**
+     * @brief   Get row either by it's index or name.
+     * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index after removing filtered rows).
+     * @returns 'vector<string>' of row data from view.
+     *          If 'pRowName_ViewRowIdx' belongs to a filtered out row, then 'out_of_range' error is thrown.
      */
     inline std::vector<std::string>
     GetViewRow_VecStr(const c_sizet_or_string auto& pRowName_ViewRowIdx) const
@@ -370,34 +415,18 @@ namespace rapidcsv
       return _document.GetRow_VecStr(docRowIdx);
     }
 
-/*
-    NOTE: the code below doesn't compile, nor is it a good idea to
-          have two variadic lists of T's and CONV_S2T's.
-
-          Alternatively, if needed explicitly call using template 'S2TwrapperFunction<T, CONV_S2T>'
-          GetRow< S2TwrapperFunction<T, CONV_S2T> , ... >(pRowName_ViewRowIdx);
-
-          usage details refer test063.cpp
-
-    template< typename ... T, auto ... (*CONV_S2T)(const std::string&) >
-    inline std::vector< typename std::invoke_result_t< decltype(CONV_S2T),
-                                                       const std::string&
-                                                     >...
-                      >
-    GetViewRow(const c_sizet_or_string auto& pRowName_ViewRowIdx) const
-    {
-      return GetViewRow< S2TwrapperFunction<T, CONV_S2T>... >(pRowName_ViewRowIdx);
-    }
-*/
-
     // TODO function and unit tests  for ARGS...
     /**
      * @brief   Get cell by column index and row-name/zero-based-row-view-index.
-     * @tparam  T_C                   T can be data-type such as int, double etc ;
-     *                                XOR  C -> Conversion class statisfying concept 'c_S2Tconverter'.
+     * @tparam  T_C                   T can be data-type such as int, double etc ;  xOR
+     *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
      * @param   pColumnNameIdx        column-name or zero-based column index.
-     * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index removing filtered rows).
-     * @returns cell data.
+     * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index after removing filtered rows).
+     * @returns cell data of type R. By default, R is usually same type as T.
+     *          Else if 'C ≃ ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *          On conversion success variant has the converted value,
+     *          else the string value which caused failure during conversion.
+     *          If 'pRowName_ViewRowIdx' belongs to a filtered out row, then 'out_of_range' error is thrown.
      */
     template< typename T_C >
     inline typename t_S2Tconv_c<T_C>::return_type
@@ -411,20 +440,21 @@ namespace rapidcsv
 
     /**
      * @brief   Get cell by column index and row-name/zero-based-row-view-index.
-     * @tparam  T                     'type' converted to, from string data, using conversion function.
      * @tparam  CONV_S2T              conversion function.
      * @param   pColumnNameIdx        column-name or zero-based column index.
-     * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index removing filtered rows).
-     * @returns cell data.
+     * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index after removing filtered rows).
+     * @returns cell data of type R. By default, R is usually same type as T.
+     *          Else if 'CONV_S2T ≃ ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
+     *          On conversion success variant has the converted value,
+     *          else the string value which caused failure during conversion.
+     *          If 'pRowName_ViewRowIdx' belongs to a filtered out row, then 'out_of_range' error is thrown.
      */
-    template< typename T, auto (*CONV_S2T)(const std::string&) >
-    inline typename std::invoke_result_t< decltype(CONV_S2T),
-                                          const std::string&
-                                        >
+    template< auto (*CONV_S2T)(const std::string&) >
+    inline typename f_S2Tconv_c< CONV_S2T >::return_type
     GetViewCell(const c_sizet_or_string auto& pColumnNameIdx,
 	              const c_sizet_or_string auto& pRowName_ViewRowIdx) const
     {
-      return GetViewCell< S2TwrapperFunction<T, CONV_S2T> >( pColumnNameIdx, pRowName_ViewRowIdx);
+      return GetViewCell< f_S2Tconv_c< CONV_S2T > >( pColumnNameIdx, pRowName_ViewRowIdx);
     }
   };
 
@@ -443,7 +473,8 @@ namespace rapidcsv
   public:
 
     /**
-     * @brief   Constructor
+     * @brief   Constructor. After excluding the rows as defined by 'evaluateBooleanExpression',
+     *          creates bi-directional map between view-rows and actual-csv-rows.
      * @param   document               'Document' object with CSV data.
      */
     explicit FilterDocument(const Document& document)
@@ -467,13 +498,35 @@ namespace rapidcsv
     }
   };
 
+/*  not needed
+  template< typename T_SP,
+            e_SortOrder SORT_ORDER = e_SortOrder::ASCEND >
+  struct t_SPpromo;
+
+  //template< c_SortParams SP >
+  template< typename T_C, e_SortOrder SORT_ORDER >
+  struct t_SPpromo< SortParams<T_C, SORT_ORDER>,
+                    SORT_ORDER
+                  > {
+    using sortparams_type = SortParams<T_C, SORT_ORDER>;
+  };
+
+  template< c_NOT_SortParams T,
+            e_SortOrder SORT_ORDER >
+  struct t_SPpromo<T, SORT_ORDER> {
+    using sortparams_type = SortParams<T,SORT_ORDER>;
+  };
+*/
+
   /**
-   * @brief     Class representing a CSV document filtered-view. The underlying 'Document' is viewed after
-   *            applying filter on rows, based on cell values after type-conversion, and rows sorted by SPtypes.
-   *            Only intended for internal usage, but exposed externally (thru 'FilterSortDocument')
+   * @brief     Class representing a CSV document filtered-sort-view. The underlying 'Document' is viewed after
+   *            applying filter on rows and then sorted on minimum one column, based on cell values after type-conversion.
+   * @tparam    evaluateBooleanExpression         boolean function which determines row filtering.
+   * @tparam    SPtypes                           variadic list of SortParams satisfying concept 'c_SortParams',
+   *                                              one for each column to be sorted.
    */
   template<f_EvalBoolExpr evaluateBooleanExpression, c_SortParams ... SPtypes>
-  class _FilterSortDocument : public _ViewDocument
+  class FilterSortDocument : public _ViewDocument
   {
   private:
     using t_sortPredicate = _RowComparator<SPtypes ...>;
@@ -483,8 +536,8 @@ namespace rapidcsv
     std::map<t_sortKey, size_t,
              t_sortPredicate > _sortedData;
 
-  protected:
-    explicit _FilterSortDocument(const Document& document, const SPtypes& ... spArgs)
+  public:
+    explicit FilterSortDocument(const Document& document, const SPtypes& ... spArgs)
       : _ViewDocument(document), _sortPredicate(), _sortedData(_sortPredicate)
     {
       size_t rowIdx = 0;
@@ -511,15 +564,16 @@ namespace rapidcsv
       }
     }
 
-  public:
     /**
      * @brief   Get row either by it's index or name.
-     * @tparam  T_C                   T can be data-type such as int, double etc ;
-     *                                XOR  C -> Conversion class statisfying concept 'c_S2Tconverter'.
+     * @tparam  T_C                   T can be data-type such as int, double etc ;  xOR
+     *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
      * @param   pRowKey               tuple representing indexed-key to data-row.
-     * @returns tuple<Rs> of row data. By default, R is usually same type as T.
-     *          Else if C = ConvertFromStr_gNaN<T>, then R = std::variant<T, std::string> .
-     *          If 'pRowName_ViewRowIdx' belongs to a filtered out row, then 'out_of_range' error is thrown.
+     * @returns tuple<R...> of row data. By default, R is usually same type as T.
+     *          Else if 'C = ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *          On conversion success variant has the converted value,
+     *          else the string value which caused failure during conversion.
+     *          If 'pRowKey' belongs to a filtered out row, then 'out_of_range' error is thrown.
      */
     template< typename ... T_C >
     std::tuple<typename t_S2Tconv_c<T_C>::return_type ...>
@@ -530,7 +584,7 @@ namespace rapidcsv
         docRowIdx  = _sortedData.at(pRowKey);
       } catch (std::out_of_range& err) {
         throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+" : FilterSortDocument::GetOrderedRow() : "
-              +" rowKey not found in 'sortedKeyMap'. For pRowKey="
+              +"rowKey not found in 'sortedKeyMap'. For pRowKey="
               +ConvertFromTuple<typename SPtypes::S2Tconv_type::return_type ...>::ToStr(pRowKey) + " : ERROR: " + err.what());
       }
       return _document.GetRow< t_S2Tconv_c<T_C> ... >(docRowIdx);
@@ -538,8 +592,25 @@ namespace rapidcsv
 
     /**
      * @brief   Get row either by it's index or name.
+     * @tparam  CONV_S2T              conversion function of type 'R (*CONV_S2T)(const std::string&)'.
+     * @param   pRowNameIdx           row-name or zero-based row index.
+     * @returns 'tuple<R...>' of row data. By default, R is usually same type as T.
+     *          Else if 'CONV_S2T ≃ ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
+     *          On conversion success variant has the converted value,
+     *          else the string value which caused failure during conversion.
+     *          If 'pRowKey' belongs to a filtered out row, then 'out_of_range' error is thrown.
+     */
+    template< auto ... CONV_S2T >
+    inline std::tuple< typename f_S2Tconv_c< CONV_S2T >::return_type... >
+    GetOrderedRow(const typename SortKeyFactory<SPtypes ...>::t_sortKey& pRowKey) const
+    {
+      return GetOrderedRow< f_S2Tconv_c< CONV_S2T >... >(pRowKey);
+    }
+
+    /**
+     * @brief   Get row either by it's index or name.
      * @param   pRowKey               tuple representing indexed-key to data-row.
-     * @returns vector<std::string> of row data
+     * @returns 'vector<std::string>' of row data
      *          If 'pRowKey' belongs to a filtered out row, then 'out_of_range' error is thrown.
      */
     inline std::vector<std::string>
@@ -550,31 +621,11 @@ namespace rapidcsv
         docRowIdx  = _sortedData.at(pRowKey);
       } catch (std::out_of_range& err) {
         throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+" : FilterSortDocument::GetOrderedRow_VecStr() : "
-              +" rowKey not found in 'sortedKeyMap'. For pRowKey="
+              +"rowKey not found in 'sortedKeyMap'. For pRowKey="
               +ConvertFromTuple<typename SPtypes::S2Tconv_type::return_type ...>::ToStr(pRowKey) + " : ERROR: " + err.what());
       }
       return _document.GetRow_VecStr(docRowIdx);
     }
-
-/*
-    NOTE: the code below doesn't compile, nor is it a good idea to
-          have two variadic lists of T's and CONV_S2T's.
-
-          Alternatively, if needed explicitly call using template 'S2TwrapperFunction<T, CONV_S2T>'
-          GetRow< S2TwrapperFunction<T, CONV_S2T> , ... >(pRowNameIdx);
-
-          usage details refer test063.cpp
-
-    template< typename ... T, auto ... (*CONV_S2T)(const std::string&) >
-    inline std::tuple< typename std::invoke_result_t< decltype(CONV_S2T),
-                                                      const std::string&
-                                                   >...
-                     >
-    GetOrderedRow(const typename SortKeyFactory<SPtypes ...>::t_sortKey& pRowKey) const
-    {
-      return GetOrderedRow< S2TwrapperFunction<T, CONV_S2T>... >(pRowKey);
-    }
-*/
 
     /**
      * @brief   Get cell either by it's index or name.
@@ -583,7 +634,7 @@ namespace rapidcsv
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pRowKey               tuple representing indexed-key to data-row.
      * @returns cell data of type R. By default, R is usually same type as T.
-     *          Else if C = ConvertFromStr_gNaN<T>, then R = std::variant<T, std::string>
+     *          Else if 'C = ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value, 
      *          else the string value which caused failure during conversion.
      *          If 'pRowKey' belongs to a filtered out row, then 'out_of_range' error is thrown.
@@ -598,8 +649,8 @@ namespace rapidcsv
       try {
         docRowIdx  = _sortedData.at(pRowKey);
       } catch (std::out_of_range& err) {
-        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+" :FilterSortDocument::GetOrderedCell() : "
-              +" rowKey not found in 'sortedKeyMap'. For pRowKey="
+        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+" : FilterSortDocument::GetOrderedCell() : "
+              +"rowKey not found in 'sortedKeyMap'. For pRowKey="
               +ConvertFromTuple<typename SPtypes::S2Tconv_type::return_type ...>::ToStr(pRowKey) + " : ERROR: " + err.what());
       }
       return _document.GetCell< t_S2Tconv_c<T_C> >(pColumnIdx, docRowIdx);
@@ -612,7 +663,7 @@ namespace rapidcsv
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pRowKey               tuple representing indexed-key to data-row.
      * @returns cell data of type R. By default, R is usually same type as T.
-     *          Else if C = ConvertFromStr_gNaN<T>, then R = std::variant<T, std::string>
+     *          Else if 'CONV_S2T ≃ ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value, 
      *          else the string value which caused failure during conversion.
      *          If 'pRowKey' belongs to a filtered out row, then 'out_of_range' error is thrown.
@@ -628,45 +679,6 @@ namespace rapidcsv
     }
   };
 
-  // https://stackoverflow.com/questions/68058640/using-concepts-to-select-class-template-specialization?rq=3
-  template<f_EvalBoolExpr evaluateBooleanExpression, typename ... T>
-  class FilterSortDocument;
-
-
-  /**
-   * @brief     Class representing a CSV document filtered-sort-view. The underlying 'Document' is viewed after
-   *            applying filter on rows and then sorted on minimum one column, based on cell values after type-conversion.
-   * @tparam    evaluateBooleanExpression         boolean function which determines row filtering.
-   * @tparam    SPtypes                           variadic list of SortParams satisfying concept 'c_SortParams',
-   *                                              one for each column to be sorted.
-   */
-  template<f_EvalBoolExpr evaluateBooleanExpression, c_SortParams ... SPtypes>
-  class FilterSortDocument <evaluateBooleanExpression, SPtypes...>     // IMPORTANT specialization declaration
-           : public _FilterSortDocument<evaluateBooleanExpression, SPtypes...>
-  {
-  public:
-    explicit FilterSortDocument(const Document& document, const SPtypes& ... spArgs)
-      : _FilterSortDocument<evaluateBooleanExpression, SPtypes...>(document, spArgs ...)
-    {}
-  };
-
-  /**
-   * @brief     Class representing a CSV document filtered-sort-view. The underlying 'Document' is viewed after
-   *            applying filter on rows and then sorted on minimum one column, based on cell values after type-conversion.
-   * @tparam    evaluateBooleanExpression         boolean function which determines row filtering.
-   * @tparam    T                                 variadic list of data-types such as int, double etc;
-   *                                              one for each column to be sorted.
-   */
-  template<f_EvalBoolExpr evaluateBooleanExpression, c_NOT_SortParams ... T>
-  class FilterSortDocument <evaluateBooleanExpression, T...>     // IMPORTANT specialization declaration
-           : public _FilterSortDocument<evaluateBooleanExpression, SortParams<T>...>
-  {
-  public:
-    explicit FilterSortDocument(const Document& document, const SortParams<T>& ... spArgs)
-      : _FilterSortDocument<evaluateBooleanExpression, SortParams<T>...>(document, spArgs ...)
-    {}
-  };
-
 
 
   constexpr bool selectAll(const Document::t_dataRow&) { return true; }
@@ -674,11 +686,9 @@ namespace rapidcsv
   /**
    * @brief     Class representing a CSV document sort-view. The underlying 'Document' is viewed after
    *            applying sorting on minimum one column, based on cell values after type-conversion.
-   * @tparam  T_S                   variadic list of types.
-   *                                T can be data-type such as int, double etc ;
-   *                                XOR  S -> Conversion class statisfying concept 'c_SortParams'.
-   *                                one for each column to be sorted.
+   * @tparam    SPtypes                           variadic list of SortParams satisfying concept 'c_SortParams',
+   *                                              one for each column to be sorted.
    */
-  template<typename ... T_S>
-  using SortDocument = FilterSortDocument<selectAll, T_S ...>;
+  template<c_SortParams ... SPtypes>
+  using SortDocument = FilterSortDocument<selectAll, SPtypes ...>;
 }
