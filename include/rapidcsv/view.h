@@ -70,6 +70,10 @@ namespace rapidcsv
     /**
      * @brief   Gets cell-data(convertedfrom string) from Data-row.
      * @param   pRowData                 data row. vector<string>
+     * @returns cell data of type R. By default, R is usually same type as T.
+     *          Else if 'CONV_S2T ≃ ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
+     *          On conversion success variant has the converted value,
+     *          else the string value which caused failure during conversion.
      */
     inline typename S2Tconv_type::return_type
     getValue(const Document::t_dataRow& pRowData) const
@@ -121,7 +125,7 @@ namespace rapidcsv
     createSortKey(const Document::t_dataRow& pRowData, const SPtypes& ... sp)
     {
       t_sortKey result;
-      auto write_tuple = [&pRowData, &sp ... ] (SPtypes::return_type & ... wrt_result) -> void
+      auto write_tuple = [&pRowData, &sp ... ] (typename SPtypes::return_type & ... wrt_result) -> void
       {
         ( (wrt_result = sp.getValue(pRowData)), ... );  // comma operator ensures the element order is from left to right
       };
@@ -537,6 +541,13 @@ namespace rapidcsv
              t_sortPredicate > _sortedData;
 
   public:
+
+    /**
+     * @brief   Constructor. After excluding the rows as defined by 'evaluateBooleanExpression',
+     *          and sorting the rows based on SortPrams;
+     *          creates bi-directional map between view-rows and actual-csv-rows.
+     * @param   document               'Document' object with CSV data.
+     */
     explicit FilterSortDocument(const Document& document, const SPtypes& ... spArgs)
       : _ViewDocument(document), _sortPredicate(), _sortedData(_sortPredicate)
     {
@@ -610,7 +621,7 @@ namespace rapidcsv
     /**
      * @brief   Get row either by it's index or name.
      * @param   pRowKey               tuple representing indexed-key to data-row.
-     * @returns 'vector<std::string>' of row data
+     * @returns 'vector<std::string>' of row data.
      *          If 'pRowKey' belongs to a filtered out row, then 'out_of_range' error is thrown.
      */
     inline std::vector<std::string>
@@ -629,8 +640,8 @@ namespace rapidcsv
 
     /**
      * @brief   Get cell either by it's index or name.
-     * @tparam  T_C                   T can be data-type such as int, double etc ;
-     *                                XOR  C -> Conversion class statisfying concept 'c_S2Tconverter'.
+     * @tparam  T_C                   T can be data-type such as int, double etc ;    xOR
+     *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pRowKey               tuple representing indexed-key to data-row.
      * @returns cell data of type R. By default, R is usually same type as T.
@@ -658,7 +669,6 @@ namespace rapidcsv
 
     /**
      * @brief   Get cell either by it's index or name.
-     * @tparam  T                     'type' converted to, from string data, using conversion function.
      * @tparam  CONV_S2T              conversion function.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pRowKey               tuple representing indexed-key to data-row.

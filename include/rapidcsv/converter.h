@@ -1746,7 +1746,8 @@ namespace rapidcsv
   /**
    * @brief   Convertor class implementation for tuple type, with underlying elements(of different types)
    *          individually converted to string.
-   * @tparam  T_C           can be data-type such as int, double etc ;  XOR  C -> can be type of 'T2Sconverter'
+   * @tparam  T_C                   T can be data-type such as int, double etc ;     xOR
+   *                                C -> Conversion class statisfying concept 'c_T2Sconverter'.
    */
   template< typename ... T_C >
   struct ConvertFromTuple

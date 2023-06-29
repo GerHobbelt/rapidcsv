@@ -73,7 +73,8 @@ GetCell (const c_sizet_or_string auto & pColumnNameIdx,
          const c_sizet_or_string auto & pRowNameIdx)
 ```
 Get cell either by it's index or name. 
-Template Parameters:
+
+**Template Parameters**
 - `CONV_S2T`   conversion function. 
 
 **Parameters**

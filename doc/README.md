@@ -7,6 +7,7 @@ The following classes makes up the Rapidcsv interface:
  - [class rapidcsv::ConvertFromStr_gNaN< T, S2T_FORMAT >](doc/converter/rapidcsv_ConvertFromStr_gNaN.md)
  - [class rapidcsv::ConvertFromVal< T, T2S_FORMAT >](doc/converter/rapidcsv_ConverterToVal.md)
  - [class rapidcsv::ConvertFromVal_gNaN< T, T2S_FORMAT >](doc/converter/rapidcsv_ConvertFromVal_gNaN.md)
+ - [class rapidcsv::ConvertFromTuple< T_C >](doc/converter/rapidcsv_ConvertFromTuple.md)
 
  ## CSV Document classes
  - [class rapidcsv::Document](doc/document/rapidcsv_Document.md)
@@ -15,3 +16,9 @@ The following classes makes up the Rapidcsv interface:
  - [class rapidcsv::LineReaderParams](doc/document/rapidcsv_LineReaderParams.md)
 
  ## View classes
+ - [class rapidcsv::SortParams](doc/view/rapidcsv_SortParams.md)
+ - [class rapidcsv::SortKeyFactory](doc/view/rapidcsv_SortKeyFactory.md)
+ - [class rapidcsv::_RowComparator](doc/view/rapidcsv__RowComparator.md)
+ - [class rapidcsv::_ViewDocument](doc/view/rapidcsv__ViewDocument.md)
+ - [class rapidcsv::FilterDocument](doc/view/rapidcsv_FilterDocument.md)
+ - [class rapidcsv::FilterSortDocument](doc/view/rapidcsv_FilterSortDocument.md)
