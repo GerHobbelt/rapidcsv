@@ -55,7 +55,7 @@ int main()
 
     /////   Sort
     const rapidcsv::SortParams<int> spA(0);
-    rapidcsv::SortDocument viewdoc1(doc, spA);
+    rapidcsv::SortDocument<decltype(spA)> viewdoc1(doc, spA);   // `<decltype(spA)>` mandatory for clang
 
     unittest::ExpectEqual(size_t, viewdoc1.GetViewRowCount(), 7);
 

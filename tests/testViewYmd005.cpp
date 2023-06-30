@@ -47,7 +47,7 @@ int main()
 
     /////   Sort
     const rapidcsv::SortParams<rdb::year_month_day> spA(0);
-    rapidcsv::SortDocument viewdoc1(doc, spA);
+    rapidcsv::SortDocument<decltype(spA)> viewdoc1(doc, spA);   // `<decltype(spA)>` mandatory for clang
 
     strs = viewdoc1.GetViewRow_VecStr(0);
     unittest::ExpectEqual(size_t, strs.size(), 6);

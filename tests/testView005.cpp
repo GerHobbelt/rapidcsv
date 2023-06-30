@@ -74,7 +74,7 @@ int main()
 
     /////   Sort
     const rapidcsv::SortParams<int> spA(1);
-    rapidcsv::SortDocument viewdoc1(doc, spA);
+    rapidcsv::SortDocument<decltype(spA)> viewdoc1(doc, spA);   // `<decltype(spA)>` mandatory for clang
 
     ints = viewdoc1.GetViewRow<int, unsigned, long>(1);
     unittest::ExpectEqual(size_t, std::tuple_size_v<decltype(ints)>, 3);
