@@ -15,8 +15,8 @@ Class representing a CSV document filtered-sort-view. The underlying 'Document' 
 ```c++
 template<typename T_C >
 t_S2Tconv_c<T_C>::return_type
-GetOrderedCell (const c_sizet_or_string auto & pColumnNameIdx,
-                const t_sortKey & pRowKey)
+GetCell_IndexKey (const c_sizet_or_string auto & pColumnNameIdx,
+                  const t_sortKey & pRowKey)
 ```
 Get cell either by it's index or name. 
 
@@ -40,8 +40,8 @@ Get cell either by it's index or name.
 ```c++
 template<typename T , auto(*)(const std::string &) CONV_S2T>
 std::invoke_result_t< decltype(CONV_S2T), const std::string& >
-GetOrderedCell (const c_sizet_or_string auto & pColumnNameIdx,
-                const t_sortKey & pRowKey)
+GetCell_IndexKey (const c_sizet_or_string auto & pColumnNameIdx,
+                  const t_sortKey & pRowKey)
 ```
 Get cell either by it's index or name. 
 
@@ -64,7 +64,7 @@ Get cell either by it's index or name.
 ```c++
 template<typename ... T_C>
 std::tuple<typename t_S2Tconv_c<T_C>::return_type ...>
-GetOrderedRow (const typename SortKeyFactory< SPtypes ... >::t_sortKey & pRowKey)
+GetRow_IndexKey (const typename SortKeyFactory< SPtypes ... >::t_sortKey & pRowKey)
 ```
 Get row either by it's index or name. 
 
@@ -87,7 +87,7 @@ Get row either by it's index or name.
 ```c++
 template<auto ... CONV_S2T>
 std::tuple< typename f_S2Tconv_c< CONV_S2T >::return_type... >
-GetOrderedRow (const typename SortKeyFactory< SPtypes ... >::t_sortKey & pRowKey)
+GetRow_IndexKey (const typename SortKeyFactory< SPtypes ... >::t_sortKey & pRowKey)
 ```
 Get row either by it's index or name. 
 
@@ -95,7 +95,7 @@ Get row either by it's index or name.
 - `CONV_S2T`   conversion function of type 'R (*CONV_S2T)(const std::string&)'. 
 
 **Parameters**
-- `pRowNameIdx` row-name or zero-based row index. 
+- `pRowKey` tuple representing indexed-key to data-row. 
 
 **Returns:**
 - *`tuple<R...>`* of row data. By default, R is usually same type as T. <br>
@@ -107,7 +107,8 @@ Get row either by it's index or name.
 ---
 
 ```c++
-std::vector<std::string> GetOrderedRow_VecStr (const typename SortKeyFactory< SPtypes ... >::t_sortKey & pRowKey)
+std::vector<std::string>
+GetRow_IndexKey_VecStr (const typename SortKeyFactory< SPtypes ... >::t_sortKey & pRowKey)
 ```
 Get row either by it's index or name. 
 

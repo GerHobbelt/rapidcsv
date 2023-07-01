@@ -54,9 +54,9 @@ int main()
 
       rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0),
                              rapidcsv::SeparatorParams(';' /* pSeparator */));
-      unittest::ExpectEqual(float, doc.GetCell<&rapidcsv::ConvertFromStr<float COMMA deLocal_iss>::ToVal>("A", "2"), 0.1f);
-      unittest::ExpectEqual(float, doc.GetCell<&rapidcsv::ConvertFromStr<float COMMA deLocal_iss>::ToVal>("B", "2"), 0.01f);
-      unittest::ExpectEqual(float, doc.GetCell<&rapidcsv::ConvertFromStr<float COMMA deLocal_iss>::ToVal>("C", "2"), 0.001f);
+      unittest::ExpectEqual(float, doc.GetCell<rapidcsv::ConvertFromStr<float COMMA deLocal_iss>>("A", "2"), 0.1f);
+      unittest::ExpectEqual(float, doc.GetCell<rapidcsv::ConvertFromStr<float COMMA deLocal_iss>>("B", "2"), 0.01f);
+      unittest::ExpectEqual(float, doc.GetCell<rapidcsv::ConvertFromStr<float COMMA deLocal_iss>>("C", "2"), 0.001f);
 
       unittest::DeleteFile(path);
     }
@@ -73,9 +73,9 @@ int main()
       rapidcsv::LabelParams labelParams(0, 0);
       rapidcsv::SeparatorParams separatorParams;
       rapidcsv::Document doc(path, labelParams, separatorParams);
-      unittest::ExpectEqual(float, doc.GetCell<&rapidcsv::ConvertFromStr<float COMMA rapidcsv::S2T_Format_StreamAsIs>::ToVal>("A", "2"), 0.1f);
-      unittest::ExpectEqual(float, doc.GetCell<&rapidcsv::ConvertFromStr<float COMMA rapidcsv::S2T_Format_StreamAsIs>::ToVal>("B", "2"), 0.01f);
-      unittest::ExpectEqual(float, doc.GetCell<&rapidcsv::ConvertFromStr<float COMMA rapidcsv::S2T_Format_StreamAsIs>::ToVal>("C", "2"), 0.001f);
+      unittest::ExpectEqual(float, doc.GetCell<rapidcsv::ConvertFromStr<float COMMA rapidcsv::S2T_Format_StreamAsIs>>("A", "2"), 0.1f);
+      unittest::ExpectEqual(float, doc.GetCell<rapidcsv::ConvertFromStr<float COMMA rapidcsv::S2T_Format_StreamAsIs>>("B", "2"), 0.01f);
+      unittest::ExpectEqual(float, doc.GetCell<rapidcsv::ConvertFromStr<float COMMA rapidcsv::S2T_Format_StreamAsIs>>("C", "2"), 0.001f);
 
       unittest::DeleteFile(path);
     }

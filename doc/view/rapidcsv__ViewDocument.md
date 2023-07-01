@@ -46,7 +46,11 @@ Get cell by column index and row-name/zero-based-row-view-index.
 
 **Parameters**
 - `pColumnNameIdx` column-name or zero-based column index. 
-- `pRowName_ViewRowIdx` row-name or zero-based row-view-index(i.e index after removing filtered rows). 
+- `pRowName_ViewRowIdx` row-name or zero-based row-view-index(i.e index after removing filtered rows and/or sorting the csv-rows). <br>
+                    'FilterDocument' excludes the elements filtered out. <br>
+                    'SortDocument' sorts the elements by order defined. <br>
+                    'FilterSortDocument' excludes the elements filtered out, <br>
+                                        and sorts the remaining elements by order defined.
 
 **Returns:**
 - cell data of type R. By default, R is usually same type as T. <br>
@@ -70,7 +74,11 @@ Get cell by column index and row-name/zero-based-row-view-index.
 
 **Parameters**
 - `pColumnNameIdx` column-name or zero-based column index. 
-- `pRowName_ViewRowIdx` row-name or zero-based row-view-index(i.e index after removing filtered rows). 
+- `pRowName_ViewRowIdx` row-name or zero-based row-view-index(i.e index after removing filtered rows and/or sorting the csv-rows). <br>
+                    'FilterDocument' excludes the elements filtered out. <br>
+                    'SortDocument' sorts the elements by order defined. <br>
+                    'FilterSortDocument' excludes the elements filtered out, <br>
+                                        and sorts the remaining elements by order defined.
 
 **Returns:**
 - cell data of type R. By default, R is usually same type as T. <br>
@@ -96,7 +104,11 @@ Get column by index.
 - `pColumnNameIdx` column-name or zero-based column-index. 
 
 **Returns:**
-- *`vector<R>`* of column data, excluding the elements filtered out. <br>
+- *`vector<R>`* of column data. <br>
+                    'FilterDocument' excludes the elements filtered out. <br>
+                    'SortDocument' sorts the elements by order defined. <br>
+                    'FilterSortDocument' excludes the elements filtered out, <br>
+                                        and sorts the remaining elements by order defined. <br>
  By default, R is usually same type as T. <br>
  Else if *`C ≃ ConvertFromStr_gNaN<T>`*, then *`R = std::variant<T, std::string>`*. <br>
  On conversion success variant has the converted value, <br>
@@ -118,7 +130,11 @@ Get column either by it's index or name.
 - `pColumnNameIdx` column-name or zero-based column-index. 
 
 **Returns:**
-- *`vector<R>`* of column data, excluding the elements filtered out. <br>
+- *`vector<R>`* of column data. <br>
+                    'FilterDocument' excludes the elements filtered out. <br>
+                    'SortDocument' sorts the elements by order defined. <br>
+                    'FilterSortDocument' excludes the elements filtered out, <br>
+                                        and sorts the remaining elements by order defined. <br>
  By default, R is usually same type as T. <br>
  Else if *`CONV_S2T ≃ ConvertFromStr_gNaN<T>::ToVal`*, then *`R = std::variant<T, std::string>`*. <br>
  On conversion success variant has the converted value, <br>
@@ -138,7 +154,11 @@ Get row either by it's index or name.
             C -> Conversion class statisfying concept 'c_S2Tconverter'. 
 
 **Parameters**
-- `pRowName_ViewRowIdx` row-name or zero-based row-view-index(i.e index after removing filtered rows). 
+- `pRowName_ViewRowIdx` row-name or zero-based row-view-index(i.e index after removing filtered rows and/or sorting the csv-rows). <br>
+                    'FilterDocument' excludes the elements filtered out. <br>
+                    'SortDocument' sorts the elements by order defined. <br>
+                    'FilterSortDocument' excludes the elements filtered out, <br>
+                                        and sorts the remaining elements by order defined.
 
 **Returns:**
 - *`tuple<R...>`* of row data. By default, R is usually same type as T. <br>
@@ -160,7 +180,11 @@ Get row either by it's index or name.
 - `CONV_S2T`   conversion function of type 'R (*CONV_S2T)(const std::string&)'. 
 
 **Parameters**
-- `pRowName_ViewRowIdx` row-name or zero-based row-view-index(i.e index after removing filtered rows). 
+- `pRowName_ViewRowIdx` row-name or zero-based row-view-index(i.e index after removing filtered rows and/or sorting the csv-rows). <br>
+                    'FilterDocument' excludes the elements filtered out. <br>
+                    'SortDocument' sorts the elements by order defined. <br>
+                    'FilterSortDocument' excludes the elements filtered out, <br>
+                                        and sorts the remaining elements by order defined.
 
 **Returns:**
 - *`tuple<R...>`* of row data. By default, R is usually same type as T. <br>
@@ -177,7 +201,11 @@ std::vector<std::string> GetViewRow_VecStr (const c_sizet_or_string auto & pRowN
 Get row either by it's index or name. 
 
 **Parameters**
-- `pRowName_ViewRowIdx` row-name or zero-based row-view-index(i.e index after removing filtered rows). 
+- `pRowName_ViewRowIdx` row-name or zero-based row-view-index(i.e index after removing filtered rows and/or sorting the csv-rows). <br>
+                    'FilterDocument' excludes the elements filtered out. <br>
+                    'SortDocument' sorts the elements by order defined. <br>
+                    'FilterSortDocument' excludes the elements filtered out, <br>
+                                        and sorts the remaining elements by order defined.
 
 **Returns:**
 - `vector<string>` of row data from view. <br>

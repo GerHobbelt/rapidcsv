@@ -29,17 +29,17 @@ int main()
     unittest::ExpectEqual(char, doc.GetCell<char>(0, 0), '-');
     unittest::ExpectEqual(char, doc.GetCell<char>(1, 0), 'A');
     unittest::ExpectEqual(char, doc.GetCell<char>(2, 0), 'B');
-    unittest::ExpectEqual(char, doc.GetCell<&rapidcsv::ConvertFromStr<char COMMA rapidcsv::S2T_Format_StreamAsIs>::ToVal>(3, 0), 'C');
+    unittest::ExpectEqual(char, doc.GetCell< rapidcsv::ConvertFromStr<char COMMA rapidcsv::S2T_Format_StreamAsIs> >(3, 0), 'C');
 
     unittest::ExpectEqual(int, doc.GetCell<int>(0, 1), 1);
     unittest::ExpectEqual(int, doc.GetCell<int>(1, 1), 3);
     unittest::ExpectEqual(int, doc.GetCell<int>(2, 1), 9);
-    unittest::ExpectEqual(int, doc.GetCell<&rapidcsv::ConvertFromStr<int COMMA rapidcsv::S2T_Format_StreamAsIs>::ToVal>(3, 1), 81);
+    unittest::ExpectEqual(int, doc.GetCell< rapidcsv::ConvertFromStr<int COMMA rapidcsv::S2T_Format_StreamAsIs> >(3, 1), 81);
 
     unittest::ExpectEqual(unsigned int, doc.GetCell<unsigned int>(0, 2), 2);
     unittest::ExpectEqual(unsigned int, doc.GetCell<unsigned int>(1, 2), 4);
     unittest::ExpectEqual(unsigned int, doc.GetCell<unsigned int>(2, 2), 16);
-    unittest::ExpectEqual(unsigned int, doc.GetCell<&rapidcsv::ConvertFromStr<unsigned int COMMA rapidcsv::S2T_Format_StreamAsIs>::ToVal>(3, 2), 256);
+    unittest::ExpectEqual(unsigned int, doc.GetCell< rapidcsv::ConvertFromStr<unsigned int COMMA rapidcsv::S2T_Format_StreamAsIs> >(3, 2), 256);
 
     unittest::ExpectEqual(std::string, doc.GetCell<std::string>(0, 3), "text");
     unittest::ExpectEqual(std::string, doc.GetCell<std::string>(1, 3), "quoted text");
@@ -47,7 +47,7 @@ int main()
                           "quoted\ntext\nwith\nlinebreaks");
     // doesn't compile as expected , reason S2T_FORMAT_STREAM conversion
     // not allowed when val type is std::string
-    //unittest::ExpectEqual(std::string, doc.GetCell<&rapidcsv::ConvertFromStr<std::string COMMA rapidcsv::S2T_Format_StreamAsIs>::ToVal>(3, 3), "");
+    //unittest::ExpectEqual(std::string, doc.GetCell< rapidcsv::ConvertFromStr<std::string COMMA rapidcsv::S2T_Format_StreamAsIs> >(3, 3), "");
     unittest::ExpectEqual(std::string, doc.GetCell<std::string>(3, 3), "");
   }
   catch (const std::exception& ex)

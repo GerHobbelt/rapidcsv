@@ -261,7 +261,11 @@ namespace rapidcsv
      * @tparam  T_C                   T can be data-type such as int, double etc ;  xOR
      *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
-     * @returns 'vector<R>' of column data, excluding the elements filtered out.
+     * @returns 'vector<R>' of column data.
+     *              'FilterDocument' excludes the elements filtered out.
+     *              'SortDocument' sorts the elements by order defined.
+     *              'FilterSortDocument' excludes the elements filtered out,
+     *                                   and sorts the remaining elements by order defined.
      *          By default, R is usually same type as T.
      *          Else if 'C = ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value, 
@@ -301,7 +305,11 @@ namespace rapidcsv
      * @brief   Get column either by it's index or name.
      * @tparam  CONV_S2T              conversion function.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
-     * @returns 'vector<R>' of column data, excluding the elements filtered out.
+     * @returns 'vector<R>' of column data.
+     *              'FilterDocument' excludes the elements filtered out.
+     *              'SortDocument' sorts the elements by order defined.
+     *              'FilterSortDocument' excludes the elements filtered out,
+     *                                   and sorts the remaining elements by order defined.
      *          By default, R is usually same type as T.
      *          Else if 'CONV_S2T ≃ ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value, 
@@ -374,7 +382,11 @@ namespace rapidcsv
      * @brief   Get row either by it's index or name.
      * @tparam  T_C                   T can be data-type such as int, double etc ;  xOR
      *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
-     * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index after removing filtered rows).
+     * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index after removing filtered rows and/or sorting the csv-rows).
+     *                                'FilterDocument' excludes the elements filtered out.
+     *                                'SortDocument' sorts the elements by order defined.
+     *                                'FilterSortDocument' excludes the elements filtered out,
+     *                                                     and sorts the remaining elements by order defined.
      * @returns 'tuple<R...>' of row data. By default, R is usually same type as T.
      *          Else if 'C = ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value,
@@ -392,7 +404,11 @@ namespace rapidcsv
     /**
      * @brief   Get row either by it's index or name.
      * @tparam  CONV_S2T              conversion function of type 'R (*CONV_S2T)(const std::string&)'.
-     * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index after removing filtered rows).
+     * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index after removing filtered rows and/or sorting the csv-rows).
+     *                                'FilterDocument' excludes the elements filtered out.
+     *                                'SortDocument' sorts the elements by order defined.
+     *                                'FilterSortDocument' excludes the elements filtered out,
+     *                                                     and sorts the remaining elements by order defined.
      * @returns 'tuple<R...>' of row data. By default, R is usually same type as T.
      *          Else if 'CONV_S2T ≃ ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value,
@@ -408,7 +424,11 @@ namespace rapidcsv
 
     /**
      * @brief   Get row either by it's index or name.
-     * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index after removing filtered rows).
+     * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index after removing filtered rows and/or sorting the csv-rows).
+     *                                'FilterDocument' excludes the elements filtered out.
+     *                                'SortDocument' sorts the elements by order defined.
+     *                                'FilterSortDocument' excludes the elements filtered out,
+     *                                                     and sorts the remaining elements by order defined.
      * @returns 'vector<string>' of row data from view.
      *          If 'pRowName_ViewRowIdx' belongs to a filtered out row, then 'out_of_range' error is thrown.
      */
@@ -425,7 +445,11 @@ namespace rapidcsv
      * @tparam  T_C                   T can be data-type such as int, double etc ;  xOR
      *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
      * @param   pColumnNameIdx        column-name or zero-based column index.
-     * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index after removing filtered rows).
+     * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index after removing filtered rows and/or sorting the csv-rows).
+     *                                'FilterDocument' excludes the elements filtered out.
+     *                                'SortDocument' sorts the elements by order defined.
+     *                                'FilterSortDocument' excludes the elements filtered out,
+     *                                                     and sorts the remaining elements by order defined.
      * @returns cell data of type R. By default, R is usually same type as T.
      *          Else if 'C ≃ ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value,
@@ -446,7 +470,11 @@ namespace rapidcsv
      * @brief   Get cell by column index and row-name/zero-based-row-view-index.
      * @tparam  CONV_S2T              conversion function.
      * @param   pColumnNameIdx        column-name or zero-based column index.
-     * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index after removing filtered rows).
+     * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index after removing filtered rows and/or sorting the csv-rows).
+     *                                'FilterDocument' excludes the elements filtered out.
+     *                                'SortDocument' sorts the elements by order defined.
+     *                                'FilterSortDocument' excludes the elements filtered out,
+     *                                                     and sorts the remaining elements by order defined.
      * @returns cell data of type R. By default, R is usually same type as T.
      *          Else if 'CONV_S2T ≃ ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value,
@@ -575,6 +603,16 @@ namespace rapidcsv
       }
     }
 
+    /*
+     * GetColumn_IndexKey(columnName) does not make sense, as information retrived is identified by
+     * index-key of type std::tuple< Ts... > . This is applicable for fetching row and cell data,
+     * but does not make any sense to fetch column data, using this index-key.
+     *
+     * Note that `GetViewColumn(...)` will get the column in the sorted order specified by
+     * template parameter `c_SortParams ... SPtypes`.
+     *
+     */
+
     /**
      * @brief   Get row either by it's index or name.
      * @tparam  T_C                   T can be data-type such as int, double etc ;  xOR
@@ -588,13 +626,13 @@ namespace rapidcsv
      */
     template< typename ... T_C >
     std::tuple<typename t_S2Tconv_c<T_C>::return_type ...>
-    GetOrderedRow(const typename SortKeyFactory<SPtypes ...>::t_sortKey& pRowKey) const
+    GetRow_IndexKey(const typename SortKeyFactory<SPtypes ...>::t_sortKey& pRowKey) const
     {
       size_t docRowIdx;
       try {
         docRowIdx  = _sortedData.at(pRowKey);
       } catch (std::out_of_range& err) {
-        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+" : FilterSortDocument::GetOrderedRow() : "
+        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+" : FilterSortDocument::GetRow_IndexKey() : "
               +"rowKey not found in 'sortedKeyMap'. For pRowKey="
               +ConvertFromTuple<typename SPtypes::S2Tconv_type::return_type ...>::ToStr(pRowKey) + " : ERROR: " + err.what());
       }
@@ -604,7 +642,7 @@ namespace rapidcsv
     /**
      * @brief   Get row either by it's index or name.
      * @tparam  CONV_S2T              conversion function of type 'R (*CONV_S2T)(const std::string&)'.
-     * @param   pRowNameIdx           row-name or zero-based row index.
+     * @param   pRowKey               tuple representing indexed-key to data-row.
      * @returns 'tuple<R...>' of row data. By default, R is usually same type as T.
      *          Else if 'CONV_S2T ≃ ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value,
@@ -613,9 +651,9 @@ namespace rapidcsv
      */
     template< auto ... CONV_S2T >
     inline std::tuple< typename f_S2Tconv_c< CONV_S2T >::return_type... >
-    GetOrderedRow(const typename SortKeyFactory<SPtypes ...>::t_sortKey& pRowKey) const
+    GetRow_IndexKey(const typename SortKeyFactory<SPtypes ...>::t_sortKey& pRowKey) const
     {
-      return GetOrderedRow< f_S2Tconv_c< CONV_S2T >... >(pRowKey);
+      return GetRow_IndexKey< f_S2Tconv_c< CONV_S2T >... >(pRowKey);
     }
 
     /**
@@ -625,13 +663,13 @@ namespace rapidcsv
      *          If 'pRowKey' belongs to a filtered out row, then 'out_of_range' error is thrown.
      */
     inline std::vector<std::string>
-    GetOrderedRow_VecStr(const typename SortKeyFactory<SPtypes ...>::t_sortKey& pRowKey) const
+    GetRow_IndexKey_VecStr(const typename SortKeyFactory<SPtypes ...>::t_sortKey& pRowKey) const
     {
       size_t docRowIdx;
       try {
         docRowIdx  = _sortedData.at(pRowKey);
       } catch (std::out_of_range& err) {
-        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+" : FilterSortDocument::GetOrderedRow_VecStr() : "
+        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+" : FilterSortDocument::GetRow_IndexKey_VecStr() : "
               +"rowKey not found in 'sortedKeyMap'. For pRowKey="
               +ConvertFromTuple<typename SPtypes::S2Tconv_type::return_type ...>::ToStr(pRowKey) + " : ERROR: " + err.what());
       }
@@ -652,15 +690,15 @@ namespace rapidcsv
      */
     template< typename T_C >
     typename t_S2Tconv_c<T_C>::return_type
-    GetOrderedCell(const c_sizet_or_string auto& pColumnNameIdx,
-	                 const t_sortKey& pRowKey) const
+    GetCell_IndexKey(const c_sizet_or_string auto& pColumnNameIdx,
+	                   const t_sortKey& pRowKey) const
     {
       const size_t pColumnIdx = _document.GetColumnIdx(pColumnNameIdx);
       size_t docRowIdx;
       try {
         docRowIdx  = _sortedData.at(pRowKey);
       } catch (std::out_of_range& err) {
-        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+" : FilterSortDocument::GetOrderedCell() : "
+        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+" : FilterSortDocument::GetCell_IndexKey() : "
               +"rowKey not found in 'sortedKeyMap'. For pRowKey="
               +ConvertFromTuple<typename SPtypes::S2Tconv_type::return_type ...>::ToStr(pRowKey) + " : ERROR: " + err.what());
       }
@@ -682,10 +720,10 @@ namespace rapidcsv
     inline typename std::invoke_result_t< decltype(CONV_S2T),
                                           const std::string&
                                         >
-    GetOrderedCell(const c_sizet_or_string auto& pColumnNameIdx,
-	                 const t_sortKey& pRowKey) const
+    GetCell_IndexKey(const c_sizet_or_string auto& pColumnNameIdx,
+	                   const t_sortKey& pRowKey) const
     {
-      return GetOrderedCell< S2TwrapperFunction<T, CONV_S2T> >( pColumnNameIdx, pRowKey);
+      return GetCell_IndexKey< S2TwrapperFunction<T, CONV_S2T> >( pColumnNameIdx, pRowKey);
     }
   };
 

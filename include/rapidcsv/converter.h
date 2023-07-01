@@ -478,7 +478,7 @@ namespace rapidcsv
   template<typename T, typename S2T_FORMAT = typename S2T_DefaultFormat<T>::type >
   struct ConvertFromStr;
 
-    // https://eli.thegreenplace.net/2014/perfect-forwarding-and-universal-references-in-c/
+  // https://eli.thegreenplace.net/2014/perfect-forwarding-and-universal-references-in-c/
   /**
    * @brief     Convertor class implementation for any (no-string)type's, FROM string; using 'std::istringstream'.
    * @tparam  T                     'type' converted to, from string data. (Not Applicable for 'string to string' conversion.)
