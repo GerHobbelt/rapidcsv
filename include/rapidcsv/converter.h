@@ -2,7 +2,7 @@
  * converter.h
  *
  * URL:      https://github.com/panchaBhuta/rapidcsv_FilterSort
- * Version:  2.02.fs-8.75
+ * Version:  v2.03.fs
  *
  * Copyright (C) 2022-2023 Gautam Dhar
  * All rights reserved.

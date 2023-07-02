@@ -2,7 +2,7 @@
  * rapidcsv.h
  *
  * URL:      https://github.com/panchaBhuta/rapidcsv_FilterSort
- * Version:  v2.02.fs-8.77
+ * Version:  v2.03.fs-8.78
  *
  * Copyright (C) 2022-2023 Gautam Dhar
  * All rights reserved.
@@ -13,7 +13,7 @@
  * ***********************************************************************************
  *
  * URL:      https://github.com/d99kris/rapidcsv
- * Version:  8.77
+ * Version:  8.78
  *
  * Copyright (C) 2017-2023 Kristofer Berggren
  * All rights reserved.
@@ -1439,7 +1439,8 @@ namespace rapidcsv
      */
     inline RawIdx _getDataRowIndex(const size_t pRowIdx) const
     {
-      return RawIdx{pRowIdx + static_cast<size_t>(_mLabelParams.mColumnNameIdx + 1)};
+      const size_t firstDataRow = static_cast<size_t>((_mLabelParams.mColumnNameIdx + 1 >= 0) ? _mLabelParams.mColumnNameIdx + 1 : 0);
+      return RawIdx{pRowIdx + firstDataRow};
     }
 
     /**
@@ -1449,7 +1450,8 @@ namespace rapidcsv
      */
     inline RawIdx _getDataColumnIndex(const size_t pColumnIdx) const
     {
-      return RawIdx{pColumnIdx + static_cast<size_t>(_mLabelParams.mRowNameIdx + 1)};
+      const size_t firstDataColumn = static_cast<size_t>((_mLabelParams.mRowNameIdx + 1 >= 0) ? _mLabelParams.mRowNameIdx + 1 : 0);
+      return RawIdx{pColumnIdx + firstDataColumn};
     }
 
     std::string _trim(const std::string& pStr) const
