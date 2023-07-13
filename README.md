@@ -22,10 +22,10 @@ Example Usage
 =============
 Here is a simple example reading a CSV file and getting 'Close' column as a vector of floats.
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/colhdr.csv#L1-L6
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/colhdr.csv#L1-L6
 
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/ex001.cpp#L1-L12
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/ex001.cpp#L1-L12
 
 
 
@@ -95,28 +95,28 @@ as row headers one needs to use LabelParams and set pRowNameIdx to 0.
 ### Column and Row Headers
 csv file with both column and row headers
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/colrowhdr.csv#L1-L6
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/colrowhdr.csv#L1-L6
 
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/ex002.cpp#L1-L16
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/ex002.cpp#L1-L16
 
 
 ### Row Headers Only
 csv file with row header (no column header)
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/rowhdr.csv#L1-L6
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/rowhdr.csv#L1-L6
 
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/ex003.cpp#L1-L13
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/ex003.cpp#L1-L13
 
 
 ### No Headers
 csv file with no column and row headers
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/nohdr.csv#L1-L5
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/nohdr.csv#L1-L5
 
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/ex004.cpp#L1-L15
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/ex004.cpp#L1-L15
 
 
 Reading a File with Custom Separator
@@ -125,10 +125,10 @@ For reading of files with custom separator (i.e. not comma), one need to
 specify the SeparatorParams argument. The following example reads a file using
 semi-colon as separator.
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/semi.csv#L1-L6
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/semi.csv#L1-L6
 
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/ex005.cpp#L1-L16
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/ex005.cpp#L1-L16
 
 
 
@@ -141,10 +141,10 @@ of `char-types` or `bool`. For `char-types`, rapidcsv interprets the cell's (fir
 byte as a character. For `bool`, the expected integer values are `0` or `1`.
 The following example illustrates the supported data types.
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/colrowhdr.csv#L1-L6
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/colrowhdr.csv#L1-L6
 
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/ex006.cpp#L1-L21
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/ex006.cpp#L1-L21
 
 
 ### **rapidcsv::datelib::year_month_day** is the alias for `Date` type
@@ -156,7 +156,7 @@ Global Custom Data Type Conversion
 One may override conversion routines (or add new ones) by implementing ToVal() and/or ToStr(). Below is an example of int conversion, to instead provide two decimal fixed-point numbers. Also see [tests/test035.cpp](tests/test035.cpp) for test using specialized instances of `ToVal()` and `ToStr()`.
 
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/ex008.cpp#L1-L19
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/ex008.cpp#L1-L19
 
 
 Custom Data Type Conversion Per Call
@@ -166,7 +166,7 @@ It is also possible to override conversions on a per-call basis, enabling more f
 [tests/test087.cpp](tests/test087.cpp) and
 [tests/test092.cpp](tests/test092.cpp)
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/ex009.cpp#L1-L43
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/ex009.cpp#L1-L43
 
 
 Reading CSV Data from a Stream or String
@@ -176,7 +176,15 @@ from a stream and, indirectly through stringstream, from a string. File streams
 used with rapidcsv should be opened in `std::ios::binary` mode to enable full
 functionality. Here is a simple example reading CSV data from a string:
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/ex007.cpp#L1-L25
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/ex007.cpp#L1-L25
+
+
+View CSV data using 'filters' and/or 'sort' on Column(s)
+--------------------------------------------------------- 
+Similar to 'WHERE' clause in SQL, 'rapidcsv::FilterDocument' applies filters on one or more columns. <br>
+Similar to 'ORDER BY' clause in SQL, 'rapidcsv::SortDocument' applies sorting on one or more columns. <br>
+Similar to 'ORDER BY' clause in SQL, 'rapidcsv::FilterSortDocument' applies sorting on one or more columns. <br>
+Refer [tests/testView001.cpp](tests/testView001.cpp)
 
 
 Check if a Column Exists
@@ -321,7 +329,7 @@ Refer [test091.cpp](tests/test091.cpp),  to see the effect of lowered Decimal-Pr
 
 One can also provide their own decimal precision parameter thru several ways. This is illustrated in the example [exConv001.cpp](examples/exConv001.cpp), where data conversion precision is checked by implementing a complete conversion cycle i.e    **data -> string -> data** .<br>
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/exConv001.cpp#L1-L166
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/exConv001.cpp#L1-L166
 
 Note: If only data conversions is needed, then just include [rapidcsv/converter.h](include/rapidcsv/converter.h).
 

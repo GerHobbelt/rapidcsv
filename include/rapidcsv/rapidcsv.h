@@ -37,7 +37,6 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <tuple>
 
 #if defined(_MSC_VER)
 #include <BaseTsd.h>

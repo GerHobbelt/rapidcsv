@@ -28,6 +28,7 @@
 #include <variant>
 #include <locale>
 #include <stdexcept>
+#include <tuple>
 
 #if  USE_CHRONO == 1
   #include <chrono>
@@ -1004,28 +1005,20 @@ namespace rapidcsv
 
 
   // [===========[ workarounds in case std::apply() doesn't work as expected for a given compiler(MSVC)
-  template <size_t IDX,c_S2Tconverter ... S2Tconv>
-  struct GetTupleElement {
-    inline static void get(const std::vector<std::string>& dataVec,
-                           const size_t colIdx,
-                           std::tuple<typename S2Tconv::return_type ...>& dataTuple)
+  template <size_t IDX, c_S2Tconverter ... S2Tconv>
+  inline static void getTupleElements(const std::vector<std::string>& dataVec,
+                                      const size_t colIdx,
+                                      std::tuple<typename S2Tconv::return_type ...>& dataTuple)
+  {
+    using _t_tuple_convertors = std::tuple< S2Tconv ...>;
+    std::get<IDX>(dataTuple) = std::tuple_element_t<IDX, _t_tuple_convertors>::ToVal(dataVec.at(IDX+colIdx));
+    if constexpr(IDX>0)
     {
-      using _t_tuple_convertors = std::tuple< S2Tconv ...>;
-      std::get<IDX>(dataTuple) = std::tuple_element_t<IDX, _t_tuple_convertors>::ToVal(dataVec.at(IDX+colIdx));
-      GetTupleElement< (IDX -1), S2Tconv ... >::get(dataVec,colIdx,dataTuple);
+      // "((IDX>0)?(IDX-1):0)" eliminates infinite compile time looping,
+      // and we don't have to define function specialization for getTupleElements<0>()
+      getTupleElements< ((IDX>0)?(IDX-1):0), S2Tconv ... >(dataVec,colIdx,dataTuple);
     }
-  };
-
-  template <c_S2Tconverter ... S2Tconv>
-  struct GetTupleElement<0, S2Tconv ...> {
-    inline static void get(const std::vector<std::string>& dataVec,
-                           [[maybe_unused]] const size_t colIdx,
-                           std::tuple<typename S2Tconv::return_type ...>& dataTuple)
-    {
-      using _t_tuple_convertors = std::tuple< S2Tconv ...>;
-      std::get<0>(dataTuple) = std::tuple_element_t<0, _t_tuple_convertors>::ToVal(dataVec.at(0+colIdx));
-    }
-  };
+  }
   // ]===========] workarounds in case std::apply() doesn't work as expected for a given compiler(MSVC)
 
   /**
@@ -1048,7 +1041,7 @@ namespace rapidcsv
       ( (wrt_result = S2Tconv::ToVal(dataVec.at(colIdx++))), ... );  // comma operator ensures the element order is from left to right
     };
     std::apply(write_tuple, dataTuple);
-    //GetTupleElement< (sizeof...(S2Tconv) -1), S2Tconv ... >::get(dataVec,colIdx,dataTuple);
+    //getTupleElements<(sizeof...(S2Tconv) -1), S2Tconv ...>(dataVec,colIdx,dataTuple);
   }
   
 
@@ -1698,27 +1691,19 @@ namespace rapidcsv
 
   // [===========[ workarounds in case std::apply() doesn't work as expected for a given compiler(MSVC)
   template <size_t IDX,c_T2Sconverter ... T2Sconv>
-  struct SetTupleElement {
-    inline static void set(const std::tuple<typename T2Sconv::input_type ...>& dataTuple,
-                           const size_t colIdx,
-                           std::vector<std::string>& dataVec)
+  inline static void setTupleElements(const std::tuple<typename T2Sconv::input_type ...>& dataTuple,
+                                      const size_t colIdx,
+                                      std::vector<std::string>& dataVec)
+  {
+    using _t_tuple_convertors = std::tuple< T2Sconv ...>;
+    dataVec.at(IDX+colIdx) = std::tuple_element_t<IDX, _t_tuple_convertors>::ToStr(std::get<IDX>(dataTuple));
+    if constexpr(IDX>0)
     {
-      using _t_tuple_convertors = std::tuple< T2Sconv ...>;
-      dataVec.at(IDX+colIdx) = std::tuple_element_t<IDX, _t_tuple_convertors>::ToStr(std::get<IDX>(dataTuple));
-      SetTupleElement< (IDX -1), T2Sconv ... >::set(dataTuple,colIdx,dataVec);
+      // "((IDX>0)?(IDX-1):0)" eliminates infinite compile time looping,
+      // and we don't have to define function specialization for setTupleElements<0>()
+      setTupleElements< ((IDX>0)?(IDX-1):0), T2Sconv ... >(dataTuple,colIdx,dataVec);
     }
-  };
-
-  template <c_T2Sconverter ... T2Sconv>
-  struct SetTupleElement<0, T2Sconv ...> {
-    inline static void set(const std::tuple<typename T2Sconv::input_type ...>& dataTuple,
-                           [[maybe_unused]] const size_t colIdx,
-                           std::vector<std::string>& dataVec)
-    {
-      using _t_tuple_convertors = std::tuple< T2Sconv ...>;
-      dataVec.at(0+colIdx) = std::tuple_element_t<0, _t_tuple_convertors>::ToStr(std::get<0>(dataTuple));
-    }
-  };
+  }
   // ]===========] workarounds in case std::apply() doesn't work as expected for a given compiler(MSVC)
 
   /**
@@ -1740,7 +1725,7 @@ namespace rapidcsv
       ( (dataVec.at(colIdx++) = T2Sconv::ToStr(rowElem)) , ... );
     };
     std::apply(read_tuple, dataTuple);
-    //SetTupleElement< (sizeof...(T2Sconv) -1), T2Sconv ... >::set(dataTuple,colIdx,dataVec);
+    //setTupleElements<(sizeof...(T2Sconv) -1), T2Sconv ... >(dataTuple,colIdx,dataVec);
   }
 
   /**
