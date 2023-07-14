@@ -5,9 +5,9 @@
 
 
 constexpr char dmY_fmt[] = "%d-%m-%Y";  // string literal object with static storage duration
-namespace rdb = rapidcsv::datelib;
+namespace rdb = converter::datelib;
 constexpr rdb::year_month_day (*To_dmY)(const std::string& str) =
-                    &rapidcsv::ConvertFromStr< rdb::year_month_day, rapidcsv::S2T_Format_StreamYMD< dmY_fmt > >::ToVal;
+                    &converter::ConvertFromStr< rdb::year_month_day, converter::S2T_Format_StreamYMD< dmY_fmt > >::ToVal;
 
 int main()
 {

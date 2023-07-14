@@ -23,7 +23,7 @@ void checkRoundTripConversion_Val1Val2(
   }
 }
 
-template<rapidcsv::c_floating_point T>
+template<converter::c_floating_point T>
 constexpr int getLowerDecimalPrecision()
 {
   if constexpr (std::is_same_v<T, float>)
@@ -35,11 +35,11 @@ constexpr int getLowerDecimalPrecision()
   if constexpr (std::is_same_v<T, long double>)
     return LDBL_DIG;
 }
-template<rapidcsv::c_floating_point T>
-using T2S_Format_ldp = rapidcsv::T2S_Format_StreamDecimalPrecision<T, getLowerDecimalPrecision<T>() >;
+template<converter::c_floating_point T>
+using T2S_Format_ldp = converter::T2S_Format_StreamDecimalPrecision<T, getLowerDecimalPrecision<T>() >;
 
-template<rapidcsv::c_floating_point T>
-using ConvertFromVal_lDP = rapidcsv::ConvertFromVal<T, T2S_Format_ldp<T> >;
+template<converter::c_floating_point T>
+using ConvertFromVal_lDP = converter::ConvertFromVal<T, T2S_Format_ldp<T> >;
 
 
 const float f1 = 3.14159f;

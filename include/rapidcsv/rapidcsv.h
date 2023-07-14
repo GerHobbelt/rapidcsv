@@ -43,7 +43,7 @@
 typedef SSIZE_T ssize_t;
 #endif
 
-#include <rapidcsv/converter.h>
+#include <converter/converter.h>
 
 namespace rapidcsv
 {
@@ -400,7 +400,7 @@ namespace rapidcsv
     https://en.cppreference.com/w/cpp/language/template_parameters
     template<typename T, typename ...ARGS,
              T (*CONV_S2T)(const std::string&, ARGS ...) =
-                       &ConvertFromStr<T, S2T_DefaultFormat<T>, ARGS...>::ToVal >
+                       &converter::ConvertFromStr<T, S2T_DefaultFormat<T>, ARGS...>::ToVal >
     std::vector<T> GetColumn(const auto& pColumnNameIdx,
                              ARGS&& ... args) const
     TODO function and unit tests  for ARGS...
@@ -412,17 +412,17 @@ namespace rapidcsv
      *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @returns 'vector<R>' of column data. By default, R is usually same type as T.
-     *          Else if 'C ≃ ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *          Else if 'C ≃ converter::ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value,
      *          else the string value which caused failure during conversion.
      */
     template< typename T_C >
-    std::vector<typename t_S2Tconv_c<T_C>::return_type>
+    std::vector<typename converter::t_S2Tconv_c<T_C>::return_type>
     GetColumn(const c_sizet_or_string auto& pColumnNameIdx) const
     {
       const size_t pColumnIdx = GetColumnIdx(pColumnNameIdx);
       const size_t dataColumnIdx = _getDataColumnIndex(pColumnIdx).dataIdx;
-      std::vector<typename t_S2Tconv_c<T_C>::return_type> column;
+      std::vector<typename converter::t_S2Tconv_c<T_C>::return_type> column;
       size_t rowIdx = _getDataRowIndex(0).dataIdx;
       for (auto itRow = _mData.begin() + static_cast<ssize_t>(_getDataRowIndex(0).dataIdx);
            itRow != _mData.end(); ++itRow, ++rowIdx)
@@ -430,8 +430,8 @@ namespace rapidcsv
         if (dataColumnIdx < itRow->size())
         {
           const std::string& cellStrVal = itRow->at(dataColumnIdx);
-          //typename t_S2Tconv_c<T_C>::return_type val = t_S2Tconv_c<T_C>::ToVal_args(cellStrVal, std::forward<ARGS>(args)...);
-          typename t_S2Tconv_c<T_C>::return_type val = t_S2Tconv_c<T_C>::ToVal(cellStrVal);
+          //typename converter::t_S2Tconv_c<T_C>::return_type val = converter::t_S2Tconv_c<T_C>::ToVal_args(cellStrVal, std::forward<ARGS>(args)...);
+          typename converter::t_S2Tconv_c<T_C>::return_type val = converter::t_S2Tconv_c<T_C>::ToVal(cellStrVal);
           column.push_back(val);
         } else {
           const std::string errStr = __RAPIDCSV_PREFERRED_PATH__+
@@ -450,15 +450,15 @@ namespace rapidcsv
      * @tparam  CONV_S2T              conversion function.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @returns 'vector<R>' of column data. By default, R is usually same type as T.
-     *          Else if 'CONV_S2T ≃ ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
+     *          Else if 'CONV_S2T ≃ converter::ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value,
      *          else the string value which caused failure during conversion.
      */
     template< auto (*CONV_S2T)(const std::string&) >
-    inline std::vector< typename f_S2Tconv_c< CONV_S2T >::return_type >
+    inline std::vector< typename converter::f_S2Tconv_c< CONV_S2T >::return_type >
     GetColumn(const c_sizet_or_string auto& pColumnNameIdx) const
     {
-      return GetColumn< f_S2Tconv_c< CONV_S2T > >(pColumnNameIdx);
+      return GetColumn< converter::f_S2Tconv_c< CONV_S2T > >(pColumnNameIdx);
     }
 
     /**
@@ -467,13 +467,13 @@ namespace rapidcsv
      *                                C -> Conversion class statisfying concept 'c_T2Sconverter'.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pColumn               'vector<R>' of column data. By default, R is usually same type as T.
-     *                                Else if 'C ≃ ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *                                Else if 'C ≃ converter::ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      */
     template< typename T_C >
     void SetColumn(const c_sizet_or_string auto& pColumnNameIdx,
-                   const std::vector<typename t_T2Sconv_c<T_C>::input_type>& pColumn)
+                   const std::vector<typename converter::t_T2Sconv_c<T_C>::input_type>& pColumn)
     {
       const size_t pColumnIdx = GetColumnIdx(pColumnNameIdx);
       const size_t dataColumnIdx = _getDataColumnIndex(pColumnIdx).dataIdx;
@@ -496,7 +496,7 @@ namespace rapidcsv
       size_t rowIdx = _getDataRowIndex(0).dataIdx;
       for (auto itCell = pColumn.begin(); itCell != pColumn.end(); ++itCell, ++rowIdx)
       {
-        _mData.at(rowIdx).at(dataColumnIdx) = t_T2Sconv_c<T_C>::ToStr(*itCell);
+        _mData.at(rowIdx).at(dataColumnIdx) = converter::t_T2Sconv_c<T_C>::ToStr(*itCell);
       }
     }
 
@@ -506,16 +506,16 @@ namespace rapidcsv
      * @tparam  CONV_T2S              conversion function of type 'std::string (*CONV_T2S)(const R&)'.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pColumn               'vector<R>' of column data. By default, R usually is same type as T.
-     *                                Else if 'CONV_T2S ≃ ConvertFromVal_gNaN<T>::ToStr', then 'R = std::variant<T, std::string>'.
+     *                                Else if 'CONV_T2S ≃ converter::ConvertFromVal_gNaN<T>::ToStr', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      */
     //template< typename T, typename R, std::string (*CONV_T2S)(const R&) >
     template< auto CONV_T2S >
     inline void SetColumn(const c_sizet_or_string auto& pColumnNameIdx,
-                          const std::vector<typename f_T2Sconv_c<CONV_T2S>::input_type>& pColumn)
+                          const std::vector<typename converter::f_T2Sconv_c<CONV_T2S>::input_type>& pColumn)
     {
-      SetColumn< f_T2Sconv_c<CONV_T2S> >(pColumnNameIdx, pColumn);
+      SetColumn< converter::f_T2Sconv_c<CONV_T2S> >(pColumnNameIdx, pColumn);
     }
 
     /**
@@ -540,15 +540,15 @@ namespace rapidcsv
      *                                C -> Conversion class statisfying concept 'c_T2Sconverter'.
      * @param   pColumnIdx            zero-based column index.
      * @param   pColumn               'vector<R>' of column data (optional argument). By default, R is usually same type as T.
-     *                                Else if 'C ≃ ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *                                Else if 'C ≃ converter::ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      * @param   pColumnName           column label name (optional argument)
      */
     template< typename T_C >
     void InsertColumn(const size_t pColumnIdx,
-                      const std::vector<typename t_T2Sconv_c<T_C>::input_type>& pColumn
-                          = std::vector<typename t_T2Sconv_c<T_C>::input_type>(),
+                      const std::vector<typename converter::t_T2Sconv_c<T_C>::input_type>& pColumn
+                          = std::vector<typename converter::t_T2Sconv_c<T_C>::input_type>(),
                       const std::string& pColumnName = std::string())
     {
       const size_t dataColumnIdx = _getDataColumnIndex(pColumnIdx).dataIdx;
@@ -562,7 +562,7 @@ namespace rapidcsv
         size_t rowIdx = _getDataRowIndex(0).dataIdx;
         for (auto itCell = pColumn.begin(); itCell != pColumn.end(); ++itCell, ++rowIdx)
         {
-          column.at(rowIdx) = t_T2Sconv_c<T_C>::ToStr(*itCell);
+          column.at(rowIdx) = converter::t_T2Sconv_c<T_C>::ToStr(*itCell);
         }
       }
 
@@ -595,7 +595,7 @@ namespace rapidcsv
      * @tparam  CONV_T2S              conversion function of type 'std::string (*CONV_T2S)(const R&)'.
      * @param   pColumnIdx            zero-based column index.
      * @param   pColumn               'vector<R>' of column data (optional argument). By default, R is usually same type as T.
-     *                                Else if 'CONV_T2S ≃ ConvertFromVal_gNaN<T>::ToStr', then 'R = std::variant<T, std::string>'
+     *                                Else if 'CONV_T2S ≃ converter::ConvertFromVal_gNaN<T>::ToStr', then 'R = std::variant<T, std::string>'
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      * @param   pColumnName           column label name (optional argument)
@@ -603,11 +603,11 @@ namespace rapidcsv
     //template< typename T, typename R, std::string (*CONV_T2S)(const R&) >
     template< auto CONV_T2S >
     inline void InsertColumn(const size_t pColumnIdx,
-                             const std::vector<typename f_T2Sconv_c<CONV_T2S>::input_type>& pColumn
-                                 = std::vector<typename f_T2Sconv_c<CONV_T2S>::input_type>(),
+                             const std::vector<typename converter::f_T2Sconv_c<CONV_T2S>::input_type>& pColumn
+                                 = std::vector<typename converter::f_T2Sconv_c<CONV_T2S>::input_type>(),
                              const std::string& pColumnName = std::string())
     {
-      InsertColumn< f_T2Sconv_c<CONV_T2S> >(pColumnIdx, pColumn, pColumnName);
+      InsertColumn< converter::f_T2Sconv_c<CONV_T2S> >(pColumnIdx, pColumn, pColumnName);
     }
 
     /**
@@ -662,12 +662,12 @@ namespace rapidcsv
      *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
      * @param   pRowNameIdx           row-name or zero-based row index.
      * @returns 'tuple<R...>' of row data. By default, R is usually same type as T.
-     *          Else if 'C ≃ ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *          Else if 'C ≃ converter::ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value, 
      *          else the string value which caused failure during conversion.
      */
     template< typename ... T_C >
-    std::tuple<typename t_S2Tconv_c<T_C>::return_type ...>
+    std::tuple<typename converter::t_S2Tconv_c<T_C>::return_type ...>
     GetRow(const c_sizet_or_string auto& pRowNameIdx) const
     {
       const size_t pRowIdx = GetRowIdx(pRowNameIdx);
@@ -684,9 +684,9 @@ namespace rapidcsv
       const t_dataRow& rowData = _mData.at(dataRowIdx);
       //return std::make_tuple(S2Tconv::ToVal(rowData.at(colIdx++)) ...);  on ubuntu the tuple elements order gets reversed
 
-      using _t_tuple_result = std::tuple<typename t_S2Tconv_c<T_C>::return_type...>;
+      using _t_tuple_result = std::tuple<typename converter::t_S2Tconv_c<T_C>::return_type...>;
       _t_tuple_result result;
-      GetTuple< t_S2Tconv_c<T_C>... >(rowData,colIdx,result);
+      converter::GetTuple< converter::t_S2Tconv_c<T_C>... >(rowData,colIdx,result);
       return result;
     }
 
@@ -695,15 +695,15 @@ namespace rapidcsv
      * @tparam  CONV_S2T              conversion function of type 'R (*CONV_S2T)(const std::string&)'.
      * @param   pRowNameIdx           row-name or zero-based row index.
      * @returns 'tuple<R...>' of row data. By default, R is usually same type as T.
-     *          Else if 'CONV_S2T ≃ ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
+     *          Else if 'CONV_S2T ≃ converter::ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value, 
      *          else the string value which caused failure during conversion.
      */
     template< auto ... CONV_S2T >
-    inline std::tuple< typename f_S2Tconv_c< CONV_S2T >::return_type... >
+    inline std::tuple< typename converter::f_S2Tconv_c< CONV_S2T >::return_type... >
     GetRow(const c_sizet_or_string auto& pRowNameIdx) const
     {
-      return GetRow< f_S2Tconv_c< CONV_S2T >... >(pRowNameIdx);
+      return GetRow< converter::f_S2Tconv_c< CONV_S2T >... >(pRowNameIdx);
     }
 
     /**
@@ -726,14 +726,14 @@ namespace rapidcsv
      *                                C -> Conversion class statisfying concept 'c_T2Sconverter'.
      * @param   pRowNameIdx           row-name or zero-based row index.
      * @param   pRow                  'tuple<R...>' of row data. By default, R is usually same type as T.
-     *                                Else if 'C ≃ ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *                                Else if 'C ≃ converter::ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      */
     // TODO unit tests  for customised C
     template< typename ... T_C >
     void SetRow(const c_sizet_or_string auto& pRowNameIdx,
-                const std::tuple<typename t_T2Sconv_c<T_C>::input_type ...>& pRow)
+                const std::tuple<typename converter::t_T2Sconv_c<T_C>::input_type ...>& pRow)
     {
       const size_t pRowIdx = GetRowIdx(pRowNameIdx);
       const size_t dataRowIdx = _getDataRowIndex(pRowIdx).dataIdx;
@@ -742,7 +742,7 @@ namespace rapidcsv
       size_t colIdx = _getDataColumnIndex(0).dataIdx;
       t_dataRow& rowData = _mData.at(dataRowIdx);
 
-      SetTuple< t_T2Sconv_c<T_C>... >(pRow,colIdx,rowData);
+      converter::SetTuple< converter::t_T2Sconv_c<T_C>... >(pRow,colIdx,rowData);
     }
 
     /**
@@ -750,16 +750,16 @@ namespace rapidcsv
      * @tparam  CONV_T2S              conversion function of type 'std::string (*CONV_T2S)(const R&)'.
      * @param   pRowNameIdx           row-name or zero-based row index.
      * @param   pRow                  'tuple<R...>' of row data. By default, R is usually same type as T.
-     *                                Else if 'CONV_T2S ≃ ConvertFromVal_gNaN<T>::ToStr', then 'R = std::variant<T, std::string>'.
+     *                                Else if 'CONV_T2S ≃ converter::ConvertFromVal_gNaN<T>::ToStr', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      */
     // TODO unit tests
     template< auto ... CONV_T2S >
     void SetRow(const c_sizet_or_string auto& pRowNameIdx,
-                const std::tuple<typename f_T2Sconv_c<CONV_T2S>::input_type...>& pRow)
+                const std::tuple<typename converter::f_T2Sconv_c<CONV_T2S>::input_type...>& pRow)
     {
-      SetRow< f_T2Sconv_c<CONV_T2S>... >(pRowNameIdx, pRow);
+      SetRow< converter::f_T2Sconv_c<CONV_T2S>... >(pRowNameIdx, pRow);
     }
 
     /**
@@ -800,7 +800,7 @@ namespace rapidcsv
      *                                C -> Conversion class statisfying concept 'c_T2Sconverter'.
      * @param   pRowIdx               zero-based row index.
      * @param   pRow                  'tuple<R...>' of row data. By default, R is usually same type as T.
-     *                                Else if 'C ≃ ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *                                Else if 'C ≃ converter::ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      * @param   pRowName              row label name (optional argument).
@@ -808,8 +808,8 @@ namespace rapidcsv
     // TODO unit tests  for customised C
     template< typename ... T_C >
     void InsertRow(const size_t pRowIdx,
-                   const std::tuple<typename t_T2Sconv_c<T_C>::input_type ...>& pRow
-                       = std::tuple<typename t_T2Sconv_c<T_C>::input_type ...>(),
+                   const std::tuple<typename converter::t_T2Sconv_c<T_C>::input_type ...>& pRow
+                       = std::tuple<typename converter::t_T2Sconv_c<T_C>::input_type ...>(),
                    const std::string& pRowName = std::string())
     {
       const size_t rowIdx = _getDataRowIndex(pRowIdx).dataIdx;
@@ -822,7 +822,7 @@ namespace rapidcsv
         rowData.resize(_getDataColumnIndex(sizeof...(T_C)).dataIdx);
         size_t colIdx = _getDataColumnIndex(0).dataIdx;
 
-        SetTuple< t_T2Sconv_c<T_C>... >(pRow,colIdx,rowData);
+        converter::SetTuple< converter::t_T2Sconv_c<T_C>... >(pRow,colIdx,rowData);
       }
 
       while (rowIdx > _getDataRowCount())
@@ -847,7 +847,7 @@ namespace rapidcsv
      * @tparam  CONV_T2S              conversion function of type 'std::string (*CONV_T2S)(const R&)'.
      * @param   pRowIdx               zero-based row index.
      * @param   pRow                  'tuple<R...>' of row data. By default, R is usually same type as T.
-     *                                Else if 'C ≃ ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *                                Else if 'C ≃ converter::ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      * @param   pRowName              row label name (optional argument).
@@ -855,11 +855,11 @@ namespace rapidcsv
     // TODO unit tests
     template<auto ... CONV_T2S>
     inline void InsertRow(const size_t pRowIdx,
-                          const std::tuple<typename f_T2Sconv_c<CONV_T2S>::input_type...>& pRow
-                              = std::tuple<typename f_T2Sconv_c<CONV_T2S>::input_type...>(),
+                          const std::tuple<typename converter::f_T2Sconv_c<CONV_T2S>::input_type...>& pRow
+                              = std::tuple<typename converter::f_T2Sconv_c<CONV_T2S>::input_type...>(),
                           const std::string& pRowName = std::string())
     {
-      InsertRow< f_T2Sconv_c<CONV_T2S>... >(pRowIdx, pRow, pRowName);
+      InsertRow< converter::f_T2Sconv_c<CONV_T2S>... >(pRowIdx, pRow, pRowName);
     }
 
     /**
@@ -924,12 +924,12 @@ namespace rapidcsv
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pRowNameIdx           row-name or zero-based row-index.
      * @returns cell data of type R. By default, R is usually same type as T.
-     *          Else if 'C ≃ ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *          Else if 'C ≃ converter::ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value,
      *          else the string value which caused failure during conversion.
      */
     template< typename T_C >
-    typename t_S2Tconv_c<T_C>::return_type
+    typename converter::t_S2Tconv_c<T_C>::return_type
     GetCell(const c_sizet_or_string auto& pColumnNameIdx,
             const c_sizet_or_string auto& pRowNameIdx) const
     {
@@ -939,7 +939,7 @@ namespace rapidcsv
       const size_t dataColumnIdx = _getDataColumnIndex(pColumnIdx).dataIdx;
       const size_t dataRowIdx = _getDataRowIndex(pRowIdx).dataIdx;
 
-      return t_S2Tconv_c<T_C>::ToVal(_mData.at(dataRowIdx).at(dataColumnIdx));
+      return converter::t_S2Tconv_c<T_C>::ToVal(_mData.at(dataRowIdx).at(dataColumnIdx));
     }
 
     // TODO function and unit tests  for ARGS...
@@ -949,16 +949,16 @@ namespace rapidcsv
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pRowNameIdx           row-name or zero-based row-index.
      * @returns cell data of type R. By default, R is usually same type as T.
-     *          Else if 'CONV_S2T ≃ ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
+     *          Else if 'CONV_S2T ≃ converter::ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
      *          On conversion success variant has the converted value,
      *          else the string value which caused failure during conversion.
      */
     template< auto (*CONV_S2T)(const std::string&) >
-    inline typename f_S2Tconv_c< CONV_S2T >::return_type
+    inline typename converter::f_S2Tconv_c< CONV_S2T >::return_type
     GetCell(const c_sizet_or_string auto& pColumnNameIdx,
             const c_sizet_or_string auto& pRowNameIdx) const
     {
-      return GetCell< f_S2Tconv_c< CONV_S2T > >(pColumnNameIdx, pRowNameIdx);
+      return GetCell< converter::f_S2Tconv_c< CONV_S2T > >(pColumnNameIdx, pRowNameIdx);
     }
 
     // TODO function and unit tests  for ARGS...
@@ -969,14 +969,14 @@ namespace rapidcsv
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pRowNameIdx           row-name or zero-based row-index.
      * @param   pCell                 cell data. By default, R is usually same type as T.
-     *                                Else if 'C ≃ ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
+     *                                Else if 'C ≃ converter::ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      */
     template< typename T_C >
     void SetCell(const c_sizet_or_string auto& pColumnNameIdx,
                  const c_sizet_or_string auto& pRowNameIdx,
-                 const typename t_T2Sconv_c<T_C>::input_type& pCell)
+                 const typename converter::t_T2Sconv_c<T_C>::input_type& pCell)
     {
       const size_t pColumnIdx = GetColumnIdx(pColumnNameIdx);
       const size_t pRowIdx = GetRowIdx(pRowNameIdx);
@@ -999,7 +999,7 @@ namespace rapidcsv
         }
       }
 
-      _mData.at(dataRowIdx).at(dataColumnIdx) = t_T2Sconv_c<T_C>::ToStr(pCell);
+      _mData.at(dataRowIdx).at(dataColumnIdx) = converter::t_T2Sconv_c<T_C>::ToStr(pCell);
     }
 
     // TODO function and unit tests  for ARGS...
@@ -1009,7 +1009,7 @@ namespace rapidcsv
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pRowNameIdx           row-name or zero-based row-index.
      * @param   pCell                 cell data. By default, R is usually same type as T.
-     *                                Else if 'CONV_T2S ≃ ConvertFromVal_gNaN<T>::ToStr', then 'R = std::variant<T, std::string>'.
+     *                                Else if 'CONV_T2S ≃ converter::ConvertFromVal_gNaN<T>::ToStr', then 'R = std::variant<T, std::string>'.
      *                                On conversion success variant has the converted value,
      *                                else the string value which caused failure during conversion.
      */
@@ -1017,9 +1017,9 @@ namespace rapidcsv
     template<auto CONV_T2S >
     inline void SetCell(const c_sizet_or_string auto& pColumnNameIdx,
                         const c_sizet_or_string auto& pRowNameIdx,
-                        const typename f_T2Sconv_c<CONV_T2S>::input_type& pCell)
+                        const typename converter::f_T2Sconv_c<CONV_T2S>::input_type& pCell)
     {
-      SetCell< f_T2Sconv_c<CONV_T2S> >(pColumnNameIdx, pRowNameIdx, pCell);
+      SetCell< converter::f_T2Sconv_c<CONV_T2S> >(pColumnNameIdx, pRowNameIdx, pCell);
     }
 
     /**

@@ -2,12 +2,12 @@
 The following classes makes up the Rapidcsv interface:
 
 ## Convertor classes
- - [class rapidcsv::ConvertFromStr< T, S2T_FORMAT >](doc/converter/rapidcsv_ConvertFromStr.md)
- - [class rapidcsv::ConvertFromStr_fNaN< T, S2T_FORMAT >](doc/converter/rapidcsv_ConvertFromStr_fNaN.md)
- - [class rapidcsv::ConvertFromStr_gNaN< T, S2T_FORMAT >](doc/converter/rapidcsv_ConvertFromStr_gNaN.md)
- - [class rapidcsv::ConvertFromVal< T, T2S_FORMAT >](doc/converter/rapidcsv_ConverterToVal.md)
- - [class rapidcsv::ConvertFromVal_gNaN< T, T2S_FORMAT >](doc/converter/rapidcsv_ConvertFromVal_gNaN.md)
- - [class rapidcsv::ConvertFromTuple< T_C >](doc/converter/rapidcsv_ConvertFromTuple.md)
+ - [class converter::ConvertFromStr< T, S2T_FORMAT >](doc/converter/converter_ConvertFromStr.md)
+ - [class converter::ConvertFromStr_fNaN< T, S2T_FORMAT >](doc/converter/converter_ConvertFromStr_fNaN.md)
+ - [class converter::ConvertFromStr_gNaN< T, S2T_FORMAT >](doc/converter/converter_ConvertFromStr_gNaN.md)
+ - [class converter::ConvertFromVal< T, T2S_FORMAT >](doc/converter/rapidcsv_ConverterToVal.md)
+ - [class converter::ConvertFromVal_gNaN< T, T2S_FORMAT >](doc/converter/converter_ConvertFromVal_gNaN.md)
+ - [class converter::ConvertFromTuple< T_C >](doc/converter/converter_ConvertFromTuple.md)
 
  ## CSV Document classes
  - [class rapidcsv::Document](doc/document/rapidcsv_Document.md)

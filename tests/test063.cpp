@@ -48,8 +48,8 @@ int main()
     unittest::ExpectEqual(int, doc.GetCell<ToVal>("A", 0), 100);
     unittest::ExpectEqual(int, doc.GetCell<ToVal>("B", "1"), 1000);
 
-    using t_raw100multi = rapidcsv::S2TwrapperFunction<int, ToVal>;
-    using t_wrp100multi = rapidcsv::S2TwrapperFunction<StrVal, ToStrVal>;
+    using t_raw100multi = converter::S2TwrapperFunction<int, ToVal>;
+    using t_wrp100multi = converter::S2TwrapperFunction<StrVal, ToStrVal>;
 
     std::tuple<int, long, int, StrVal> row1 = doc.GetRow< int, long,
                                                           t_raw100multi, t_wrp100multi >(0);
@@ -79,28 +79,28 @@ int main()
     unittest::ExpectEqual(int, doc.GetColumn<&ToStrVal>("B").at(0).val, 1000);
 
     std::tuple< float, double, float,
-                rapidcsv::ConvertFromStr_gNaN<double>::return_type > row3 =
+                converter::ConvertFromStr_gNaN<double>::return_type > row3 =
                        doc.GetRow< float, double,
-                                   rapidcsv::ConvertFromStr_fNaN<float>,
-                                   rapidcsv::ConvertFromStr_gNaN<double> >("3");
+                                   converter::ConvertFromStr_fNaN<float>,
+                                   converter::ConvertFromStr_gNaN<double> >("3");
 
     unittest::ExpectEqual(float, std::get<0>(row3),  0.3f);
     unittest::ExpectEqual(double, std::get<1>(row3),  0.03);
     unittest::ExpectEqual(bool, std::isnan( std::get<2>(row3) ),  true);
-    rapidcsv::ConvertFromStr_gNaN<double>::return_type row3_cell4 = std::get<3>(row3);
+    converter::ConvertFromStr_gNaN<double>::return_type row3_cell4 = std::get<3>(row3);
     unittest::ExpectEqual(size_t, row3_cell4.index(),  1);
     unittest::ExpectEqual(std::string, std::get<std::string>(row3_cell4),  "");
 
     std::tuple< float, double, float,
-                rapidcsv::ConvertFromStr_gNaN<double>::return_type > row4 =
+                converter::ConvertFromStr_gNaN<double>::return_type > row4 =
                        doc.GetRow< float, double,
-                                   rapidcsv::ConvertFromStr_fNaN<float>,
-                                   rapidcsv::ConvertFromStr_gNaN<double> >("4");
+                                   converter::ConvertFromStr_fNaN<float>,
+                                   converter::ConvertFromStr_gNaN<double> >("4");
 
     unittest::ExpectEqual(float, std::get<0>(row4),  0.4f);
     unittest::ExpectEqual(double, std::get<1>(row4),  0.04);
     unittest::ExpectEqual(bool, std::isnan( std::get<2>(row4) ),  true);
-    rapidcsv::ConvertFromStr_gNaN<double>::return_type row4_cell4 = std::get<3>(row4);
+    converter::ConvertFromStr_gNaN<double>::return_type row4_cell4 = std::get<3>(row4);
     unittest::ExpectEqual(size_t, row4_cell4.index(),  1);
     unittest::ExpectEqual(std::string, std::get<std::string>(row4_cell4),  "abc");
 

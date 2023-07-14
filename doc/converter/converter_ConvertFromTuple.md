@@ -1,4 +1,4 @@
-## class rapidcsv::ConvertFromTuple< T_C >
+## class converter::ConvertFromTuple< T_C >
 
 ```c++
 template<typename ... T_C>

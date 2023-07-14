@@ -1,4 +1,4 @@
-## class rapidcsv::ConvertFromVal_gNaN< T, T2S_FORMAT >
+## class converter::ConvertFromVal_gNaN< T, T2S_FORMAT >
 
 ```c++
 template<c_NOT_string T, typename T2S_FORMAT = typename T2S_DefaultFormat<T>::type >

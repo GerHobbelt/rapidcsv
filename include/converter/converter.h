@@ -67,7 +67,7 @@
  *                   Same goes for dates as there are different conventions on how to display
  *                   the day, the month, the year.
  */
-namespace rapidcsv
+namespace converter
 {
 #if  USE_CHRONO == 1
   namespace datelib = std::chrono;

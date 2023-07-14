@@ -147,8 +147,8 @@ https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a
 https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/ex006.cpp#L1-L21
 
 
-### **rapidcsv::datelib::year_month_day** is the alias for `Date` type
-As of writing this, `std::chrono` is not fully supported by various compilers. If that's the case then, alias `rapidcsv::datelib` which points to [date](https://github.com/HowardHinnant/date) is used. The default date format is _"%F"_ (i.e "%Y-%m-%d"). For configuring a different date format refer [exConv001.cpp](examples/exConv001.cpp) and [test001.cpp](tests/test001.cpp)
+### **converter::datelib::year_month_day** is the alias for `Date` type
+As of writing this, `std::chrono` is not fully supported by various compilers. If that's the case then, alias `converter::datelib` which points to [date](https://github.com/HowardHinnant/date) is used. The default date format is _"%F"_ (i.e "%Y-%m-%d"). For configuring a different date format refer [exConv001.cpp](examples/exConv001.cpp) and [test001.cpp](tests/test001.cpp)
 
 
 Global Custom Data Type Conversion
@@ -331,7 +331,7 @@ One can also provide their own decimal precision parameter thru several ways. Th
 
 https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/exConv001.cpp#L1-L166
 
-Note: If only data conversions is needed, then just include [rapidcsv/converter.h](include/rapidcsv/converter.h).
+Note: If only data conversions is needed, then just include [converter/converter.h](include/converter/converter.h).
 
 
 Locale Parsing Formats : String-to-T (i.e S2T)
@@ -355,23 +355,23 @@ T ConvertFromStr< T,
                   S2T_FORMAT = S2T_DefaultFormat<T>::type
                 >::ToVal(const std::string& pStr);
 
-// "S2T_DefaultFormat<T>::type" for numeric-types evaluates to  "rapidcsv::S2T_Format_std_StoT"
+// "S2T_DefaultFormat<T>::type" for numeric-types evaluates to  "converter::S2T_Format_std_StoT"
 ```
 
 It is possible to configure **rapidcsv_FilterSort** to use locale dependent parsing by changing template-parameter `S2T_FORMAT=S2T_Format_StreamAsIs`, see for example [tests/test087.cpp](tests/test087.cpp).
 
 ```cpp
-  doc.GetCell< rapidcsv::ConvertFromStr< float,
-                                         rapidcsv::S2T_Format_StreamAsIs
-                                       >
+  doc.GetCell< converter::ConvertFromStr< float,
+                                          coverter::S2T_Format_StreamAsIs
+                                        >
              >("A", "2");
 ```
 ... or configure **rapidcsv_FilterSort** to use either classic-locale parsing by setting template-parameter `S2T_FORMAT=S2T_Format_StreamUseClassicLocale`,
 
 ```cpp
-  float f1 = doc.GetCell< rapidcsv::ConvertFromStr< float,
-                                                    rapidcsv::S2T_Format_StreamUseClassicLocale
-                                                  >
+  float f1 = doc.GetCell< converter::ConvertFromStr< float,
+                                                     converter::S2T_Format_StreamUseClassicLocale
+                                                   >
                         >("A", "2");
 ```
 
@@ -380,11 +380,11 @@ It is possible to configure **rapidcsv_FilterSort** to use locale dependent pars
 ```cpp
 constexpr char de_Loc[] = "de_DE";  // string literal object with static storage duration
 
-  using deLocal_iss = rapidcsv::S2T_Format_StreamUserLocale<de_Loc>;
+  using deLocal_iss = converter::S2T_Format_StreamUserLocale<de_Loc>;
 
-  float f2 = doc.GetCell< rapidcsv::ConvertFromStr< float,
-                                                    deLocal_iss
-                                                  >
+  float f2 = doc.GetCell< converter::ConvertFromStr< float,
+                                                     deLocal_iss
+                                                   >
                         >("A", "2");
 ```
 
@@ -424,8 +424,8 @@ std::string ConvertFromVal< T,
                             T2S_FORMAT = typename T2S_DefaultFormat<T>::type
                           >::ToStr(const T& val);
 
-// "T2S_DefaultFormat<T>::type" for floating-types evaluates to  "rapidcsv::T2S_Format_StreamDecimalPrecision<T>"
-// "T2S_DefaultFormat<T>::type" for  integer-types evaluates to  "rapidcsv::T2S_Format_std_TtoS"
+// "T2S_DefaultFormat<T>::type" for floating-types evaluates to  "converter::T2S_Format_StreamDecimalPrecision<T>"
+// "T2S_DefaultFormat<T>::type" for  integer-types evaluates to  "converter::T2S_Format_std_TtoS"
 ```
 
 ### WARNING
@@ -434,17 +434,17 @@ With floating point types `std::to_string(...)` may yield unexpected results as 
 It is possible to configure **rapidcsv_FilterSort** to use locale dependent parsing by changing template-parameter `T2S_FORMAT=T2S_Format_StreamAsIs`.
 
 ```cpp
-  doc.SetCell< rapidcsv::ConvertFromVal< float,
-                                         rapidcsv::T2S_Format_StreamAsIs
-                                       >
+  doc.SetCell< converter::ConvertFromVal< float,
+                                          converter::T2S_Format_StreamAsIs
+                                        >
              >("A", "2", 1.234f);
 ```
 ... or configure **rapidcsv_FilterSort** to use either classic-locale parsing by setting template-parameter `T2S_FORMAT=T2S_Format_StreamUseClassicLocale`,
 
 ```cpp
-  doc.SetCell< rapidcsv::ConvertFromVal< double,
-                                         rapidcsv::T2S_Format_StreamUseClassicLocale
-                                       >
+  doc.SetCell< converter::ConvertFromVal< double,
+                                          converter::T2S_Format_StreamUseClassicLocale
+                                        >
              >("A", "2", 1.23456789);
 ```
 
@@ -453,11 +453,11 @@ It is possible to configure **rapidcsv_FilterSort** to use locale dependent pars
 ```cpp
 constexpr char de_Loc[] = "de_DE";  // string literal object with static storage duration
 
-  using deLocal_iss = rapidcsv::T2S_Format_StreamUserLocale<de_Loc>;
+  using deLocal_iss = converter::T2S_Format_StreamUserLocale<de_Loc>;
 
-  doc.SetCell< rapidcsv::ConvertFromVal< float,
-                                         deLocal_iss
-                                       >
+  doc.SetCell< converter::ConvertFromVal< float,
+                                          deLocal_iss
+                                        >
              >("A", "2", 1.234f);
 ```
 
@@ -507,11 +507,11 @@ Usage Example:
 rapidcsv::Document doc("file.csv", rapidcsv::LabelParams(),
                        rapidcsv::SeparatorParams());
 ...
-float cellVal_f = doc.GetCell<float, ConvertFromStr_fNaN<float>::ToVal>("colName", rowIdx);
+float cellVal_f = doc.GetCell<float, converter::ConvertFromStr_fNaN<float>::ToVal>("colName", rowIdx);
 ...
-std::variant<int, std::string> cellVal_i = doc.GetCell<int, ConvertFromStr_gNaN<int>::ToVal>("colName", rowIdx);
+std::variant<int, std::string> cellVal_i = doc.GetCell<int, converter::ConvertFromStr_gNaN<int>::ToVal>("colName", rowIdx);
 ...
-std::variant<double, std::string> cellVal_d = doc.GetCell<double, ConvertFromStr_gNaN<double>::ToVal>("colName", rowIdx);
+std::variant<double, std::string> cellVal_d = doc.GetCell<double, converter::ConvertFromStr_gNaN<double>::ToVal>("colName", rowIdx);
 ```
 
 Refer [test048.cpp](tests/test048.cpp) and [test049.cpp](tests/test049.cpp) for sample code.
@@ -541,12 +541,12 @@ Template-typename `ConvertFromVal_gNaN<T, T2S_FORMAT>` can be used for all types
 The following classes makes up the Rapidcsv interface:
 
 ## Convertor classes
- - [class rapidcsv::ConvertFromStr< T, S2T_FORMAT >](doc/converter/rapidcsv_ConvertFromStr.md)
- - [class rapidcsv::ConvertFromStr_fNaN< T, S2T_FORMAT >](doc/converter/rapidcsv_ConvertFromStr_fNaN.md)
- - [class rapidcsv::ConvertFromStr_gNaN< T, S2T_FORMAT >](doc/converter/rapidcsv_ConvertFromStr_gNaN.md)
- - [class rapidcsv::ConvertFromVal< T, T2S_FORMAT >](doc/converter/rapidcsv_ConverterToVal.md)
- - [class rapidcsv::ConvertFromVal_gNaN< T, T2S_FORMAT >](doc/converter/rapidcsv_ConvertFromVal_gNaN.md)
- - [class rapidcsv::ConvertFromTuple< T_C >](doc/converter/rapidcsv_ConvertFromTuple.md)
+ - [class converter::ConvertFromStr< T, S2T_FORMAT >](doc/converter/converter_ConvertFromStr.md)
+ - [class converter::ConvertFromStr_fNaN< T, S2T_FORMAT >](doc/converter/converter_ConvertFromStr_fNaN.md)
+ - [class converter::ConvertFromStr_gNaN< T, S2T_FORMAT >](doc/converter/converter_ConvertFromStr_gNaN.md)
+ - [class converter::ConvertFromVal< T, T2S_FORMAT >](doc/converter/rapidcsv_ConverterToVal.md)
+ - [class converter::ConvertFromVal_gNaN< T, T2S_FORMAT >](doc/converter/converter_ConvertFromVal_gNaN.md)
+ - [class converter::ConvertFromTuple< T_C >](doc/converter/converter_ConvertFromTuple.md)
 
  ## CSV Document classes
  - [class rapidcsv::Document](doc/document/rapidcsv_Document.md)

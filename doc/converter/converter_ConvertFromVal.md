@@ -1,4 +1,4 @@
-## class rapidcsv::ConvertFromVal< T, T2S_FORMAT >
+## class converter::ConvertFromVal< T, T2S_FORMAT >
 
 ```c++
 template<typename T, typename T2S_FORMAT = typename T2S_DefaultFormat<T>::type >
@@ -15,7 +15,7 @@ Class declaration for any types, TO string using 'std::ostringstream'.
 ---
 
 
-## class rapidcsv::ConvertFromVal< T, T2S_FORMAT >
+## class converter::ConvertFromVal< T, T2S_FORMAT >
 
 ```c++
 template<c_NOT_string T, c_formatOSS T2S_FORMAT >
@@ -44,7 +44,7 @@ Converts numerical datatype from string holding a numerical value.
 ---
 
 
-## class rapidcsv::ConvertFromVal< T, T2S_Format_std_TtoS >
+## class converter::ConvertFromVal< T, T2S_Format_std_TtoS >
 
 ```c++
   template<c_integer_type T>
@@ -72,7 +72,7 @@ Converts integer datatype to string.
 ---
 
 
-## class rapidcsv::ConvertFromVal< std::string, T2S_Format_WorkAround >
+## class converter::ConvertFromVal< std::string, T2S_Format_WorkAround >
 
 ```c++
 template<>
@@ -98,7 +98,7 @@ Converts string to string.
 ---
 
 
-## class rapidcsv::ConvertFromVal< T, T2S_Format_WorkAround >
+## class converter::ConvertFromVal< T, T2S_Format_WorkAround >
 
 ```c++
 template<c_char T>
@@ -126,7 +126,7 @@ Converts char value to string.
 ---
 
 
-## class rapidcsv::ConvertFromVal< bool, T2S_Format_WorkAround >
+## class converter::ConvertFromVal< bool, T2S_Format_WorkAround >
 
 ```c++
 template<>
@@ -152,7 +152,7 @@ Converts bool value to string.
 ---
 
 
-## class rapidcsv::ConvertFromVal< datelib::year_month_day, T2S_FORMAT_YMD >
+## class converter::ConvertFromVal< datelib::year_month_day, T2S_FORMAT_YMD >
 
 ```c++
 template<c_formatYMDoss T2S_FORMAT_YMD>
@@ -200,7 +200,7 @@ Converts variable holding 'year_month_day' value to string. The string has the f
 ---
 ---
 
-## function rapidcsv::SetTuple< c_T2Sconverter ... T2Sconv >
+## function converter::SetTuple< c_T2Sconverter ... T2Sconv >
 
 ```c++
 template <c_T2Sconverter ... T2Sconv>
@@ -223,7 +223,7 @@ populate a vector of string from a tuple.
 ---
 ---
 
-## class rapidcsv::t_T2Sconv< T_C >
+## class converter::t_T2Sconv< T_C >
 
 If a 'type-C' satisfies concept 'c_T2Sconverter', then use that 'type-C'; else assume it's a 'type-T' and bumped up using 'ConvertFromVal< type-T >' to create a class staisfying concept 'c_T2Sconverter'. This mechanism enables 'template-converter-algorithm' to handle both 'type-C' and 'type-T' using the same code base, (i.e. reduces code duplicity).  
 
@@ -245,7 +245,7 @@ a converter alias that satisfies concept 'c_T2Sconverter'
 ---
 ---
 
-## class rapidcsv::f_T2Sconv< CONV_T2S >
+## class converter::f_T2Sconv< CONV_T2S >
 
 convert a function with signature 'auto (*CONV_S2T)(const std::string&)' to a converter type that satisfies concept 'c_T2Sconverter'.  
 

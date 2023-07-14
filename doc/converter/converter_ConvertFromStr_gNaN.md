@@ -1,4 +1,4 @@
-## class rapidcsv::ConvertFromStr_gNaN< T, S2T_FORMAT >
+## class converter::ConvertFromStr_gNaN< T, S2T_FORMAT >
 
 ```c++
 template<c_signaling_NaN T, typename S2T_FORMAT = typename S2T_DefaultFormat<T>::type >

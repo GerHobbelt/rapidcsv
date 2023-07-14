@@ -1,4 +1,4 @@
-## class rapidcsv::ConvertFromStr< T, S2T_FORMAT >
+## class converter::ConvertFromStr< T, S2T_FORMAT >
 
 ```c++
 template<typename T, typename S2T_FORMAT = typename S2T_DefaultFormat<T>::type >
@@ -14,7 +14,7 @@ Class declaration of convertor FROM string to any type's.
 ---
 
 
-## class rapidcsv::ConvertFromStr< T, S2T_FORMAT >
+## class converter::ConvertFromStr< T, S2T_FORMAT >
 
 ```c++
 template< c_NOT_string T, c_formatISS S2T_FORMAT >
@@ -44,7 +44,7 @@ Converts string holding a numerical value to numerical datatype representation.
 ---
 
 
-## class rapidcsv::ConvertFromStr< T, S2T_Format_std_StoT >
+## class converter::ConvertFromStr< T, S2T_Format_std_StoT >
 
 ```c++
 template <c_integer_type T>
@@ -90,7 +90,7 @@ Converts string holding a integer represenation to integer datatype.
 ---
 
 
-## class rapidcsv::ConvertFromStr< T, S2T_Format_std_StoT >
+## class converter::ConvertFromStr< T, S2T_Format_std_StoT >
 
 ```c++
 template<c_floating_point T>
@@ -136,7 +136,7 @@ Converts string holding a floating-number represenation to floating datatype.
 ---
 
 
-## class rapidcsv::ConvertFromStr< std::string, S2T_Format_WorkAround >
+## class converter::ConvertFromStr< std::string, S2T_Format_WorkAround >
 
 ```c++
 template<>
@@ -162,7 +162,7 @@ Converts string to string.
 ---
 
 
-## class rapidcsv::ConvertFromStr< T, S2T_Format_WorkAround >
+## class converter::ConvertFromStr< T, S2T_Format_WorkAround >
 
 ```c++
 template<c_char T>
@@ -191,7 +191,7 @@ Converts string holding char value.
 ---
 
 
-## class rapidcsv::ConvertFromStr< bool, S2T_Format_WorkAround >
+## class converter::ConvertFromStr< bool, S2T_Format_WorkAround >
 
 ```c++
 template<>
@@ -217,7 +217,7 @@ Converts string holding bool value.
 ---
 
 
-## class rapidcsv::ConvertFromStr< datelib::year_month_day, S2T_FORMAT_YMD >
+## class converter::ConvertFromStr< datelib::year_month_day, S2T_FORMAT_YMD >
 
 ```c++
 template<c_formatYMDiss S2T_FORMAT_YMD>
@@ -264,7 +264,7 @@ Converts string holding 'year_month_day' value. The string has the format '%F' -
 ---
 ---
 
-## function rapidcsv::GetTuple< c_S2Tconverter ... S2Tconv >
+## function converter::GetTuple< c_S2Tconverter ... S2Tconv >
 
 ```c++
 template <c_S2Tconverter ... S2Tconv>
@@ -285,7 +285,7 @@ populate a tuple from a vector of string.
 ---
 ---
 
-## class rapidcsv::t_S2Tconv< T_C >
+## class converter::t_S2Tconv< T_C >
 
 If a 'type-C' satisfies concept 'c_S2Tconverter', then use that 'type-C'; else assume it's a 'type-T' and bumped up using 'ConvertFromStr< type-T >' to create a class staisfying concept 'c_S2Tconverter'. This mechanism enables 'template-converter-algorithm' to handle both 'type-C' and 'type-T' using the same code base, (i.e. reduces code duplicity of Getters and Setters functions).  
 
@@ -307,7 +307,7 @@ a converter alias that satisfies concept 'c_S2Tconverter'
 ---
 ---
 
-## class rapidcsv::f_S2Tconv< CONV_S2T >
+## class converter::f_S2Tconv< CONV_S2T >
 
 convert a function with signature 'auto (*CONV_S2T)(const std::string&)' to a converter type that satisfies concept 'c_S2Tconverter'.
 

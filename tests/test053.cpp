@@ -61,8 +61,8 @@ int main()
   {
     rapidcsv::Document doc1(path, rapidcsv::LabelParams(0, 0));
 
-    //std::string tstr = rapidcsv::ConvertFromVal<double,format_type>::ToStr(1.2e10);
-    //std::string tstr = rapidcsv::ConvertFromVal<double>::ToStr(1.2e10);
+    //std::string tstr = converter::ConvertFromVal<double,format_type>::ToStr(1.2e10);
+    //std::string tstr = converter::ConvertFromVal<double>::ToStr(1.2e10);
     doc1.SetCell<double>("A", "1", 1.2e10);
     doc1.SetCell<double>("B", "1", 2.00E-07);
     // std::cout << "doc1.GetCell<double>(\"B\", \"1\") = " << std::setprecision(10) << doc1.GetCell<double>("B", "1") << std::endl;

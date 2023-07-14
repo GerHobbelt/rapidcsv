@@ -3,11 +3,11 @@
 #include <iomanip>
 #include <cmath>
 
-#include <rapidcsv/converter.h>
+#include <converter/converter.h>
 
 struct format_num {};
 
-template<rapidcsv::c_floating_point T>
+template<converter::c_floating_point T>
 struct format_oss {
     using stream_type = std::ostringstream;
     static void streamUpdate(std::ostringstream& oss)
@@ -18,7 +18,7 @@ struct format_oss {
     }
 };
 
-template<rapidcsv::c_floating_point T>
+template<converter::c_floating_point T>
 constexpr int getHigherDecimalPrecision()
 {
   if constexpr (std::is_same_v<T, float>)
@@ -30,10 +30,10 @@ constexpr int getHigherDecimalPrecision()
   if constexpr (std::is_same_v<T, long double>)
     return LDBL_DIG+10;
 }
-template<rapidcsv::c_floating_point T>
-using T2S_Format_hdp = rapidcsv::T2S_Format_StreamDecimalPrecision<T, getHigherDecimalPrecision<T>() >;
+template<converter::c_floating_point T>
+using T2S_Format_hdp = converter::T2S_Format_StreamDecimalPrecision<T, getHigherDecimalPrecision<T>() >;
 
-namespace rapidcsv
+namespace converter
 {
   template<>
   struct ConvertFromStr<int, format_num>
@@ -78,8 +78,8 @@ std::string ToStr(const T& val)
 template<typename T>
 void testType(const std::string& typeData, const T& orgT)
 {
-  const std::string strT = rapidcsv::ConvertFromVal<T>::ToStr(orgT);
-  const T convT = rapidcsv::ConvertFromStr<T>::ToVal(strT);
+  const std::string strT = converter::ConvertFromVal<T>::ToStr(orgT);
+  const T convT = converter::ConvertFromStr<T>::ToVal(strT);
 
   std::cout << std::setprecision(25) << "org" << typeData << " = " << orgT << " ; str"
             << typeData << " = " << strT << " ; conv-" << typeData << " = " << convT << std::endl;
@@ -101,18 +101,18 @@ int main()
   testType<long double>("LongDouble", 23453.1234567890123456789012345L);
   testType<char>("Char", 'G');
   testType<bool>("Bool", true);
-  namespace rdb = rapidcsv::datelib;
+  namespace rdb = converter::datelib;
   testType<rdb::year_month_day>("YearMonthDay", rdb::year_month_day{rdb::year{2023}, rdb::month{3}, rdb::day{14} } );
 
   typename std::string (*dmY_To_str)(const rdb::year_month_day& str) =
-              &rapidcsv::ConvertFromVal<  rdb::year_month_day,
-                                          rapidcsv::T2S_Format_StreamYMD< dmY_fmt >
-                                       >::ToStr;
+              &converter::ConvertFromVal< rdb::year_month_day,
+                                          converter::T2S_Format_StreamYMD< dmY_fmt >
+                                        >::ToStr;
 
   typename rdb::year_month_day (*To_dmY)(const std::string& str) =
-              &rapidcsv::ConvertFromStr<  rdb::year_month_day,
-                                          rapidcsv::S2T_Format_StreamYMD< dmY_fmt >
-                                       >::ToVal;
+              &converter::ConvertFromStr<  rdb::year_month_day,
+                                           converter::S2T_Format_StreamYMD< dmY_fmt >
+                                        >::ToVal;
   {
     rdb::year_month_day orgT{rdb::year{1980}, rdb::month{8}, rdb::day{17}};
     const std::string strT = dmY_To_str(orgT);
@@ -130,22 +130,22 @@ int main()
   std::cout << "                      step1.  long-double -> string" << std::endl;
 
   // call to -> static std::string ConvertFromVal<T, format_num> >::ToStr(const T& val);
-  const std::string strLongDouble1 = rapidcsv::ConvertFromVal<long double,
-                                                              format_num
-                                                            >::ToStr(orgLongDouble);
+  const std::string strLongDouble1 = converter::ConvertFromVal<long double,
+                                                               format_num
+                                                              >::ToStr(orgLongDouble);
   std::cout << "                      step2.  string -> int" << std::endl;
-  const int convInt1 = rapidcsv::ConvertFromStr<int,format_num>::ToVal(strLongDouble1);
+  const int convInt1 = converter::ConvertFromStr<int,format_num>::ToVal(strLongDouble1);
 
   std::cout << "orgLongDouble = " << orgLongDouble << " ; strLongDouble1 = "
             << strLongDouble1 << " ; convInt1 = " << convInt1 << std::endl;
 
   std::cout << "-------------   case 2 ::     long-double -> string -> int" << std::endl;
   std::cout << "                      step1.  long-double -> string" << std::endl;
-  const std::string strLongDouble2 = rapidcsv::ConvertFromVal<long double,
-                                                              format_oss<long double>
-                                                             >::ToStr(orgLongDouble);
+  const std::string strLongDouble2 = converter::ConvertFromVal<long double,
+                                                               format_oss<long double>
+                                                              >::ToStr(orgLongDouble);
   std::cout << "                      step2.  string -> int" << std::endl;
-  const int convInt2 = rapidcsv::ConvertFromStr<int,format_num>::ToVal(strLongDouble2);
+  const int convInt2 = converter::ConvertFromStr<int,format_num>::ToVal(strLongDouble2);
 
   std::cout << "orgLongDouble = " << orgLongDouble << " ; strLongDouble2 = "
             << strLongDouble2 << " ; convInt2 = " << convInt2 << std::endl;
@@ -155,11 +155,11 @@ int main()
 
   std::cout << "call to -> int getHigherDecimalPrecision<T>();" << std::endl;
   std::cout << "check the higher precision of 'strLongDouble3'" << std::endl;
-  const std::string strLongDouble3 = rapidcsv::ConvertFromVal<long double,
-                                                              T2S_Format_hdp<long double>
-                                                             >::ToStr(orgLongDouble);
+  const std::string strLongDouble3 = converter::ConvertFromVal<long double,
+                                                               T2S_Format_hdp<long double>
+                                                              >::ToStr(orgLongDouble);
   std::cout << "                      step2.  string -> int" << std::endl;
-  const int convInt3 = rapidcsv::ConvertFromStr<int,format_num>::ToVal(strLongDouble3);
+  const int convInt3 = converter::ConvertFromStr<int,format_num>::ToVal(strLongDouble3);
 
   std::cout << "orgLongDouble = " << orgLongDouble << " ; strLongDouble3 = "
             << strLongDouble3 << " ; convInt3 = " << convInt3 << std::endl;

@@ -3,13 +3,13 @@
 #include <rapidcsv/view.h>
 #include "unittest.h"
 
-namespace rdb = rapidcsv::datelib;
+namespace rdb = converter::datelib;
 
 
 bool isYear2016(const rapidcsv::Document::t_dataRow& dataRow)
 {
   // NOTE : data-zero-index is label
-  return ( rapidcsv::ConvertFromStr< rdb::year_month_day >::ToVal(dataRow.at(0)).year() == rdb::year(2016) );
+  return ( converter::ConvertFromStr< rdb::year_month_day >::ToVal(dataRow.at(0)).year() == rdb::year(2016) );
 }
 
 
