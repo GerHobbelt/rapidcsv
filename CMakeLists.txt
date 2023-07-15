@@ -5,67 +5,6 @@ set (CMAKE_CXX_STANDARD 20)
 #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 
 
-#[==============================================[
-    Check if chrono-lib is supported
-#]==============================================]
-try_compile(USE_CHRONO_LIB
-            SOURCES  "${CMAKE_CURRENT_SOURCE_DIR}/tests/checkChrono_fromStream.cpp"
-            #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
-            COMPILE_DEFINITIONS "-DUSE_CHRONO=1"
-            CXX_STANDARD "${CMAKE_CXX_STANDARD}"
-            CXX_STANDARD_REQUIRED True
-           )
-if(USE_CHRONO_LIB)
-  message(STATUS "'checkChrono_fromStream' SUCCEDED")
-  try_compile(IS_CHRONO_TOSTREAM
-              SOURCES  "${CMAKE_CURRENT_SOURCE_DIR}/tests/checkChrono_toStream.cpp"
-              #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
-              COMPILE_DEFINITIONS "-DUSE_CHRONO=1"
-              CXX_STANDARD "${CMAKE_CXX_STANDARD}"
-              CXX_STANDARD_REQUIRED True
-             )
-  if(IS_CHRONO_TOSTREAM)
-    message(STATUS "'checkChrono_toStream' SUCCEDED")
-  else()
-    message(STATUS "'checkChrono_toStream' FAILED")
-  endif()
-else()
-  message(STATUS "'checkChrono_fromStream' FAILED")
-  message(STATUS "'checkChrono_toStream' SKIPPED")
-endif()
-
-
-if(USE_CHRONO_LIB)
-  message(STATUS "Using DATE_TIME-lib : <chrono>")
-  add_definitions(-DUSE_CHRONO=1)
-  unset(DATELIB)
-  if(IS_CHRONO_TOSTREAM)
-    message(STATUS "Using CHRONO_TOSTREAM : std::chrono::to_stream(...)")
-    add_definitions(-DUSE_CHRONO_TOSTREAM=1)
-  else()
-    message(STATUS "Using workaround CHRONO_TOSTREAM : as std::chrono::to_stream(...) fails to compile")
-    add_definitions(-DUSE_CHRONO_TOSTREAM=0)
-  endif()
-else()
-  message(STATUS "Using DATE_TIME-lib : <date/date.h>")
-  add_definitions(-DUSE_CHRONO=0)
-  set(DATELIB date)
-
-  include( FetchContent )
-  FetchContent_Declare( ${DATELIB}
-      GIT_REPOSITORY https://github.com/HowardHinnant/date.git
-      GIT_TAG        v3.0.1  # adjust tag/branch/commit as needed
-    )
-  FetchContent_MakeAvailable(${DATELIB})
-
-  #FetchContent_GetProperties(${DATELIB})
-  #if(NOT ${DATELIB}_POPULATED)
-  #  FetchContent_Populate(${DATELIB})
-
-  #  add_subdirectory(${${DATELIB}_SOURCE_DIR} ${${DATELIB}_BINARY_DIR} EXCLUDE_FROM_ALL)
-  #endif()
-endif()
-
 file(TO_NATIVE_PATH "/" _path_separator)
 message("The systems's path separator is '${_path_separator}'")
 
@@ -137,7 +76,6 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
 
   # Install
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/rapidcsv.h
-                ${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/converter.h
                 ${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/view.h
           DESTINATION include/rapidcsv/)
   export(TARGETS rapidcsv FILE cmake/rapidcsvTargets.cmake)
