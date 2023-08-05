@@ -1,6 +1,6 @@
 # Project
 cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
-project(rapidcsv VERSION 2.04.08.78 LANGUAGES CXX)
+project(rapidcsv VERSION 2.05.08.80 LANGUAGES CXX)
 set (CMAKE_CXX_STANDARD 20)
 #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 
@@ -125,6 +125,10 @@ endif()
 # Library
 add_library(rapidcsv INTERFACE)
 target_include_directories(rapidcsv INTERFACE include)
+if(DATELIB)
+    message(STATUS "'rapidcsv' linking to '${DATELIB}'")
+    target_link_libraries(rapidcsv INTERFACE ${DATELIB})
+endif()
 
 
 # Install / Uninstall targets for standalone rapidcsv build
@@ -149,13 +153,6 @@ endif()
 
 
 
-# Ccache
-find_program(CCACHE_PROGRAM ccache)
-if(CCACHE_PROGRAM)
-  message(STATUS "Found ccache")
-  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
-endif()
-
 # Tests
 option(RAPIDCSV_BUILD_TESTS "Build tests" OFF)
 message(STATUS "Build tests: ${RAPIDCSV_BUILD_TESTS}")
@@ -164,6 +161,13 @@ if(RAPIDCSV_BUILD_TESTS)
   # Test init
   include(CTest)
   enable_testing()
+
+  # Ccache
+  find_program(CCACHE_PROGRAM ccache)
+  if(CCACHE_PROGRAM)
+    message(STATUS "Found ccache")
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+  endif()
 
   # Enable codecvt tests if supported
   if (CMAKE_CXX_STANDARD VERSION_LESS "17")
@@ -182,7 +186,7 @@ if(RAPIDCSV_BUILD_TESTS)
       FILE(GLOB sources tests/${testname}*.cpp)
       add_executable(${testname} ${sources})
       add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/${testname}")
-      target_link_libraries(${testname} PUBLIC rapidcsv ${DATELIB})
+      target_link_libraries(${testname} PUBLIC rapidcsv)
     endif()
   endmacro(add_perf_test)
 
@@ -192,7 +196,7 @@ if(RAPIDCSV_BUILD_TESTS)
       FILE(GLOB sources tests/${testname}*.cpp)
       add_executable(${testname} ${sources})
       add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/${testname}")
-      target_link_libraries(${testname} PUBLIC rapidcsv ${DATELIB})
+      target_link_libraries(${testname} PUBLIC rapidcsv)
     endif()
   endmacro(add_unit_test)
 
@@ -346,7 +350,7 @@ if(RAPIDCSV_BUILD_TESTS)
   macro(add_example testname)
     if(CMAKE_BUILD_TYPE MATCHES "Debug")
       add_executable(${testname} examples/${testname}.cpp)
-      target_link_libraries(${testname} PUBLIC rapidcsv ${DATELIB})
+      target_link_libraries(${testname} PUBLIC rapidcsv)
     endif()
   endmacro(add_example)
 

@@ -2,7 +2,7 @@
  * rapidcsv.h
  *
  * URL:      https://github.com/panchaBhuta/rapidcsv_FilterSort
- * Version:  v2.03.fs-8.78
+ * Version:  v2.05.fs-8.80
  *
  * Copyright (C) 2022-2023 Gautam Dhar
  * All rights reserved.
@@ -13,7 +13,7 @@
  * ***********************************************************************************
  *
  * URL:      https://github.com/d99kris/rapidcsv
- * Version:  8.78
+ * Version:  8.80
  *
  * Copyright (C) 2017-2023 Kristofer Berggren
  * All rights reserved.
