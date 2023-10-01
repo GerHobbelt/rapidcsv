@@ -45,20 +45,30 @@ typedef SSIZE_T ssize_t;
 
 #include <converter/converter.h>
 
+#define RAPIDCSV__VERSION_MAJOR 3
+#define RAPIDCSV__VERSION_MINOR 0
+#define RAPIDCSV__VERSION_PATCH 0
+
 //  Project path is removed from the __FILE__
 //  Resulting file-path is relative path from project-root-folder.
-#if  USE_MACROPREFIXMAP == 1
-  // the project-prefix-path is removed via compilation directive macro-prefix-map
+#if  USE_FILEPREFIXMAP == 1
+  // the project-prefix-path is removed via compilation directive file-prefix-map
   #define __RAPIDCSV_FILE__    __FILE__
 #else
   // https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
   // the project-prefix-path is skipped by offsetting to length of project-prefix-path
-  #define __RAPIDCSV_FILE__   (__FILE__ + CONVERTER_SOURCE_PATH_SIZE)
+  #define __RAPIDCSV_FILE__   (__FILE__ + RAPIDCSV_SOURCE_PATH_SIZE)
 #endif
 
 // to handle windows back-slash path seperator
 #define __RAPIDCSV_PREFERRED_PATH__    std::filesystem::path(__RAPIDCSV_FILE__).make_preferred().string()
 
+
+#ifdef ENABLE_RAPIDCSV_DEBUG_LOG
+#define RAPIDCSV_DEBUG_LOG(aMessage) { std::cout << aMessage << " :: file:" << __RAPIDCSV_PREFERRED_PATH__ << ":" << __LINE__ << std::endl; }
+#else
+#define RAPIDCSV_DEBUG_LOG(aMessage)
+#endif
 
 
 

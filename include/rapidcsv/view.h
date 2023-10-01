@@ -670,8 +670,8 @@ namespace rapidcsv
         docRowIdx  = _sortedData.at(pRowKey);
       } catch (std::out_of_range& err) {
         throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+" : FilterSortDocument::GetRow_IndexKey_VecStr() : "
-              +"rowKey not found in 'sortedKeyMap'. For pRowKey="
-              +converter::ConvertFromTuple<typename SPtypes::S2Tconv_type::return_type ...>::ToStr(pRowKey) + " : ERROR: " + err.what());
+              +"rowKey not found in 'sortedKeyMap'. For pRowKey=["
+              +converter::ConvertFromTuple<typename SPtypes::S2Tconv_type::return_type ...>::ToStr(pRowKey) + "] : ERROR: " + err.what());
       }
       return _document.GetRow_VecStr(docRowIdx);
     }

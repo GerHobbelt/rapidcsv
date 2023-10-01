@@ -1,5 +1,22 @@
 // test088.cpp - test parsing of files larger than 64 KB
 
+/*
+#ifdef WINDOWS
+#include <direct.h>
+#define GetCurrentDir _getcwd
+#else
+#include <unistd.h>
+#define GetCurrentDir getcwd
+#endif
+
+std::string get_current_dir() {
+   char buff[FILENAME_MAX]; //create string buffer to hold path
+   GetCurrentDir( buff, FILENAME_MAX );
+   std::string current_working_dir(buff);
+   return current_working_dir;
+}
+*/
+
 #include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
@@ -44,7 +61,8 @@ int main()
     const long long msftMaxVolume = 1031788800;
 
     {
-      rapidcsv::Document doc("../tests/msft.csv");
+      //std::cout << "test088 :: " << get_current_dir() << std::endl;  //  enable this line in case of test failure
+      rapidcsv::Document doc("../../tests/msft.csv");
       std::vector<float> close = doc.GetColumn<float>("Close");
       std::vector<long long> volume = doc.GetColumn<long long>("Volume");
       unittest::ExpectEqual(size_t, doc.GetRowCount(), msftDataRows);
@@ -59,7 +77,7 @@ int main()
 
     // parse msft.csv via non-binary ifstream, sanity check certain values
     {
-      std::ifstream in("../tests/msft.csv");
+      std::ifstream in("../../tests/msft.csv");
       rapidcsv::Document doc(in);
       std::vector<float> close = doc.GetColumn<float>("Close");
       std::vector<long long> volume = doc.GetColumn<long long>("Volume");

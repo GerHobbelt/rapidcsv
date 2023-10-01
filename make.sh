@@ -2,7 +2,7 @@
 
 # make.sh
 #
-# Copyright (C) 2020-2021 Kristofer Berggren
+# Copyright (C) 2023-2023 Gautam Dhar
 # All rights reserved.
 #
 # See LICENSE for redistribution information.
@@ -78,6 +78,10 @@ if [[ "${DEPS}" == "1" ]]; then
     if [[ "${DISTRO}" == "Ubuntu" ]]; then
       if [[ "${GITHUB_ACTIONS}" == "true" ]]; then
         # ensure de_DE locale is present when running CI tests
+        locale -a | grep -qi "de_DE"
+        if [[ "${?}" != "0" ]]; then
+          sudo locale-gen "de_DE" || exiterr "deps failed (${DISTRO}), exiting."
+        fi
         locale -a | grep -qi "de_DE.utf8"
         if [[ "${?}" != "0" ]]; then
           sudo locale-gen "de_DE.UTF-8" || exiterr "deps failed (${DISTRO}), exiting."
@@ -136,8 +140,8 @@ if [[ "${BUILD}" == "1" ]]; then
   elif [ "${OS}" == "Darwin" ]; then
     MAKEARGS="-j$(sysctl -n hw.ncpu)"
   fi
-  mkdir -p build-debug && cd build-debug && cmake -DRAPIDCSV_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug .. && make -s ${MAKEARGS} && cd .. && \
-  mkdir -p build-release && cd build-release && cmake -DRAPIDCSV_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release .. && make -s ${MAKEARGS} && cd .. || \
+  mkdir -p build-debug && cd build-debug && cmake -DRAPIDCSV_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . ${MAKEARGS} && cd .. && \
+  mkdir -p build-release && cd build-release && cmake -DRAPIDCSV_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release .. && cmake --build . ${MAKEARGS} && cd .. || \
   exiterr "build failed, exiting."
 fi
 
@@ -166,9 +170,9 @@ fi
 if [[ "${INSTALL}" == "1" ]]; then
   OS="$(uname)"
   if [ "${OS}" == "Linux" ]; then
-    cd build-release && sudo make install && cd .. || exiterr "install failed (linux), exiting."
+    cd build-release && sudo cmake --install . && cd .. || exiterr "install failed (linux), exiting."
   elif [ "${OS}" == "Darwin" ]; then
-    cd build-release && make install && cd .. || exiterr "install failed (mac), exiting."
+    cd build-release && cmake --install . && cd .. || exiterr "install failed (mac), exiting."
   else
     exiterr "install failed (unsupported os ${OS}), exiting."
   fi

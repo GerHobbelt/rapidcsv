@@ -140,6 +140,44 @@ namespace unittest
   }
 
   template<typename T>
+  struct SScompatible {
+    inline static const T& getVal(const T& val) { return val; }
+  };
+
+  
+  template <typename T>
+  concept c_xchar = (std::is_same_v<T, unsigned char> ||
+                     std::is_same_v<T, signed char> ||
+                     std::is_same_v<T, wchar_t> ||
+                     std::is_same_v<T, char8_t> ||
+                     std::is_same_v<T, char16_t> ||
+                     std::is_same_v<T, char32_t> ); // Note : excluding 'char' type
+
+  template<c_xchar T>
+  struct SScompatible<T> {
+    inline static std::string getVal(const T& val)
+    {
+      // https://stackoverflow.com/questions/27720553/conversion-of-wchar-t-to-string
+      std::basic_string<T> ssVal(&val,1);
+      std::string sVal(ssVal.begin(),ssVal.end());
+      return sVal;
+    }
+  };
+
+  template<>
+  struct SScompatible<std::chrono::year_month_day> {
+    inline static std::string getVal(const std::chrono::year_month_day& val)
+    {
+      std::ostringstream oss;
+      oss << std::setfill('0') << std::setw(4) << static_cast<int>(val.year()) << "-";
+      oss << std::setfill('0') << std::setw(2) << static_cast<unsigned>(val.month()) << "-";
+      oss << std::setfill('0') << std::setw(2) << static_cast<unsigned>(val.day());
+
+      return oss.str();
+    }
+  };
+
+  template<typename T>
   inline void ExpectEqualFun(T pTest, T pRef, const std::string& testName,
                              const std::string& refName, const std::string& filePath, int lineNo)
   {
@@ -149,8 +187,8 @@ namespace unittest
       ss << std::setprecision(std::numeric_limits<long double>::digits10 + 1);
       ss << detail::FileName(filePath) << ":" << std::to_string(lineNo);
       ss << " ExpectEqual failed: " << testName << " != " << refName << std::endl;
-      ss << testName << " = '" << pTest << "'" << std::endl;
-      ss << refName << " = '" << pRef << "'" << std::endl;
+      ss << testName << " = '" << SScompatible<T>::getVal(pTest) << "'" << std::endl;
+      ss << refName << " = '"  << SScompatible<T>::getVal(pRef)  << "'" << std::endl;
 
       throw std::runtime_error(ss.str());
     }

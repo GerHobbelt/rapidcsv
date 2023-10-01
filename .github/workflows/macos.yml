@@ -2,17 +2,85 @@ name: macOS
 
 on:
   push:
-  pull_request:
-    branches:
-      - master
+    branches: [ master, main ]
     paths-ignore:
       - 'docs/**'
+    tags-ignore:
+      - v*
+  pull_request:
+    branches: [ master, main ]
+    paths-ignore:
+      - 'docs/**'
+    tags-ignore:
+      - v*
+  workflow_dispatch:
+
+#env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  #BUILD_TYPE: Release
+
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
-  mac-build:
-    runs-on: macos-latest
+  build-macos:
+    name: Build
+    strategy:
+      fail-fast: false
+      matrix:
+        # https://github.com/actions/runner-images#available-images
+        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources  (os-labels : macos-12)
+        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
+        # os: [ macos-11, macos-12 ] compiles with 'AppleClang-14' which is not available in macos-11
+        os: [ macos-11, macos-12, macOS-13 ]  #  macOS-latest  ==  macOS-13
+        # https://github.com/actions/runner-images/blob/main/images/macos/macos-13-Readme.md#language-and-runtime
+        # https://github.com/actions/runner-images/blob/main/images/macos/macos-12-Readme.md#language-and-runtime
+        # https://github.com/actions/runner-images/blob/main/images/macos/macos-11-Readme.md#language-and-runtime
+          # clang++ == 'AppleClang-14'
+          # default == 'AppleClang-14'
+        compiler: [ default, g++-11, g++-12 ]
+        exclude:
+          - os: macos-11
+            compiler : default
+    runs-on: ${{matrix.os}}
     steps:
-    - name: Checkout
-      uses: actions/checkout@v1
-    - name: Build macOS
-      run: ./make.sh all
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Get Version
+        run: uname -a && cmake --version
+      - name: Check Generators
+        # https://stackoverflow.com/questions/25941536/what-is-a-cmake-generator
+        run: cmake --help
+      - name: Configure CMake (compiler=default) [Debug]
+        if: matrix.compiler == 'default'
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DRAPIDCSV_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - name: Configure CMake (compiler=NOT-default) [Debug]
+        if: matrix.compiler != 'default'
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DRAPIDCSV_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
+      - name: Show compile commands [Debug]
+        run: cat build-debug/compile_commands.json
+      - name: Build [Debug]
+        run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j
+      - name: Test [Debug]
+        working-directory: ${{github.workspace}}/build-debug
+        #run: ctest -C Debug --output-on-failure -j
+        run: ctest -C Debug --verbose
+      - name: Install [Debug]
+        run: cmake --install "${{github.workspace}}/build-debug" --config Debug
+      - name: Configure CMake (compiler=default) [Release]
+        if: matrix.compiler == 'default'
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DRAPIDCSV_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - name: Configure CMake (compiler=NOT-default) [Release]
+        if: matrix.compiler != 'default'
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DRAPIDCSV_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
+      - name: Build [Release]
+        run: cmake --build "${{github.workspace}}/build-release" --config Release -j
+      - name: Test [Release]
+        working-directory: ${{github.workspace}}/build-release
+        run: ctest -C Release --verbose
+      - name: Install [Release]
+        run: cmake --install "${{github.workspace}}/build-release" --config Release
+      - name: Check Work-Arounds
+        run: grep define "${{github.workspace}}/build-release/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " _e_"

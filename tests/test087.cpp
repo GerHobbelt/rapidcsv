@@ -4,12 +4,48 @@
 #include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
+template<typename T>
+using convertS2T_stream =
+    converter::ConvertFromStr<T,
+                              converter::S2T_Format_StreamAsIs<T,
+                                                               converter::FailureS2Tprocess::THROW_ERROR,
+                                                               char>
+                             >;
+
+template<typename T>
+using convertS2T_streamClassic =
+    converter::ConvertFromStr<T,
+                              converter::S2T_Format_StreamUseClassicLocale< T,
+                                                                            converter::FailureS2Tprocess::THROW_ERROR,
+                                                                            char>
+                             >;
+
+
+template<typename T>
+using convertS2T_StoT =
+    converter::ConvertFromStr<T,
+                              converter::S2T_Format_std_StoT<T,
+                                                             converter::FailureS2Tprocess::THROW_ERROR>
+                             >;
+
+
+
+static constexpr char loc[] = "de_DE.UTF-8"; // uses comma (,) as decimal separator
+
+template<typename T>
+using deLocal_iss = converter::S2T_Format_StreamUserLocale<T, converter::FailureS2Tprocess::THROW_ERROR, char, loc>;
+
+template<typename T>
+using convertS2T_userLocale =
+    converter::ConvertFromStr<T, deLocal_iss<T> >;
+
+
+
 int main()
 {
   int rv = 0;
 
-  std::string loc = "de_DE.UTF-8"; // uses comma (,) as decimal separator
-  if (std::setlocale(LC_ALL, loc.c_str()) == nullptr)
+  if (std::setlocale(LC_ALL, loc) == nullptr)
   {
     std::cout << "locale " << loc << " not available, skipping test.\n";
     // pass test for systems without locale present. for ci testing, make.sh
@@ -32,9 +68,13 @@ int main()
 
       rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0),
                              rapidcsv::SeparatorParams(';' /* pSeparator */));
-      unittest::ExpectEqual(float, doc.GetCell<float>("A", "2"), 0.1f);
-      unittest::ExpectEqual(float, doc.GetCell<float>("B", "2"), 0.01f);
-      unittest::ExpectEqual(float, doc.GetCell<float>("C", "2"), 0.001f);
+      unittest::ExpectEqual(float, doc.GetCell<convertS2T_StoT<float>>("A", "2"), 0.1f);
+      unittest::ExpectEqual(float, doc.GetCell<convertS2T_StoT<float>>("B", "2"), 0.01f);
+      unittest::ExpectEqual(float, doc.GetCell<convertS2T_StoT<float>>("C", "2"), 0.001f);
+
+      unittest::ExpectEqual(float, doc.GetCell<convertS2T_userLocale<float>>("A", "2"), 0.1f);
+      unittest::ExpectEqual(float, doc.GetCell<convertS2T_userLocale<float>>("B", "2"), 0.01f);
+      unittest::ExpectEqual(float, doc.GetCell<convertS2T_userLocale<float>>("C", "2"), 0.001f);
     }
 
     {
@@ -49,12 +89,17 @@ int main()
       rapidcsv::LabelParams labelParams(0, 0);
       rapidcsv::SeparatorParams separatorParams;
       rapidcsv::Document doc(path, labelParams, separatorParams);
-      // Note: 'ExceptEqual' is a macro-function; comma in "<float, converter::S2T_Format_StreamAsIs>" messes up the call.
-      // Using macro-variable 'COMMA' is a workaround "<float COMMA converter::S2T_Format_StreamAsIs>".
-      // doc.GetCell<float , converter::ConvertFromStr<float , converter::S2T_Format_StreamAsIs>>("A", "2");
-      unittest::ExpectEqual(float, doc.GetCell<converter::ConvertFromStr<float COMMA converter::S2T_Format_StreamAsIs>>("A", "2"), 0.1f);
-      unittest::ExpectEqual(float, doc.GetCell<converter::ConvertFromStr<float COMMA converter::S2T_Format_StreamAsIs>>("B", "2"), 0.01f);
-      unittest::ExpectEqual(float, doc.GetCell<converter::ConvertFromStr<float COMMA converter::S2T_Format_StreamUseClassicLocale>>("C", "2"), 0.001f);
+      unittest::ExpectEqual(float, doc.GetCell<float>("A", "2"), 0.1f);
+      unittest::ExpectEqual(float, doc.GetCell<float>("B", "2"), 0.01f);
+      unittest::ExpectEqual(float, doc.GetCell<float>("C", "2"), 0.001f);
+
+      unittest::ExpectEqual(float, doc.GetCell<convertS2T_stream<float>>("A", "2"), 0.1f);
+      unittest::ExpectEqual(float, doc.GetCell<convertS2T_stream<float>>("B", "2"), 0.01f);
+      unittest::ExpectEqual(float, doc.GetCell<convertS2T_stream<float>>("C", "2"), 0.001f);
+
+      unittest::ExpectEqual(float, doc.GetCell<convertS2T_streamClassic<float>>("A", "2"), 0.1f);
+      unittest::ExpectEqual(float, doc.GetCell<convertS2T_streamClassic<float>>("B", "2"), 0.01f);
+      unittest::ExpectEqual(float, doc.GetCell<convertS2T_streamClassic<float>>("C", "2"), 0.001f);
     }
   }
   catch (const std::exception& ex)

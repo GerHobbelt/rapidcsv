@@ -2,17 +2,80 @@ name: Linux
 
 on:
   push:
-  pull_request:
-    branches:
-      - master
+    branches: [ master, main ]
     paths-ignore:
       - 'docs/**'
+    tags-ignore:
+      - v*
+  pull_request:
+    branches: [ master, main ]
+    paths-ignore:
+      - 'docs/**'
+    tags-ignore:
+      - v*
+  workflow_dispatch:
+
+#env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  #BUILD_TYPE: Release
+
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
-  linux-build:
-    runs-on: ubuntu-latest
+  build-ubuntu:
+    name: Build
+    strategy:
+      fail-fast: false
+      matrix:
+        # https://github.com/actions/runner-images#available-images
+        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources  (os-labels : ubuntu-22.04)
+        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
+        os: [ ubuntu-22.04 ]  #  ubuntu-latest  ==  ubuntu-22.04
+        #  https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md#installed-software
+          #  default  ==  g++-11
+	  #  clang++  ==  clang++-14
+        compiler: [ default, g++-12, clang++-13, clang++-14 ]
+        #include:
+        #  - os: ubuntu-20.04
+        #    compiler : clang++-12    ::: error: no member named 'year_month_day' in namespace 'std::chrono'
+    runs-on: ${{matrix.os}}
     steps:
-    - name: Checkout
-      uses: actions/checkout@v1
-    - name: Build Linux
-      run: ./make.sh all
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Get Version
+        run: uname -a && cmake --version
+      - name: Check Generators
+        # https://stackoverflow.com/questions/25941536/what-is-a-cmake-generator
+        run: cmake --help
+      - name: Deploy Test-Dependencies
+        run: ./make.sh deps
+      - name: Configure CMake (compiler=default) [Debug]
+        if: matrix.compiler == 'default'
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DRAPIDCSV_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
+      - name: Configure CMake (compiler=NOT-default) [Debug]
+        if: matrix.compiler != 'default'
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DRAPIDCSV_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
+      - name: Build [Debug]
+        run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j
+      - name: Test [Debug]
+        working-directory: ${{github.workspace}}/build-debug
+        #run: ctest -C Debug --output-on-failure -j
+        run: ctest -C Debug --verbose
+      - name: Configure CMake (compiler=default) [Release]
+        if: matrix.compiler == 'default'
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DRAPIDCSV_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
+      - name: Configure CMake (compiler=NOT-default) [Release]
+        if: matrix.compiler != 'default'
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DRAPIDCSV_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
+      - name: Build [Release]
+        run: cmake --build "${{github.workspace}}/build-release" --config Release -j
+      - name: Test [Release]
+        working-directory: ${{github.workspace}}/build-release
+        run: ctest -C Release --verbose
+      - name: Install [Release]
+        run: sudo cmake --install "${{github.workspace}}/build-release" --config Release
+      - name: Check Work-Arounds
+        run: grep define "${{github.workspace}}/build-release/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " _e_"

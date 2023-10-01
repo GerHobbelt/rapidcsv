@@ -5,6 +5,12 @@
 #include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
+template<typename T>
+using ConvertFromStr_fNaN = converter::ConvertFromStr<T, converter::S2T_Format_std_CtoT<T, converter::FailureS2Tprocess::QUIET_NAN>>;
+
+template<typename T>
+using ConvertFromStr_gNaN = converter::ConvertFromStr<T, converter::S2T_Format_std_CtoT<T, converter::FailureS2Tprocess::VARIANT_NAN>>;
+
 // Conversion function for int data to be converted to fixed-point two decimal numbers
 int ToVal(const std::string& pStr)
 {
@@ -79,28 +85,28 @@ int main()
     unittest::ExpectEqual(int, doc.GetColumn<&ToStrVal>("B").at(0).val, 1000);
 
     std::tuple< float, double, float,
-                converter::ConvertFromStr_gNaN<double>::return_type > row3 =
+                ConvertFromStr_gNaN<double>::return_type > row3 =
                        doc.GetRow< float, double,
-                                   converter::ConvertFromStr_fNaN<float>,
-                                   converter::ConvertFromStr_gNaN<double> >("3");
+                                   ConvertFromStr_fNaN<float>,
+                                   ConvertFromStr_gNaN<double> >("3");
 
     unittest::ExpectEqual(float, std::get<0>(row3),  0.3f);
     unittest::ExpectEqual(double, std::get<1>(row3),  0.03);
     unittest::ExpectEqual(bool, std::isnan( std::get<2>(row3) ),  true);
-    converter::ConvertFromStr_gNaN<double>::return_type row3_cell4 = std::get<3>(row3);
+    ConvertFromStr_gNaN<double>::return_type row3_cell4 = std::get<3>(row3);
     unittest::ExpectEqual(size_t, row3_cell4.index(),  1);
     unittest::ExpectEqual(std::string, std::get<std::string>(row3_cell4),  "");
 
     std::tuple< float, double, float,
-                converter::ConvertFromStr_gNaN<double>::return_type > row4 =
+                ConvertFromStr_gNaN<double>::return_type > row4 =
                        doc.GetRow< float, double,
-                                   converter::ConvertFromStr_fNaN<float>,
-                                   converter::ConvertFromStr_gNaN<double> >("4");
+                                   ConvertFromStr_fNaN<float>,
+                                   ConvertFromStr_gNaN<double> >("4");
 
     unittest::ExpectEqual(float, std::get<0>(row4),  0.4f);
     unittest::ExpectEqual(double, std::get<1>(row4),  0.04);
     unittest::ExpectEqual(bool, std::isnan( std::get<2>(row4) ),  true);
-    converter::ConvertFromStr_gNaN<double>::return_type row4_cell4 = std::get<3>(row4);
+    ConvertFromStr_gNaN<double>::return_type row4_cell4 = std::get<3>(row4);
     unittest::ExpectEqual(size_t, row4_cell4.index(),  1);
     unittest::ExpectEqual(std::string, std::get<std::string>(row4_cell4),  "abc");
 

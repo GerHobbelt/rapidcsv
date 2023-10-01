@@ -5,7 +5,7 @@
 
 
 constexpr char dmY_fmt[] = "%d-%m-%Y";  // string literal object with static storage duration
-namespace rdb = converter::datelib;
+namespace rdb = std::chrono;
 constexpr rdb::year_month_day (*To_dmY)(const std::string& str) =
                     &converter::ConvertFromStr< rdb::year_month_day, converter::S2T_Format_StreamYMD< dmY_fmt > >::ToVal;
 

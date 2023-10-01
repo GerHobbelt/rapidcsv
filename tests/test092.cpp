@@ -20,15 +20,17 @@
 // string literal object with static storage duration
 constexpr char de_Loc[] = "de_DE"; // uses comma (,) as decimal separator
 
+template<typename T>
+using deLocal_iss = converter::S2T_Format_StreamUserLocale<T, converter::FailureS2Tprocess::THROW_ERROR, char, de_Loc>;
+
 int main()
 {
   int rv = 0;
 
-  using deLocal_iss = converter::S2T_Format_StreamUserLocale<de_Loc>;
   try
   {
     std::istringstream iss;
-    deLocal_iss::streamUpdate(iss);
+    deLocal_iss<float>::streamUpdate(iss);
   }
   catch (const std::exception& ex)
   {
@@ -54,9 +56,9 @@ int main()
 
       rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0),
                              rapidcsv::SeparatorParams(';' /* pSeparator */));
-      unittest::ExpectEqual(float, doc.GetCell<converter::ConvertFromStr<float COMMA deLocal_iss>>("A", "2"), 0.1f);
-      unittest::ExpectEqual(float, doc.GetCell<converter::ConvertFromStr<float COMMA deLocal_iss>>("B", "2"), 0.01f);
-      unittest::ExpectEqual(float, doc.GetCell<converter::ConvertFromStr<float COMMA deLocal_iss>>("C", "2"), 0.001f);
+      unittest::ExpectEqual(float, doc.GetCell<converter::ConvertFromStr<float COMMA deLocal_iss<float>>>("A", "2"), 0.1f);
+      unittest::ExpectEqual(float, doc.GetCell<converter::ConvertFromStr<float COMMA deLocal_iss<float>>>("B", "2"), 0.01f);
+      unittest::ExpectEqual(float, doc.GetCell<converter::ConvertFromStr<float COMMA deLocal_iss<float>>>("C", "2"), 0.001f);
 
       unittest::DeleteFile(path);
     }
@@ -73,9 +75,9 @@ int main()
       rapidcsv::LabelParams labelParams(0, 0);
       rapidcsv::SeparatorParams separatorParams;
       rapidcsv::Document doc(path, labelParams, separatorParams);
-      unittest::ExpectEqual(float, doc.GetCell<converter::ConvertFromStr<float COMMA converter::S2T_Format_StreamAsIs>>("A", "2"), 0.1f);
-      unittest::ExpectEqual(float, doc.GetCell<converter::ConvertFromStr<float COMMA converter::S2T_Format_StreamAsIs>>("B", "2"), 0.01f);
-      unittest::ExpectEqual(float, doc.GetCell<converter::ConvertFromStr<float COMMA converter::S2T_Format_StreamAsIs>>("C", "2"), 0.001f);
+      unittest::ExpectEqual(float, doc.GetCell<converter::ConvertFromStr<float COMMA converter::S2T_Format_StreamAsIs<float COMMA converter::FailureS2Tprocess::THROW_ERROR COMMA char>>>("A", "2"), 0.1f);
+      unittest::ExpectEqual(float, doc.GetCell<converter::ConvertFromStr<float COMMA converter::S2T_Format_StreamAsIs<float COMMA converter::FailureS2Tprocess::THROW_ERROR COMMA char>>>("B", "2"), 0.01f);
+      unittest::ExpectEqual(float, doc.GetCell<converter::ConvertFromStr<float COMMA converter::S2T_Format_StreamAsIs<float COMMA converter::FailureS2Tprocess::THROW_ERROR COMMA char>>>("C", "2"), 0.001f);
 
       unittest::DeleteFile(path);
     }

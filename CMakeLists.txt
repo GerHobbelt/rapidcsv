@@ -1,306 +1,136 @@
+#
+# URL:      https://github.com/panchaBhuta/rapidcsv
+#
+# Copyright (c) 2023-2023 Gautam Dhar
+# All rights reserved.
+#
+# rapidcsv is distributed under the BSD 3-Clause license, see LICENSE for details.
+#
+
+# This code is losely based on 'project(UpstreamLib)' as in url below.
+# https://cmake.org/cmake/help/v3.27/manual/cmake-packages.7.html#creating-packages
+
 # Project
-cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
-project(rapidcsv VERSION 2.05.08.80 LANGUAGES CXX)
-set (CMAKE_CXX_STANDARD 20)
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+cmake_minimum_required(VERSION 3.23)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+include(rapidcsv)
+set(PROJECT_DESCRIPTION "A header-only lightweight C++ csv file reader and writer")
+set(PROJECT_HOMEPAGE_URL "https://github.com/panchaBhuta/rapidcsv")
+
+# Get the version of the library
+rapidcsv_getversion(VERSION)
+
+#[==================================================================================[
+# https://cmake.org/cmake/help/v3.27/guide/tutorial/Adding%20Generator%20Expressions.html#cmakelists-txt-target-compile-options-genex
+#
+# refer https://cmake.org/cmake/help/v3.27/manual/cmake-generator-expressions.7.html#genex:COMPILE_LANG_AND_ID
+# when the language used for compilation unit matches language and CMake's compiler id of the language compiler
+# matches any one of the comma-separated entries in compiler_ids, otherwise 0.
+#
+# Compiler identification string : Possible values
+# https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_ID.html
+#
+#]==================================================================================]
+
+project(rapidcsv
+        VERSION "${VERSION}"
+        DESCRIPTION "${PROJECT_DESCRIPTION}"
+        HOMEPAGE_URL "${PROJECT_HOMEPAGE_URL}"
+        LANGUAGES CXX)
 
 
+
+# Must include after the project call due to GNUInstallDirs requiring a language be enabled (IE. CXX)
+include(GNUInstallDirs)
+
+message(STATUS "#### OS-id=${CMAKE_SYSTEM_NAME}   OS-id-version=${CMAKE_SYSTEM}")
+message(STATUS "#### CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}    version=${CMAKE_CXX_COMPILER_VERSION}")
+
+# Determine whether this is a standalone project or included by other projects
+set(RAPIDCSV_STANDALONE_PROJECT OFF)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    set(RAPIDCSV_STANDALONE_PROJECT ON)
+endif()
+#[===========[  donot use generator-expressions in set() functions
+set(RAPIDCSV_STANDALONE_PROJECT   $<STREQUAL:"${CMAKE_SOURCE_DIR}","${PROJECT_SOURCE_DIR}">)
+# refer  https://stackoverflow.com/questions/35695152/cmake-generator-expression-is-not-being-evaluated
+# While generator expression is stored at configuration stage
+# (when corresponded CMake command is executed), evaluation of
+# generator expressions is performed at build stage.
+
+# This is why message() command prints generator expression in
+# non-dereferenced form: value denoted by the generator
+# expression is not known at this stage.
+#]===========]
+message(STATUS "RAPIDCSV_STANDALONE_PROJECT=${RAPIDCSV_STANDALONE_PROJECT}")
+
+# Establish the project options
+option(RAPIDCSV_BUILD_EXAMPLES "Set to ON to build examples"        ${RAPIDCSV_STANDALONE_PROJECT})
+option(RAPIDCSV_BUILD_TESTS "Set to ON to build tests"              ${RAPIDCSV_STANDALONE_PROJECT})
+option(RAPIDCSV_ENABLE_INSTALL "Generate the install target"        ${RAPIDCSV_STANDALONE_PROJECT})
+option(RAPIDCSV_ENABLE_WARNINGS "Add warnings to CMAKE_CXX_FLAGS"   ${RAPIDCSV_STANDALONE_PROJECT})
+#option(RAPIDCSV_USE_UNICODE_HELP "Use ICU Unicode library"         OFF)
+
+if (RAPIDCSV_STANDALONE_PROJECT)
+    rapidcsv_set_cxx_standard()
+endif()
+
+#message(STATUS "clang_cxx=${clang_cxx}")
 file(TO_NATIVE_PATH "/" _path_separator)
-message("The systems's path separator is '${_path_separator}'")
-
-#[======================================================================[
-      Check if compiler supports '-fmacro-prefix-map=old=new'  option
-      refer ::: https://fossies.org/linux/bareos/core/CMakeLists.txt
-#]======================================================================]
-include(CheckCXXCompilerFlag)
-check_cxx_compiler_flag(
-  -fmacro-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}=.
-  cxx_compiler_macro_prefix_map
-)
-if(cxx_compiler_macro_prefix_map)
-  message(STATUS "compiler option '-fmacro-prefix-map=old=new' SUPPORTED")
-  add_definitions(-DUSE_MACROPREFIXMAP=1)
-
-  set(CMAKE_CXX_FLAGS
-      "${CMAKE_CXX_FLAGS} -fmacro-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}${_path_separator}="
-  )
-else()
-  # as of writing this code, clang does not support option '-fmacro-prefix-map=...'
-  message(STATUS "compiler option '-fmacro-prefix-map=old=new' NOT SUPPORTED")
-  add_definitions(-DUSE_MACROPREFIXMAP=0)
-
-  # https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
-  string(LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" RAPIDCSV_SOURCE_PATH_SIZE)
-  add_definitions("-DRAPIDCSV_SOURCE_PATH_SIZE=${RAPIDCSV_SOURCE_PATH_SIZE}")
-endif()
-
-
-if(MSVC)
-  if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-    string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-  else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
-  endif()
-  add_compile_options("/utf-8")
-else()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra -Wpedantic -Wshadow -Wpointer-arith \
-                       -Wcast-qual -Wno-missing-braces -Wswitch-default -Wcast-align \
-                       -Wunreachable-code -Wundef -Wuninitialized -Wold-style-cast \
-                       -Wsign-conversion -Weffc++")
-endif()
-
-# Build type
-set(DEFAULT_BUILD_TYPE "Release")
-if((EXISTS "${CMAKE_SOURCE_DIR}/.svn") OR (EXISTS "${CMAKE_SOURCE_DIR}/.git"))
-  set(DEFAULT_BUILD_TYPE "Debug")
-endif()
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  message(STATUS "Using build type '${DEFAULT_BUILD_TYPE}' (default).")
-  set(CMAKE_BUILD_TYPE "${DEFAULT_BUILD_TYPE}")
-else()
-  message(STATUS "Using build type '${CMAKE_BUILD_TYPE}'.")
-endif()
+message(STATUS "The systems's path separator is '${_path_separator}'")
 
 # Library
 add_library(rapidcsv INTERFACE)
-target_include_directories(rapidcsv INTERFACE include)
-if(DATELIB)
-    message(STATUS "'rapidcsv' linking to '${DATELIB}'")
-    target_link_libraries(rapidcsv INTERFACE ${DATELIB})
+add_library(rapidcsv::rapidcsv ALIAS rapidcsv)
+
+fetch_dependencies()
+
+#if (RAPIDCSV_STANDALONE_PROJECT)
+    rapidcsv_check_cxx_compiler_flag_file_prefix_map()
+#endif()
+
+if (RAPIDCSV_ENABLE_WARNINGS)
+    rapidcsv_enable_warnings()
+endif()
+
+rapidcsv_build()
+
+
+# Link against the ICU library when requested
+#if(RAPIDCSV_USE_UNICODE_HELP)
+#    rapidcsv_use_unicode()
+#endif()
+
+# Install rapidcsv when requested by the user
+if (RAPIDCSV_ENABLE_INSTALL)
+    rapidcsv_install_logic()
 endif()
 
 
-# Install / Uninstall targets for standalone rapidcsv build
-if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
-  message(STATUS "Install/uninstall targets enabled.")
-
-  # Install
-  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/rapidcsv.h
-                ${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/view.h
-          DESTINATION include/rapidcsv/)
-  export(TARGETS rapidcsv FILE cmake/rapidcsvTargets.cmake)
 
 
-  # Uninstall
-  add_custom_target(uninstall COMMAND "${CMAKE_COMMAND}" -E remove "${CMAKE_INSTALL_PREFIX}/include/rapidcsv")
-
-else()
-  message(STATUS "Install/uninstall targets disabled.")
-endif()
-
-
-
-
-# Tests
-option(RAPIDCSV_BUILD_TESTS "Build tests" OFF)
+# Enable testing when requested by the user
 message(STATUS "Build tests: ${RAPIDCSV_BUILD_TESTS}")
 if(RAPIDCSV_BUILD_TESTS)
-
-  # Test init
-  include(CTest)
-  enable_testing()
-
-  # Ccache
-  find_program(CCACHE_PROGRAM ccache)
-  if(CCACHE_PROGRAM)
-    message(STATUS "Found ccache")
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
-  endif()
-
-  # Enable codecvt tests if supported
-  if (CMAKE_CXX_STANDARD VERSION_LESS "17")
-    include(CheckIncludeFileCXX)
-    check_include_file_cxx(codecvt HAS_CODECVT)
-    if(HAS_CODECVT)
-      target_compile_definitions(rapidcsv INTERFACE HAS_CODECVT)
+    enable_testing()
+    include(CTest)
+    # Ccache
+    find_program(CCACHE_PROGRAM ccache)
+    if(CCACHE_PROGRAM)
+        message(STATUS "Found ccache")
+        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
     endif()
-  else()
-    message(STATUS "Skip check for C++ include codecvt - C++${CMAKE_CXX_STANDARD}")
-  endif()
 
-  # Test macro add_perf_test
-  macro(add_perf_test testname)
-    if(CMAKE_BUILD_TYPE MATCHES "Release")
-      FILE(GLOB sources tests/${testname}*.cpp)
-      add_executable(${testname} ${sources})
-      add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/${testname}")
-      target_link_libraries(${testname} PUBLIC rapidcsv)
-    endif()
-  endmacro(add_perf_test)
-
-  # Test macro add_unit_test
-  macro(add_unit_test testname)
-    if(CMAKE_BUILD_TYPE MATCHES "Debug")
-      FILE(GLOB sources tests/${testname}*.cpp)
-      add_executable(${testname} ${sources})
-      add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/${testname}")
-      target_link_libraries(${testname} PUBLIC rapidcsv)
-    endif()
-  endmacro(add_unit_test)
-
-  # Unit tests
-  add_unit_test(testTemplateInstantiation)
-  add_unit_test(test001)
-  add_unit_test(test002)
-  add_unit_test(test003)
-  add_unit_test(test004)
-  add_unit_test(test005)
-  add_unit_test(test006)
-  add_unit_test(test007)
-  add_unit_test(test008)
-  add_unit_test(test009)
-  add_unit_test(test010)
-  add_unit_test(test011)
-  add_unit_test(test012)
-  add_unit_test(test013)
-  add_unit_test(test014)
-  add_unit_test(test015)
-  add_unit_test(test016)
-  add_unit_test(test017)
-  add_unit_test(test018)
-  add_unit_test(test019)
-  add_unit_test(test020)
-  add_unit_test(test021)
-  add_unit_test(test022)
-  add_unit_test(test023)
-  add_unit_test(test024)
-  add_unit_test(test025)
-  add_unit_test(test026)
-  add_unit_test(test027)
-  add_unit_test(test028)
-  add_unit_test(test029)
-  add_unit_test(test030)
-  add_unit_test(test031)
-  add_unit_test(test032)
-  add_unit_test(test033)
-  add_unit_test(test034)
-  add_unit_test(test035)
-  add_unit_test(test036)
-  #[========================================[
-    if(CMAKE_BUILD_TYPE MATCHES "Debug")
-      if(USE_CHRONO_LIB)
-        # as FetchContent is included previously for (!USE_CHRONO_LIB)
-        include( FetchContent )
-      endif()
-      set(BIGFLOAT bigfloat)
-      FetchContent_Declare( ${BIGFLOAT}
-          GIT_REPOSITORY https://github.com/Mariotti94/BigFloat.git
-          GIT_TAG        4d2867c  # adjust tag/branch/commit as needed
-        )
-      FetchContent_MakeAvailable(${BIGFLOAT}) # as the BigFloat does not support CMake
-
-      FILE(GLOB sources tests/test036*.cpp ${CMAKE_BINARY_DIR}/_deps/${BIGFLOAT}-src/BigFloat.*)
-      add_executable(test036 ${sources})
-      add_test(NAME test036 COMMAND "${PROJECT_BINARY_DIR}/test036")
-      target_include_directories(test036 PRIVATE ${CMAKE_BINARY_DIR}/_deps/${BIGFLOAT}-src/ )
-      target_link_libraries(test036 PUBLIC rapidcsv ${DATELIB})
-    endif()
-  #]========================================]
-  add_unit_test(test037)
-  add_unit_test(test038)
-  add_unit_test(test039)
-  add_unit_test(test040)
-  add_unit_test(test041)
-  add_unit_test(test042)
-  add_unit_test(test043)
-  add_unit_test(test044)
-  add_unit_test(test045)
-  add_unit_test(test046)
-  add_unit_test(test047)
-  add_unit_test(test048)
-  add_unit_test(test049)
-  add_unit_test(test050)
-  add_unit_test(test051)
-  add_unit_test(test052)
-  add_unit_test(test053)
-  add_unit_test(test054)
-  add_unit_test(test055)
-  add_unit_test(test056)
-  if(HAS_CODECVT)
-    add_unit_test(test057)
-    add_unit_test(test058)
-    add_unit_test(test059)
-    add_unit_test(test060)
-  endif()
-  add_unit_test(test061)
-  add_unit_test(test062)
-  add_unit_test(test063)
-  add_unit_test(test064)
-  add_unit_test(test065)
-  add_unit_test(test066)
-  add_unit_test(test067)
-  add_unit_test(test068)
-  add_unit_test(test069)
-  add_unit_test(test070)
-  add_unit_test(test071)
-  add_unit_test(test072)
-  add_unit_test(test073)
-  add_unit_test(test074)
-  add_unit_test(test075)
-  add_unit_test(test076)
-  add_unit_test(test077)
-  add_unit_test(test078)
-  add_unit_test(test079)
-  add_unit_test(test080)
-  add_unit_test(test081)
-  add_unit_test(test082)
-  add_unit_test(test083)
-  add_unit_test(test084)
-  if(HAS_CODECVT)
-    add_unit_test(test085)
-  endif()
-  add_unit_test(test086)
-  add_unit_test(test087)
-  add_unit_test(test088)
-  add_unit_test(test089)
-  add_unit_test(test090)
-  add_unit_test(test091)
-  add_unit_test(test092)
-  add_unit_test(test093)
-  add_unit_test(test094)
-  add_unit_test(test095)
-
-  add_unit_test(testView001)
-  add_unit_test(testView003)
-  add_unit_test(testView005)
-  add_unit_test(testView012)
-  add_unit_test(testView014)
-  add_unit_test(testView016)
-  add_unit_test(testView023)
-  add_unit_test(testView025)
-  add_unit_test(testView027)
-  add_unit_test(testView040)
-  add_unit_test(testView042)
-  add_unit_test(testView070)
-  add_unit_test(testView071)
-
-  add_unit_test(testViewB001)
-  add_unit_test(testViewYmd001)
-  add_unit_test(testViewYmd003)
-  add_unit_test(testViewYmd005)
-
-  # perf tests
-  add_perf_test(ptest001)
-  add_perf_test(ptest002)
-
-  # Examples
-  # Test macro add_example
-  macro(add_example testname)
-    if(CMAKE_BUILD_TYPE MATCHES "Debug")
-      add_executable(${testname} examples/${testname}.cpp)
-      target_link_libraries(${testname} PUBLIC rapidcsv)
-    endif()
-  endmacro(add_example)
-
-  add_example(ex001 examples/ex001.cpp)
-  add_example(ex002 examples/ex002.cpp)
-  add_example(ex003 examples/ex003.cpp)
-  add_example(ex004 examples/ex004.cpp)
-  add_example(ex005 examples/ex005.cpp)
-  add_example(ex006 examples/ex006.cpp)
-  add_example(ex007 examples/ex007.cpp)
-  add_example(ex008 examples/ex008.cpp)
-  add_example(ex009 examples/ex009.cpp)
-  add_example(exConv001 examples/exConv001.cpp)
-
+    add_subdirectory(tests)
 endif()
+
+
+
+
+# Build examples when requested by the user
+message(STATUS "Build examples: ${RAPIDCSV_BUILD_EXAMPLES}")
+if (RAPIDCSV_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()
+

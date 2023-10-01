@@ -3,7 +3,7 @@
 #include <rapidcsv/view.h>
 #include "unittest.h"
 
-namespace rdb = converter::datelib;
+namespace rdb = std::chrono;
 
 
 bool isYear2016(const rapidcsv::Document::t_dataRow& dataRow)
@@ -28,7 +28,7 @@ int main()
   {
     std::vector<std::string> strs;
 
-    rapidcsv::Document doc("../tests/msft.csv", rapidcsv::LabelParams(0, 0));
+    rapidcsv::Document doc("../../tests/msft.csv", rapidcsv::LabelParams(0, 0));
 
     /////  Filter
     rapidcsv::FilterDocument<isYear2016> viewdoc(doc);

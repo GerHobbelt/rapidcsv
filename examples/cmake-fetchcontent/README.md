@@ -5,6 +5,6 @@ Build Steps
 -----------
 Commands to build the example project:
 
-    mkdir -p build && cd build && cmake .. && make
+    mkdir -p build && cd build && cmake .. && cmake --build .
 
 

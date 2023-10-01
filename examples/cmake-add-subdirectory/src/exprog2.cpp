@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 
 int main()
 {

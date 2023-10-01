@@ -2,7 +2,7 @@
 name: Bug report
 about: Report a bug by creating a new issue.
 labels: bug
-assignees: d99kris
+assignees: panchaBhutav
 ---
 
 **Description**:
