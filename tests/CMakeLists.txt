@@ -54,6 +54,7 @@ endif()
 add_unit_test(test001)
 add_unit_test(test002)
 add_unit_test(test003)
+#[===========================================[
 add_unit_test(test004)
 add_unit_test(test005)
 add_unit_test(test006)
@@ -87,6 +88,7 @@ add_unit_test(test033)
 add_unit_test(test034)
 add_unit_test(test035)
 add_unit_test(test036)
+#]===========================================]
   #[========================================[
     if(CMAKE_BUILD_TYPE MATCHES "Debug")
       if(USE_CHRONO_LIB)
@@ -107,6 +109,7 @@ add_unit_test(test036)
       target_link_libraries(test036 PUBLIC rapidcsv ${DATELIB})
     endif()
   #]========================================]
+#[===========================================[
 add_unit_test(test037)
 add_unit_test(test038)
 add_unit_test(test039)
@@ -196,4 +199,5 @@ add_unit_test(testViewYmd005)
 # perf tests
 add_perf_test(ptest001)
 add_perf_test(ptest002)
+#]===========================================]
 

@@ -36,7 +36,7 @@ jobs:
         os: [ ubuntu-22.04 ]  #  ubuntu-latest  ==  ubuntu-22.04
         #  https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md#installed-software
           #  default  ==  g++-11
-	  #  clang++  ==  clang++-14
+          #  clang++  ==  clang++-14
         compiler: [ default, g++-12, clang++-13, clang++-14 ]
         #include:
         #  - os: ubuntu-20.04

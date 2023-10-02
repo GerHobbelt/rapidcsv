@@ -61,7 +61,7 @@ typedef SSIZE_T ssize_t;
 #endif
 
 // to handle windows back-slash path seperator
-#define __RAPIDCSV_PREFERRED_PATH__    std::filesystem::path(__RAPIDCSV_FILE__).make_preferred().string()
+#define __RAPIDCSV_PREFERRED_PATH__    (std::filesystem::path(__RAPIDCSV_FILE__).make_preferred().string())
 
 
 #ifdef ENABLE_RAPIDCSV_DEBUG_LOG
@@ -103,16 +103,16 @@ namespace rapidcsv
     {
       if (mColumnNameIdx < -1)
       {
-        std::string errStr = __RAPIDCSV_PREFERRED_PATH__+": LabelParams(constructor) :"+
-          " invalid column name index " + std::to_string(mColumnNameIdx) + " < -1";
-        throw std::out_of_range(errStr);
+        static const std::string errMsg("Invalid 'mColumnNameIdx' received in 'constructor rapidcsv::LabelParams()'");
+        RAPIDCSV_DEBUG_LOG(errMsg << " : mColumnNameIdx='" << mColumnNameIdx << "'");
+        throw std::out_of_range(errMsg);
       }
 
       if (mRowNameIdx < -1)
       {
-        std::string errStr = __RAPIDCSV_PREFERRED_PATH__+": LabelParams(constructor) :"+
-          " invalid row name index " + std::to_string(mRowNameIdx) + " < -1";
-        throw std::out_of_range(errStr);
+        static const std::string errMsg("Invalid 'mRowNameIdx' received in 'constructor rapidcsv::LabelParams()'");
+        RAPIDCSV_DEBUG_LOG(errMsg << " : mRowNameIdx='" << mRowNameIdx << "'");
+        throw std::out_of_range(errMsg);
       }
     }
 
@@ -418,7 +418,9 @@ namespace rapidcsv
       }
       if (columnIdx < 0)
       {
-        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+": Document::GetColumnIdx(pColumnName) : column not found: " + pColumnName);
+        static const std::string errMsg("rapidcsv::Document::GetColumnIdx(pColumnName) : column not found for 'pColumnName'");
+        RAPIDCSV_DEBUG_LOG(errMsg << " : pColumnName='" << pColumnName << "'");
+        throw std::out_of_range(errMsg);
       }
       return static_cast<size_t>(columnIdx);
     }
@@ -461,12 +463,11 @@ namespace rapidcsv
           typename converter::t_S2Tconv_c<T_C>::return_type val = converter::t_S2Tconv_c<T_C>::ToVal(cellStrVal);
           column.push_back(val);
         } else {
-          const std::string errStr = __RAPIDCSV_PREFERRED_PATH__+
-            " : Document::GetColumn() # requested column index " +
-            std::to_string(pColumnIdx) + " >= " +
-            std::to_string(itRow->size() - _getDataColumnIndex(0).dataIdx) +
-            " (number of columns on row index " + std::to_string(rowIdx-_getDataColumnIndex(0).dataIdx) + ")";
-          throw std::out_of_range(errStr);
+          static const std::string errMsg("rapidcsv::Document::GetColumn(pColumnNameIdx) : column not found for 'pColumnNameIdx'");
+          RAPIDCSV_DEBUG_LOG(errMsg << " : pColumnNameIdx='" << pColumnNameIdx << "' : pColumnIdx{" << pColumnIdx << "} >= rowSize{" <<
+                            (itRow->size() - _getDataColumnIndex(0).dataIdx) << "} : (number of columns on row index " <<
+                            std::to_string(rowIdx-_getDataColumnIndex(0).dataIdx) << ")");
+          throw std::out_of_range(errMsg);
         }
       }
       return column;
@@ -677,7 +678,9 @@ namespace rapidcsv
       }
       if (rowIdx < 0)
       {
-        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+": Document::GetRowIdx(pRowName) row not found: " + pRowName);
+        static const std::string errMsg("rapidcsv::Document::GetRowIdx(pRowName) row not found for 'pRowName'");
+        RAPIDCSV_DEBUG_LOG(errMsg << " : pRowName='" << pRowName << "'");
+        throw std::out_of_range(errMsg);
       }
       return static_cast<size_t>(rowIdx);
     }
@@ -702,9 +705,10 @@ namespace rapidcsv
 
       if( _mData.at(dataRowIdx).size() < sizeof...(T_C) )
       {
-        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+": Document::GetRow(pRowNameIdx) :: ERROR >> row-size("+
-                std::to_string(_mData.at(dataRowIdx).size()) + ") less than tuple-size("+
-                std::to_string(sizeof...(T_C)) + ")");
+        static const std::string errMsg("rapidcsv::Document::GetRow(pRowNameIdx) :: ERROR : row-size less than tuple size");
+        RAPIDCSV_DEBUG_LOG(errMsg << " : pRowNameIdx='" << pRowNameIdx << "' , row-size=" << _mData.at(dataRowIdx).size()
+                                  << " , tuple-size=" << sizeof...(T_C) );
+        throw std::out_of_range(errMsg);
       }
 
       size_t colIdx = _getDataColumnIndex(0).dataIdx;
@@ -1058,8 +1062,9 @@ namespace rapidcsv
     {
       if (_mLabelParams.mColumnNameIdx < 0)
       {
-        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+": Document::GetColumnName(pColumnIdx="+std::to_string(pColumnIdx)
-              +") column name row index < 0: _mLabelParams.mColumnNameIdx=" + std::to_string(_mLabelParams.mColumnNameIdx));
+        static const std::string errMsg("rapidcsv::Document::GetColumnName(pColumnIdx) : _mLabelParams.mColumnNameIdx < 0");
+        RAPIDCSV_DEBUG_LOG(errMsg << " : _mLabelParams.mColumnNameIdx=" << _mLabelParams.mColumnNameIdx);
+        throw std::out_of_range(errMsg);
       }
 
       const size_t dataColumnIdx = _getDataColumnIndex(pColumnIdx).dataIdx;
@@ -1075,8 +1080,9 @@ namespace rapidcsv
     {
       if (_mLabelParams.mColumnNameIdx < 0)
       {
-        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+": Document::SetColumnName(pColumnIdx="+std::to_string(pColumnIdx)
-              +") column name row index < 0: _mLabelParams.mColumnNameIdx=" + std::to_string(_mLabelParams.mColumnNameIdx));
+        static const std::string errMsg("rapidcsv::Document::SetColumnName(pColumnIdx,pColumnName) : _mLabelParams.mColumnNameIdx < 0");
+        RAPIDCSV_DEBUG_LOG(errMsg << " : _mLabelParams.mColumnNameIdx=" << _mLabelParams.mColumnNameIdx);
+        throw std::out_of_range(errMsg);
       }
 
       const size_t dataColumnIdx = _getDataColumnIndex(pColumnIdx).dataIdx;
@@ -1122,8 +1128,9 @@ namespace rapidcsv
     {
       if (_mLabelParams.mRowNameIdx < 0)
       {
-        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+": Document::GetRowName(mRowIdx="+std::to_string(pRowIdx)
-              +") row name column index < 0: _mLabelParams.mRowNameIdx=" + std::to_string(_mLabelParams.mRowNameIdx));
+        static const std::string errMsg("rapidcsv::Document::GetRowName(pRowIdx) : _mLabelParams.mRowNameIdx < 0");
+        RAPIDCSV_DEBUG_LOG(errMsg << " : _mLabelParams.mRowNameIdx=" << _mLabelParams.mRowNameIdx);
+        throw std::out_of_range(errMsg);
       }
 
       const size_t dataRowIdx = _getDataRowIndex(pRowIdx).dataIdx;
@@ -1139,8 +1146,8 @@ namespace rapidcsv
     {
       if (_mLabelParams.mRowNameIdx < 0)
       {
-        throw std::out_of_range(__RAPIDCSV_PREFERRED_PATH__+": Document::SetRowName(mRowIdx="+std::to_string(pRowIdx)
-              +") row name column index < 0: _mLabelParams.mRowNameIdx=" + std::to_string(_mLabelParams.mRowNameIdx));
+        static const std::string errMsg("rapidcsv::Document::SetRowName(pRowIdx) : _mLabelParams.mRowNameIdx < 0");
+        RAPIDCSV_DEBUG_LOG(errMsg << " : _mLabelParams.mRowNameIdx=" << _mLabelParams.mRowNameIdx);
       }
 
       const size_t dataRowIdx = _getDataRowIndex(pRowIdx).dataIdx;

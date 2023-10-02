@@ -40,7 +40,7 @@ Rapidcsv is implemented using C++20 with the intention of being portable. It's b
 |  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-(12,13)** | **macOS-11** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
 |------------|------------------|--------------|--------------|-------------------------------|-------------------------------|
 | **g++ (11,12)** | ✅ (default:11) | ✅ | ✅ | - | - |
-| **clang++ (**<span style="color:grey">12\*</span>,**13,14)** | ✅ | - | - | - | - |
+| **clang++ (13,14)** | ✅ | - | - | - | - |
 | **AppleClang 14** | NA | ✅ (default) | NA | NA | NA |
 | **msvc 19** | NA | NA | NA | ✅ (default) | - |
 | **clangCL 12** | - | - | - | - | ✅ |
@@ -259,7 +259,7 @@ Data Conversion Precision
 -------------------------
 This is handled by the [converter](https://github.com/panchaBhuta/converter) library, refer [here](https://github.com/panchaBhuta/converter#data-conversion-precision) for more details.<br>
 Refer [test036.cpp](tests/test036.cpp) and [test053.cpp](tests/test053.cpp)
-for data-loss in text -> type -> text, conversion cycle.
+for data-loss in **text -> type -> text**, conversion cycle.
 Refer [test091.cpp](tests/test091.cpp),  to see the effect of lowered Decimal-Precision when writing the data and then retriving it back.
 
 
