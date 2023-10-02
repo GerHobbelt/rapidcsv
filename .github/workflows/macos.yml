@@ -83,4 +83,4 @@ jobs:
       - name: Install [Release]
         run: cmake --install "${{github.workspace}}/build-release" --config Release
       - name: Check Work-Arounds
-        run: grep define "${{github.workspace}}/build-release/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " _e_"
+        run: grep define "${{github.workspace}}/build-release/_deps/converter-build/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " _e_"
