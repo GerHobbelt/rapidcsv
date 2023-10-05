@@ -67,10 +67,10 @@ typedef SSIZE_T ssize_t;
 
 
 #ifdef ENABLE_RAPIDCSV_DEBUG_LOG
-//#define RAPIDCSV_DEBUG_LOG(aMessage) { std::cout << aMessage << " :: file:" << RAPIDCSV_PREFERRED_PATH << ":" << __LINE__ << std::endl; }
-#define RAPIDCSV_DEBUG_LOG(aMessage)
+  //#define RAPIDCSV_DEBUG_LOG(aMessage) { std::cout << aMessage << " :: file:" << RAPIDCSV_PREFERRED_PATH << ":" << __LINE__ << std::endl; }
+  #define RAPIDCSV_DEBUG_LOG(aMessage) { std::cout << aMessage << ":" << __LINE__ << std::endl; }
 #else
-#define RAPIDCSV_DEBUG_LOG(aMessage)
+  #define RAPIDCSV_DEBUG_LOG(aMessage)
 #endif
 
 
@@ -478,10 +478,12 @@ namespace rapidcsv
           column.push_back(val);
         } else {
           static const std::string errMsg("rapidcsv::Document::GetColumn(pColumnNameIdx) : column not found for 'pColumnNameIdx'");
-          size_t adjRowSize = itRow->size() - _getDataColumnIndex(0).dataIdx;
-          std::string numberOfColumns = std::to_string(rowIdx-_getDataColumnIndex(0).dataIdx);
-          RAPIDCSV_DEBUG_LOG(errMsg << " : pColumnNameIdx='" << pColumnNameIdx << "' : pColumnIdx{" << pColumnIdx << "} >= rowSize{"  \
-                                    << adjRowSize << "} : (number of columns on row index " << numberOfColumns << ")");
+          #ifdef ENABLE_RAPIDCSV_DEBUG_LOG
+            const size_t adjRowSize = itRow->size() - _getDataColumnIndex(0).dataIdx;
+            const std::string numberOfColumns = std::to_string(rowIdx-_getDataColumnIndex(0).dataIdx);
+            RAPIDCSV_DEBUG_LOG(errMsg << " : pColumnNameIdx='" << pColumnNameIdx << "' : pColumnIdx{" << pColumnIdx << "} >= rowSize{"  \
+                                      << adjRowSize << "} : (number of columns on row index " << numberOfColumns << ")");
+          #endif
           throw std::out_of_range(errMsg);
         }
       }
