@@ -58,7 +58,7 @@ typedef SSIZE_T ssize_t;
   // https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
   // the project-prefix-path is skipped by offsetting to length of project-prefix-path
   //#define RAPIDCSV_FILE   (__FILE__ + RAPIDCSV_SOURCE_PATH_SIZE)  // gives lot of warnings on windows:clangCL
-  #define RAPIDCSV_FILE   &(__FILE__[RAPIDCSV_SOURCE_PATH_SIZE])
+  #define RAPIDCSV_FILE   (&(__FILE__[RAPIDCSV_SOURCE_PATH_SIZE]))
 
 #endif
 
@@ -68,7 +68,8 @@ typedef SSIZE_T ssize_t;
 
 #ifdef ENABLE_RAPIDCSV_DEBUG_LOG
   //#define RAPIDCSV_DEBUG_LOG(aMessage) { std::cout << aMessage << " :: file:" << RAPIDCSV_PREFERRED_PATH << ":" << __LINE__ << std::endl; }
-  #define RAPIDCSV_DEBUG_LOG(aMessage) { std::cout << aMessage << ":" << __LINE__ << std::endl; }
+  //#define RAPIDCSV_DEBUG_LOG(aMessage) { std::cout << aMessage << ":" << __LINE__ << std::endl; }
+  #define RAPIDCSV_DEBUG_LOG(aMessage) { std::cout << aMessage << " :: file:" << RAPIDCSV_FILE << ":" << __LINE__ << std::endl; }
 #else
   #define RAPIDCSV_DEBUG_LOG(aMessage)
 #endif
