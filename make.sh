@@ -154,7 +154,8 @@ if [[ "${TESTS}" == "1" ]]; then
   elif [ "${OS}" == "Darwin" ]; then
     CTESTARGS="-j$(sysctl -n hw.ncpu)"
   fi
-  cd build-debug && ctest --output-on-failure ${CTESTARGS} && cd .. && \
+  #cd build-debug && ctest --output-on-failure ${CTESTARGS} && cd .. && \
+  cd build-debug && ctest --verbose ${CTESTARGS} && cd .. && \
   cd build-release && ctest --verbose && cd .. || \
   exiterr "tests failed, exiting."
 fi

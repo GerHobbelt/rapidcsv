@@ -45,27 +45,29 @@ typedef SSIZE_T ssize_t;
 
 #include <converter/converter.h>
 
-#define RAPIDCSV__VERSION_MAJOR 3
-#define RAPIDCSV__VERSION_MINOR 0
-#define RAPIDCSV__VERSION_PATCH 0
+#define RAPIDCSV_VERSION_MAJOR 3
+#define RAPIDCSV_VERSION_MINOR 0
+#define RAPIDCSV_VERSION_PATCH 0
 
 //  Project path is removed from the __FILE__
 //  Resulting file-path is relative path from project-root-folder.
 #if  USE_FILEPREFIXMAP == 1
   // the project-prefix-path is removed via compilation directive file-prefix-map
-  #define __RAPIDCSV_FILE__    __FILE__
+  #define RAPIDCSV_FILE    __FILE__
 #else
   // https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
   // the project-prefix-path is skipped by offsetting to length of project-prefix-path
-  #define __RAPIDCSV_FILE__   (__FILE__ + RAPIDCSV_SOURCE_PATH_SIZE)
+  //#define RAPIDCSV_FILE   (__FILE__ + RAPIDCSV_SOURCE_PATH_SIZE)  // gives lot of warnings on windows:clangCL
+  #define RAPIDCSV_FILE   &(__FILE__[RAPIDCSV_SOURCE_PATH_SIZE])
+
 #endif
 
 // to handle windows back-slash path seperator
-#define __RAPIDCSV_PREFERRED_PATH__    (std::filesystem::path(__RAPIDCSV_FILE__).make_preferred().string())
+#define RAPIDCSV_PREFERRED_PATH    (std::filesystem::path(RAPIDCSV_FILE).make_preferred().string())
 
 
 #ifdef ENABLE_RAPIDCSV_DEBUG_LOG
-#define RAPIDCSV_DEBUG_LOG(aMessage) { std::cout << aMessage << " :: file:" << __RAPIDCSV_PREFERRED_PATH__ << ":" << __LINE__ << std::endl; }
+#define RAPIDCSV_DEBUG_LOG(aMessage) { std::cout << aMessage << " :: file:" << RAPIDCSV_PREFERRED_PATH << ":" << __LINE__ << std::endl; }
 #else
 #define RAPIDCSV_DEBUG_LOG(aMessage)
 #endif
@@ -74,6 +76,17 @@ typedef SSIZE_T ssize_t;
 
 namespace rapidcsv
 {
+  /**
+   * @brief     Class representing Version number of the project.
+  */
+  static constexpr struct {
+    uint8_t major, minor, patch;
+  } version = {
+    RAPIDCSV_VERSION_MAJOR,
+    RAPIDCSV_VERSION_MINOR,
+    RAPIDCSV_VERSION_PATCH
+  };
+
 #if defined(_MSC_VER)
   static const bool sPlatformHasCR = true;
 #else
@@ -464,9 +477,10 @@ namespace rapidcsv
           column.push_back(val);
         } else {
           static const std::string errMsg("rapidcsv::Document::GetColumn(pColumnNameIdx) : column not found for 'pColumnNameIdx'");
-          RAPIDCSV_DEBUG_LOG(errMsg << " : pColumnNameIdx='" << pColumnNameIdx << "' : pColumnIdx{" << pColumnIdx << "} >= rowSize{" <<
-                            (itRow->size() - _getDataColumnIndex(0).dataIdx) << "} : (number of columns on row index " <<
-                            std::to_string(rowIdx-_getDataColumnIndex(0).dataIdx) << ")");
+          size_t adjRowSize = itRow->size() - _getDataColumnIndex(0).dataIdx;
+          std::string numberOfColumns = std::to_string(rowIdx-_getDataColumnIndex(0).dataIdx);
+          RAPIDCSV_DEBUG_LOG(errMsg << " : pColumnNameIdx='" << pColumnNameIdx << "' : pColumnIdx{" << pColumnIdx << "} >= rowSize{"  \
+                                    << adjRowSize << "} : (number of columns on row index " << numberOfColumns << ")");
           throw std::out_of_range(errMsg);
         }
       }

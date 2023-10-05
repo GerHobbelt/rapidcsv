@@ -19,6 +19,8 @@ set(clang_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang>")
 set(gcc_cxx "$<COMPILE_LANG_AND_ID:CXX,GNU>")
 set(gcc_like_cxx "$<OR:$<COMPILE_LANG_AND_ID:CXX,GNU,LCC>,${clang_like_cxx}>")
 set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
+set(windows_os "$<BOOL:${WIN32}>")
+
 
 set(_e_DISABLE_FEATURE_    0)
 set(_e_ENABLE_FEATURE_     1)
@@ -26,13 +28,13 @@ set(_e_ENABLE_FEATURE_     1)
 function(rapidcsv_getversion version_arg)
     # Parse the current version from the rapidcsv header
     file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/include/rapidcsv/rapidcsv.h" rapidcsv_version_defines
-        REGEX "#define RAPIDCSV__VERSION_(MAJOR|MINOR|PATCH)")
+        REGEX "#define RAPIDCSV_VERSION_(MAJOR|MINOR|PATCH)")
     foreach(ver ${rapidcsv_version_defines})
-        if(ver MATCHES "#define RAPIDCSV__VERSION_(MAJOR|MINOR|PATCH) +([^ ]+)$")
-            set(RAPIDCSV__VERSION_${CMAKE_MATCH_1} "${CMAKE_MATCH_2}" CACHE INTERNAL "")
+        if(ver MATCHES "#define RAPIDCSV_VERSION_(MAJOR|MINOR|PATCH) +([^ ]+)$")
+            set(RAPIDCSV_VERSION_${CMAKE_MATCH_1} "${CMAKE_MATCH_2}" CACHE INTERNAL "")
         endif()
     endforeach()
-    set(VERSION ${RAPIDCSV__VERSION_MAJOR}.${RAPIDCSV__VERSION_MINOR}.${RAPIDCSV__VERSION_PATCH})
+    set(VERSION ${RAPIDCSV_VERSION_MAJOR}.${RAPIDCSV_VERSION_MINOR}.${RAPIDCSV_VERSION_PATCH})
 
     # Give feedback to the user. Prefer DEBUG when available since large projects tend to have a lot
     # going on already
@@ -62,7 +64,7 @@ endfunction()
 macro(rapidcsv_set_cxx_standard)
     # DOUBT : Q  : where does RAPIDCSV_CXX_STANDARD get set?
     #         Ans: as this macro gets called only in standalone-mode,
-    #              RAPIDCSV_CXX_STANDARD might be set on comman line
+    #              RAPIDCSV_CXX_STANDARD might be set on command line
     #              while invoking cmake !
     if (RAPIDCSV_CXX_STANDARD)
         set(CMAKE_CXX_STANDARD ${RAPIDCSV_CXX_STANDARD})
@@ -86,7 +88,7 @@ macro(fetch_dependencies)
     include( FetchContent )
     FetchContent_Declare( ${CONVERTERLIB}
 		          GIT_REPOSITORY https://github.com/panchaBhuta/converter.git
-		          GIT_TAG        v1.2.7)  # adjust tag/branch/commit as needed
+		          GIT_TAG        v1.2.8)  # adjust tag/branch/commit as needed
     FetchContent_MakeAvailable(${CONVERTERLIB})
 
     #[==================[
@@ -139,7 +141,7 @@ endmacro()
 
 # Helper function to enable warnings
 macro(rapidcsv_enable_warnings)
-    set(gcc_warnings "-g;-Wall;-Wextra;-Wpedantic;-Wshadow;-Wpointer-arith")
+    set(gcc_warnings "-Wextra;-Wpedantic;-Wshadow;-Wpointer-arith")
     set(gcc_warnings "${gcc_warnings};-Wcast-qual;-Wno-missing-braces;-Wswitch-default;-Wcast-align;-Winit-self")
     set(gcc_warnings "${gcc_warnings};-Wunreachable-code;-Wundef;-Wuninitialized;-Wold-style-cast;-Wwrite-strings")
     set(gcc_warnings "${gcc_warnings};-Wsign-conversion;-Weffc++")
@@ -148,6 +150,7 @@ macro(rapidcsv_enable_warnings)
     #set(is_gnu "$<CXX_COMPILER_ID:GNU>")
     set(v5_or_later "$<VERSION_GREATER_EQUAL:$<CXX_COMPILER_VERSION>,5>")
     set(gcc_cxx_v5_or_later "$<AND:${gcc_cxx},${v5_or_later}>")
+    set(windows_os_clang_cxx "$<AND:${windows_os},${clang_cxx}>")  # used when Windows-ClangCl toolchain
     #[==================================================================================[
     # we only want these warning flags to be used during builds.
     # Consumers of our installed project should not inherit our warning flags.
@@ -155,7 +158,13 @@ macro(rapidcsv_enable_warnings)
     #]==================================================================================]
     target_compile_options(rapidcsv INTERFACE
         "$<${gcc_like_cxx}:$<BUILD_INTERFACE:${gcc_warnings}>>"
+        "$<$<AND:${gcc_like_cxx},$<NOT:${windows_os_clang_cxx}>>:$<BUILD_INTERFACE:-Wall>>" # -Wall for 'windows_os_clang_cxx' gives lot of warnings
         "$<${gcc_cxx_v5_or_later}:$<BUILD_INTERFACE:-Wsuggest-override>>"
+        "$<$<NOT:${windows_os}>:$<BUILD_INTERFACE:-g>>"  # for linux and macOS
+        "$<${windows_os}:$<BUILD_INTERFACE:-Z7>>"  # -Z7 is equivalent for -g
+        #"$<${windows_os_clang_cxx}:$<BUILD_INTERFACE:-Wno-c++98-compat;-Wno-c++98-compat-pedantic>>"
+        #"$<${windows_os_clang_cxx}:$<BUILD_INTERFACE:-Wno-global-constructors;-Wno-exit-time-destructors>>"
+        #"$<${windows_os_clang_cxx}:$<BUILD_INTERFACE:-Wno-extra-semi-stmt;-Wno-string-plus-int>>"
         "$<${msvc_cxx}:$<BUILD_INTERFACE:-W4>>")
     #add_compile_options("/utf-8")  for msvc  -> check in cxxopts.cmake
 endmacro()
@@ -181,6 +190,7 @@ macro(rapidcsv_build)
             set(_DEBUG_LOG TRUE)
     endif()
     #message(STATUS "_DEBUG_LOG=${_DEBUG_LOG}")
+    # for _DEBUG_LOG can't use generator-expression as its computed during build-stage, but we need it during config-stage
     option(RAPIDCSV_DEBUG_LOG  "Set to ON for debugging logs"  ${_DEBUG_LOG})
     message(STATUS "RAPIDCSV_DEBUG_LOG=${RAPIDCSV_DEBUG_LOG}")
     #[===========[  donot use generator-expressions in option() functions
@@ -212,7 +222,7 @@ macro(rapidcsv_build)
     #target_include_directories(rapidcsv INTERFACE
     #    "$<$<BOOL:${CMAKE_HOST_UNIX}>:/opt/include/$<CXX_COMPILER_ID>>")
 
-    target_compile_definitions(rapidcsv INTERFACE
+    target_compile_definitions(converter INTERFACE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
         $<$<CONFIG:Release>:RELEASE_BUILD>
         $<$<BOOL:"${ENABLE_RAPIDCSV_DEBUG_LOG}">:ENABLE_RAPIDCSV_DEBUG_LOG>)
