@@ -67,7 +67,8 @@ typedef SSIZE_T ssize_t;
 
 
 #ifdef ENABLE_RAPIDCSV_DEBUG_LOG
-#define RAPIDCSV_DEBUG_LOG(aMessage) { std::cout << aMessage << " :: file:" << RAPIDCSV_PREFERRED_PATH << ":" << __LINE__ << std::endl; }
+//#define RAPIDCSV_DEBUG_LOG(aMessage) { std::cout << aMessage << " :: file:" << RAPIDCSV_PREFERRED_PATH << ":" << __LINE__ << std::endl; }
+#define RAPIDCSV_DEBUG_LOG(aMessage)
 #else
 #define RAPIDCSV_DEBUG_LOG(aMessage)
 #endif
