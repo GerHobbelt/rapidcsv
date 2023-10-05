@@ -131,7 +131,7 @@ macro(rapidcsv_check_cxx_compiler_flag_file_prefix_map)
     else()
         # as of writing this code, clang does not support option '-ffile-prefix-map=...'
         message(STATUS "rapidcsv : compiler option '-ffile-prefix-map=old=new' NOT SUPPORTED")
-        string(LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" CONVERTER_SOURCE_PATH_SIZE)
+        string(LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" RAPIDCSV_SOURCE_PATH_SIZE)
         target_compile_definitions(rapidcsv INTERFACE
                                         USE_FILEPREFIXMAP=0
         # https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
