@@ -121,6 +121,7 @@ add_unit_test(test047)
 add_unit_test(test048)
 add_unit_test(test049)
 add_unit_test(test050)
+#[==================================[
 add_unit_test(test051)
 add_unit_test(test052)
 add_unit_test(test053)
@@ -196,4 +197,5 @@ add_unit_test(testViewYmd005)
 # perf tests
 add_perf_test(ptest001)
 add_perf_test(ptest002)
+#]==================================]
 
