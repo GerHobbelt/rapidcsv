@@ -44,9 +44,8 @@ int main()
     unittest::ExpectEqual(unsigned, std::get<1>(ints), 25);
     unittest::ExpectEqual(long, std::get<2>(ints), 625);
 
-    std::string errMsgPre_r = (std::filesystem::path("include/rapidcsv/rapidcsv.h")).make_preferred().string();
     ExpectExceptionMsg(viewdoc.GetViewRow<int COMMA unsigned COMMA long>("1"), std::out_of_range,
-                       errMsgPre_r + ": Document::GetRowIdx(pRowName) row not found: 1");
+                       "rapidcsv::Document::GetRowIdx(pRowName) row not found for 'pRowName'");
     /*
        unittest::ExpectEqual(size_t, ints.size(), 3);
        unittest::ExpectEqual(int, ints.at(0), 3);
@@ -74,7 +73,7 @@ int main()
     unittest::ExpectEqual(long, std::get<2>(ints), 1296);
 
     ExpectExceptionMsg(viewdoc1.GetViewRow<int COMMA unsigned COMMA long>("1"), std::out_of_range,
-                       errMsgPre_r + ": Document::GetRowIdx(pRowName) row not found: 1");
+                       "rapidcsv::Document::GetRowIdx(pRowName) row not found for 'pRowName'");
     /*
        unittest::ExpectEqual(size_t, ints.size(), 3);
        unittest::ExpectEqual(int, ints.at(0), 3);
@@ -99,7 +98,7 @@ int main()
     unittest::ExpectEqual(long, std::get<2>(ints), 2401);
 
     ExpectExceptionMsg(viewdoc2.GetViewRow<int COMMA unsigned COMMA long>("1"), std::out_of_range,
-                       errMsgPre_r + ": Document::GetRowIdx(pRowName) row not found: 1");
+                       "rapidcsv::Document::GetRowIdx(pRowName) row not found for 'pRowName'");
     /*
        unittest::ExpectEqual(size_t, ints.size(), 3);
        unittest::ExpectEqual(int, ints.at(0), 3);
@@ -114,7 +113,7 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(2), "6561");
 
     // ExpectExceptionMsg(viewdoc.GetViewRow<int>("2"), std::out_of_range,
-    //                    errMsgPre_r + "include/rapidcsv/rapidcsv.h:647 row filtered out: 2");
+    //                    "rapidcsv::Document::GetRowIdx(pRowName) row not found for 'pRowName'");
 
   }
   catch (const std::exception& ex)

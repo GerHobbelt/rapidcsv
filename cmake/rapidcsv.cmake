@@ -88,7 +88,7 @@ macro(fetch_dependencies)
     include( FetchContent )
     FetchContent_Declare( ${CONVERTERLIB}
 		          GIT_REPOSITORY https://github.com/panchaBhuta/converter.git
-		          GIT_TAG        v1.2.8)  # adjust tag/branch/commit as needed
+		          GIT_TAG        v1.2.9)  # adjust tag/branch/commit as needed
     FetchContent_MakeAvailable(${CONVERTERLIB})
 
     #[==================[
@@ -124,7 +124,7 @@ macro(rapidcsv_check_cxx_compiler_flag_file_prefix_map)
     if(cxx_compiler_file_prefix_map)
         message(STATUS "rapidcsv : compiler option '-ffile-prefix-map=old=new' SUPPORTED")
         target_compile_definitions(rapidcsv INTERFACE
-                                        USE_FILEPREFIXMAP=1)
+                                        RAPIDCSV_USE_FILEPREFIXMAP=1)
 
         target_compile_options(rapidcsv INTERFACE
             "-ffile-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}${_path_separator}=")
@@ -133,7 +133,7 @@ macro(rapidcsv_check_cxx_compiler_flag_file_prefix_map)
         message(STATUS "rapidcsv : compiler option '-ffile-prefix-map=old=new' NOT SUPPORTED")
         string(LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" RAPIDCSV_SOURCE_PATH_SIZE)
         target_compile_definitions(rapidcsv INTERFACE
-                                        USE_FILEPREFIXMAP=0
+                                        RAPIDCSV_USE_FILEPREFIXMAP=0
         # https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
                                         RAPIDCSV_SOURCE_PATH_SIZE=${RAPIDCSV_SOURCE_PATH_SIZE})
     endif()
@@ -184,10 +184,10 @@ macro(rapidcsv_build)
         message(STATUS "Using build type '${CMAKE_BUILD_TYPE}'.")
     endif()
 
-    set(_DEBUG_LOG FALSE)
+    set(_DEBUG_LOG OFF)
     if (RAPIDCSV_STANDALONE_PROJECT AND
         CMAKE_BUILD_TYPE STREQUAL "Debug")
-            set(_DEBUG_LOG TRUE)
+            set(_DEBUG_LOG ON)
     endif()
     #message(STATUS "_DEBUG_LOG=${_DEBUG_LOG}")
     # for _DEBUG_LOG can't use generator-expression as its computed during build-stage, but we need it during config-stage
@@ -222,10 +222,10 @@ macro(rapidcsv_build)
     #target_include_directories(rapidcsv INTERFACE
     #    "$<$<BOOL:${CMAKE_HOST_UNIX}>:/opt/include/$<CXX_COMPILER_ID>>")
 
-    target_compile_definitions(converter INTERFACE
+    target_compile_definitions(rapidcsv INTERFACE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
         $<$<CONFIG:Release>:RELEASE_BUILD>
-        $<$<BOOL:"${ENABLE_RAPIDCSV_DEBUG_LOG}">:ENABLE_RAPIDCSV_DEBUG_LOG>)
+	ENABLE_RAPIDCSV_DEBUG_LOG=$<BOOL:${RAPIDCSV_DEBUG_LOG}>)
     #[==================================================================================[
     # refer https://cmake.org/cmake/help/v3.27/manual/cmake-generator-expressions.7.html#genex:COMPILE_LANG_AND_ID
     # This specifies the use of different compile definitions based on both the compiler id and compilation language.

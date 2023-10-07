@@ -51,7 +51,7 @@ typedef SSIZE_T ssize_t;
 
 //  Project path is removed from the __FILE__
 //  Resulting file-path is relative path from project-root-folder.
-#if  USE_FILEPREFIXMAP == 1
+#if  RAPIDCSV_USE_FILEPREFIXMAP == 1
   // the project-prefix-path is removed via compilation directive file-prefix-map
   #define RAPIDCSV_FILE    __FILE__
 #else
@@ -66,7 +66,7 @@ typedef SSIZE_T ssize_t;
 #define RAPIDCSV_PREFERRED_PATH    (std::filesystem::path(RAPIDCSV_FILE).make_preferred().string())
 
 
-#ifdef ENABLE_RAPIDCSV_DEBUG_LOG
+#if ENABLE_RAPIDCSV_DEBUG_LOG == 1
   #define RAPIDCSV_DEBUG_LOG(aMessage) { std::cout << aMessage << " :: file:" << RAPIDCSV_PREFERRED_PATH << ":" << __LINE__ << std::endl; }
 #else
   #define RAPIDCSV_DEBUG_LOG(aMessage)
@@ -477,7 +477,7 @@ namespace rapidcsv
           column.push_back(val);
         } else {
           static const std::string errMsg("rapidcsv::Document::GetColumn(pColumnNameIdx) : column not found for 'pColumnNameIdx'");
-          #ifdef ENABLE_RAPIDCSV_DEBUG_LOG
+          #if ENABLE_RAPIDCSV_DEBUG_LOG == 1
             const size_t adjRowSize = itRow->size() - _getDataColumnIndex(0).dataIdx;
             const std::string numberOfColumns = std::to_string(rowIdx-_getDataColumnIndex(0).dataIdx);
             RAPIDCSV_DEBUG_LOG(errMsg << " : pColumnNameIdx='" << pColumnNameIdx << "' : pColumnIdx{" << pColumnIdx << "} >= rowSize{"  \

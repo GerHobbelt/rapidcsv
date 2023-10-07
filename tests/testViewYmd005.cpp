@@ -70,7 +70,7 @@ int main()
     static_assert(std::is_same_v< t_hloc, decltype(hlocV_ac)>);
     unittest::ExpectEqual(double, std::get<0>(hlocV_ac), 29.000001);
     unittest::ExpectEqual(unsigned long, std::get<4>(hlocV_ac), 133171200);
-    unittest::ExpectEqual(long, std::get<5>(hlocV_ac), 0.069131);
+    unittest::ExpectEqual(double, std::get<5>(hlocV_ac), 0.069131);
 
     strs = viewdoc1.GetRow_IndexKey_VecStr(riDate);
     unittest::ExpectEqual(size_t, strs.size(), 6);
@@ -100,7 +100,7 @@ int main()
     hlocV_ac = viewdoc2.GetRow_IndexKey<double,double,double,double,unsigned long,double>(riDate2);
     unittest::ExpectEqual(double, std::get<0>(hlocV_ac), 63.400002);
     unittest::ExpectEqual(unsigned long, std::get<4>(hlocV_ac), 14653300);
-    unittest::ExpectEqual(long, std::get<5>(hlocV_ac), 62.610426);
+    unittest::ExpectEqual(double, std::get<5>(hlocV_ac), 62.610426);
 
     strs = viewdoc2.GetRow_IndexKey_VecStr(riDate2);
     unittest::ExpectEqual(size_t, strs.size(), 6);
@@ -108,8 +108,9 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(4), "14653300");
     unittest::ExpectEqual(std::string, strs.at(5), "62.610426");
 
-    std::string errMsgPre_v = (std::filesystem::path("include/rapidcsv/view.h")).make_preferred().string();
-    std::string errMsg = errMsgPre_v + " : FilterSortDocument::GetRow_IndexKey_VecStr() : rowKey not found in 'sortedKeyMap'. For pRowKey=[2015-12-28] : ERROR: " + mapErr;
+    //std::string errMsgPre_v = (std::filesystem::path("include/rapidcsv/view.h")).make_preferred().string();
+    //std::string errMsg = errMsgPre_v + " : FilterSortDocument::GetRow_IndexKey_VecStr() : rowKey not found in 'sortedKeyMap'. For pRowKey=[2015-12-28] : ERROR: " + mapErr;
+    std::string errMsg = "rapidcsv::FilterSortDocument::GetRow_IndexKey_VecStr(...) : rowKey not found in 'sortedKeyMap'";
     rdb::year_month_day tDate3{rdb::year{2015}, rdb::month{12}, rdb::day{28} };
     rapidcsv::SortKeyFactory<decltype(spD)>::t_sortKey riDate3(tDate3);
     ExpectExceptionMsg(viewdoc2.GetRow_IndexKey_VecStr(riDate3), std::out_of_range, errMsg );

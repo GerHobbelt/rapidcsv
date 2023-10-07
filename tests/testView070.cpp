@@ -40,26 +40,24 @@ int main()
     const rapidcsv::SortParams<int, rapidcsv::e_SortOrder::DESCEND> spD(1);
     rapidcsv::FilterSortDocument<isFirstCellPositive, decltype(spD)> viewdoc2(doc, spD);
 
-    std::string errMsgPre_r = (std::filesystem::path("include/rapidcsv/rapidcsv.h")).make_preferred().string();
-    std::string errMsgPre_v = (std::filesystem::path("include/rapidcsv/view.h")).make_preferred().string();
     ExpectExceptionMsg(viewdoc2.GetViewRowIdx("-"), std::out_of_range,
-                       errMsgPre_r + ": Document::GetRowIdx(pRowName) row not found: -");
+                       "rapidcsv::Document::GetRowIdx(pRowName) row not found for 'pRowName'");
     unittest::ExpectEqual(size_t, viewdoc2.GetViewRowIdx("1"), 3);
     ExpectExceptionMsg(viewdoc2.GetViewRowIdx("2"), std::out_of_range,
-                       errMsgPre_v + " : _ViewDocument::GetViewRowIdx() : row filtered out: 2");
+                       "rapidcsv::_ViewDocument::GetViewRowIdx(pRowName) : row filtered out");
     unittest::ExpectEqual(size_t, viewdoc2.GetViewRowIdx("3"), 2);
     ExpectExceptionMsg(viewdoc2.GetViewRowIdx("6"), std::out_of_range,
-                       errMsgPre_v + " : _ViewDocument::GetViewRowIdx() : row filtered out: 6");
+                       "rapidcsv::_ViewDocument::GetViewRowIdx(pRowName) : row filtered out");
     unittest::ExpectEqual(size_t, viewdoc2.GetViewRowIdx("7"), 0);
 
     ExpectExceptionMsg(viewdoc2.GetViewRowIdx("-"), std::out_of_range,
-                       errMsgPre_r + ": Document::GetRowIdx(pRowName) row not found: -");
+                       "rapidcsv::Document::GetRowIdx(pRowName) row not found for 'pRowName'");
     unittest::ExpectEqual(size_t, viewdoc2.GetDocumentRowIdx("1"), 0);
     ExpectExceptionMsg(viewdoc2.GetViewRowIdx("2"), std::out_of_range,
-                       errMsgPre_v + " : _ViewDocument::GetViewRowIdx() : row filtered out: 2");
+                       "rapidcsv::_ViewDocument::GetViewRowIdx(pRowName) : row filtered out");
     unittest::ExpectEqual(size_t, viewdoc2.GetDocumentRowIdx("3"), 2);
     ExpectExceptionMsg(viewdoc2.GetViewRowIdx("6"), std::out_of_range,
-                       errMsgPre_v + " : _ViewDocument::GetViewRowIdx() : row filtered out: 6");
+                       "rapidcsv::_ViewDocument::GetViewRowIdx(pRowName) : row filtered out");
     unittest::ExpectEqual(size_t, viewdoc2.GetDocumentRowIdx("7"), 6);
   }
   catch (const std::exception& ex)

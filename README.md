@@ -270,57 +270,76 @@ https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a
 
 Locale Parsing Formats : String-to-T (i.e S2T)
 ----------------------------------------------
-**rapidcsv_FilterSort** uses `std::sto[T^]()` conversion functions when parsing numeric-type values from string by default.
+**rapidcsv_FilterSort** uses [converter library](https://github.com/panchaBhuta/converter#locale-parsing-formats--string-to-t-ie-s2t) conversion functions when parsing numeric-type values from string. By default, locale parsing is not used.
 
-```cpp
+```c++
+    template< typename T_C >
+    typename converter::t_S2Tconv_c<T_C>::return_type
+    GetCell(const c_sizet_or_string auto& pColumnNameIdx,
+            const c_sizet_or_string auto& pRowNameIdx) const
+```
+
+`converter::t_S2Tconv_c<T_C>` maps to default-convesrion functions that are independent of any locale.
+
+It is possible to configure **rapidcsv_FilterSort** to use locale dependent parsing by setting template-parameter `T_C` of function `Document::GetCell<T_C>(...)`, see for example [tests/test087.cpp](tests/test087.cpp).
+
+```c++
 template<typename T>
-struct S2T_DefaultFormat< T,
-                          typename  std::enable_if_t< is_integer_type<T>::value ||
-                                                      std::is_floating_point_v<T>
-                                                    >
-                        > 
-{
-  using type = S2T_Format_std_StoT;     //  uses 'std::sto[T^](...)' function's for conversion
-};
-
-.......
-
-T ConvertFromStr< T,
-                  S2T_FORMAT = S2T_DefaultFormat<T>::type
-                >::ToVal(const std::string& pStr);
-
-// "S2T_DefaultFormat<T>::type" for numeric-types evaluates to  "converter::S2T_Format_std_StoT"
+using convertS2T_stream =
+    converter::ConvertFromStr<T,
+                              converter::S2T_Format_StreamAsIs<T,
+                                                               converter::FailureS2Tprocess::THROW_ERROR,
+                                                               char>
+                             >;
+...
+  doc.GetCell<convertS2T_stream<float>>("A", "2");
 ```
 
-It is possible to configure **rapidcsv_FilterSort** to use locale dependent parsing by changing template-parameter `S2T_FORMAT=converter::S2T_Format_StreamAsIs`, see for example [tests/test087.cpp](tests/test087.cpp).
 
-```cpp
-  doc.GetCell< converter::ConvertFromStr< float,
-                                          coverter::S2T_Format_StreamAsIs
-                                        >
-             >("A", "2");
-```
-... or configure **rapidcsv_FilterSort** to use either classic-locale parsing by setting template-parameter `S2T_FORMAT=converter::S2T_Format_StreamUseClassicLocale`,
+... or configure **rapidcsv_FilterSort** to use classic-locale parsing by setting template-parameter `T_C` of function `Document::GetCell<T_C>(...)`, see for example [tests/test087.cpp](tests/test087.cpp).
 
-```cpp
-  float f1 = doc.GetCell< converter::ConvertFromStr< float,
-                                                     converter::S2T_Format_StreamUseClassicLocale
-                                                   >
-                        >("A", "2");
+```c++
+template<typename T>
+using convertS2T_streamClassic =
+    converter::ConvertFromStr<T,
+                              converter::S2T_Format_StreamUseClassicLocale< T,
+                                                                            converter::FailureS2Tprocess::THROW_ERROR,
+                                                                            char>
+                             >;
+...
+  doc.GetCell<convertS2T_streamClassic<float>>("A", "2");
 ```
 
-... or specify any specific locale, see for example [tests/test092.cpp](tests/test092.cpp)
 
-```cpp
-constexpr char de_Loc[] = "de_DE";  // string literal object with static storage duration
+... or configure **rapidcsv_FilterSort** to any of `std::stoi`, `std::stoll`, `std::sto*` for numeric-types. These functions uses System-locale for parsing. Set template-parameter `T_C` of function `Document::GetCell<T_C>(...)`, see for example [tests/test087.cpp](tests/test087.cpp).
 
-  using deLocal_iss = converter::S2T_Format_StreamUserLocale<de_Loc>;
-
-  float f2 = doc.GetCell< converter::ConvertFromStr< float,
-                                                     deLocal_iss
-                                                   >
-                        >("A", "2");
+```c++
+template<typename T>
+using convertS2T_StoT =
+    converter::ConvertFromStr<T,
+                              converter::S2T_Format_std_StoT<T,
+                                                             converter::FailureS2Tprocess::THROW_ERROR>
+                             >;
+...
+  doc.GetCell<convertS2T_StoT<float>>("A", "2");
 ```
+
+
+... or specify any specific locale, see for example [tests/test087.cpp](tests/test087.cpp) and [tests/test092.cpp](tests/test092.cpp)
+
+```c++
+static constexpr char loc[] = "de_DE.UTF-8"; // uses comma (,) as decimal separator
+
+template<typename T>
+using deLocal_iss = converter::S2T_Format_StreamUserLocale<T, converter::FailureS2Tprocess::THROW_ERROR, char, loc>;
+
+template<typename T>
+using convertS2T_userLocale =
+    converter::ConvertFromStr<T, deLocal_iss<T> >;
+...
+  doc.GetCell<convertS2T_userLocale<float>>("A", "2");
+```
+
 
 For date, the default conversion format is `S2T_Format_StreamYMD`. With format "%F" -> "%Y-%m-%d".
 

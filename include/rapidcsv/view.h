@@ -291,7 +291,7 @@ namespace rapidcsv
           column.push_back(val);
         } else {
           static const std::string errMsg("rapidcsv::_ViewDocument::GetViewColumn() : requested column index is more than row.size()");
-          RAPIDCSV_DEBUG_LOG(errMsg << " : pColumnNameIdx='" << pColumnNameIdx << "' , dataColumnIdx=" << dataColumnIdx " , row.size()=" << row.size());
+          RAPIDCSV_DEBUG_LOG(errMsg << " : pColumnNameIdx='" << pColumnNameIdx << "' , dataColumnIdx=" << dataColumnIdx << " , row.size()=" << row.size());
           throw std::out_of_range(errMsg);
         }
       }
@@ -334,7 +334,7 @@ namespace rapidcsv
       if (viewRowIdx < 0)
       {
         static const std::string errMsg("rapidcsv::_ViewDocument::GetViewRowIdx(pRowName) : row filtered out");
-        RAPIDCSV_DEBUG_LOG(errMsg << " : pRowName='" << pRowName < "'");
+        RAPIDCSV_DEBUG_LOG(errMsg << " : pRowName='" << pRowName << "'");
         throw std::out_of_range(errMsg);
       }
 
@@ -356,7 +356,7 @@ namespace rapidcsv
       if (viewRowIdx < 0)
       {
         static const std::string errMsg("rapidcsv::_ViewDocument::GetDocumentRowIdx(pRowName) : row filtered out");
-        RAPIDCSV_DEBUG_LOG(errMsg << " : pRowName='" << pRowName < "'");
+        RAPIDCSV_DEBUG_LOG(errMsg << " : pRowName='" << pRowName << "'");
         throw std::out_of_range(errMsg);
       }
 

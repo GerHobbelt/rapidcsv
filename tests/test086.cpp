@@ -24,13 +24,12 @@ int main()
     unittest::ExpectEqual(std::string, doc.GetColumnName(1), "B");
     unittest::ExpectEqual(std::string, doc.GetColumnName(2), "C");
 
-    std::string errMsgPre_r = (std::filesystem::path("include/rapidcsv/rapidcsv.h")).make_preferred().string();
     ExpectExceptionMsg(doc.GetColumn<int>(2), std::out_of_range,
-                       errMsgPre_r + " : Document::GetColumn() # requested column index 2 >= 2 (number of columns on row index 1)");
+                       "rapidcsv::Document::GetColumn(pColumnNameIdx) : column not found for 'pColumnNameIdx'");
     ExpectExceptionMsg(doc.GetColumn<int>("C"), std::out_of_range,
-                       errMsgPre_r + " : Document::GetColumn() # requested column index 2 >= 2 (number of columns on row index 1)");
+                       "rapidcsv::Document::GetColumn(pColumnNameIdx) : column not found for 'pColumnNameIdx'");
     ExpectExceptionMsg(doc.GetColumn<int>(3), std::out_of_range,
-                       errMsgPre_r + " : Document::GetColumn() # requested column index 3 >= 3 (number of columns on row index 0)");
+                       "rapidcsv::Document::GetColumn(pColumnNameIdx) : column not found for 'pColumnNameIdx'");
   }
   catch (const std::exception& ex)
   {
