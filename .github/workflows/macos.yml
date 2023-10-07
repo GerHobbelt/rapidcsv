@@ -62,7 +62,7 @@ jobs:
       - name: Show compile commands [Debug]
         run: cat build-debug/compile_commands.json
       - name: Build [Debug]
-        run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j
+        run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j$(sysctl -n hw.ncpu)
       - name: Test [Debug]
         working-directory: ${{github.workspace}}/build-debug
         #run: ctest -C Debug --output-on-failure -j
@@ -76,7 +76,7 @@ jobs:
         if: matrix.compiler != 'default'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DRAPIDCSV_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
       - name: Build [Release]
-        run: cmake --build "${{github.workspace}}/build-release" --config Release -j
+        run: cmake --build "${{github.workspace}}/build-release" --config Release -j$(sysctl -n hw.ncpu)
       - name: Test [Release]
         working-directory: ${{github.workspace}}/build-release
         run: ctest -C Release --verbose

@@ -11,7 +11,7 @@ Check [here](doc/UpstreamRepoChanges.md) for differences with [upstream repo](ht
 
 | **Linux** | **Mac** | **Windows** |
 |-----------|---------|-------------|
-| [![Linux](https://github.com/panchaBhuta/rapidcsv_FilterSort/workflows/Linux/badge.svg)](https://github.com/panchaBhuta/rapidcsv_FilterSort/actions?query=workflow%3ALinux) | [![macOS](https://github.com/panchaBhuta/rapidcsv_FilterSort/workflows/macOS/badge.svg)](https://github.com/panchaBhuta/rapidcsv_FilterSort/actions?query=workflow%3AmacOS) | [![Windows](https://github.com/panchaBhuta/rapidcsv_FilterSort/workflows/Windows/badge.svg)](https://github.com/panchaBhuta/rapidcsv_FilterSort/actions?query=workflow%3AWindows) |
+| [![Linux](https://github.com/panchaBhuta/rapidcsv_FilterSort/actions/workflows/linux.yml/badge.svg)](https://github.com/panchaBhuta/rapidcsv_FilterSort/actions/workflows/linux.yml) | [![macOS](https://github.com/panchaBhuta/rapidcsv_FilterSort/actions/workflows/macos.yml/badge.svg)](https://github.com/panchaBhuta/rapidcsv_FilterSort/actions/workflows/macos.yml) | [![Windows](https://github.com/panchaBhuta/rapidcsv_FilterSort/actions/workflows/windows.yml/badge.svg)](https://github.com/panchaBhuta/rapidcsv_FilterSort/actions/workflows/windows.yml) |
 
 Rapidcsv is an easy-to-use C++ CSV parser library. It supports C++20 (and
 later), is header-only and comes with a basic test suite.
