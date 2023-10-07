@@ -1,5 +1,6 @@
 // test049.cpp - default conversion to custom values
 
+#include <cmath>
 #include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 

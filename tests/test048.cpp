@@ -35,10 +35,12 @@ int main()
     //doc.GetCell<long long, ConvertFromStr_fNaN<long long> >(1, 0); // will not compile as 'long long' doesnot support has_signaling_NaN
     //doc.GetCell<unsigned int, ConvertFromStr_fNaN<unsigned int> >(2, 0); // will not compile as 'unsigned int' doesnot support has_signaling_NaN
 
-    doc.GetCell< ConvertFromStr_fNaN<double> >(0, 1);
-    unittest::ExpectTrue(std::isnan(doc.GetCell< ConvertFromStr_fNaN<double> >(0, 1)));
-    unittest::ExpectTrue(std::isnan(doc.GetCell< ConvertFromStr_fNaN<long double> >(1, 1)));
-    unittest::ExpectTrue(std::isnan(doc.GetCell< ConvertFromStr_fNaN<float> >(2, 1)));
+    double dNaN = doc.GetCell< ConvertFromStr_fNaN<double> >(0, 1);
+    unittest::ExpectTrue(std::isnan(dNaN));
+    long double ldNaN = doc.GetCell< ConvertFromStr_fNaN<long double> >(1, 1);
+    unittest::ExpectTrue(std::isnan(ldNaN));
+    float fNaN = doc.GetCell< ConvertFromStr_fNaN<float> >(2, 1);
+    unittest::ExpectTrue(std::isnan(fNaN));
   }
   catch (const std::exception& ex)
   {

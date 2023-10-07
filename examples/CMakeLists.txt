@@ -21,6 +21,8 @@ endmacro(add_example)
 
 
 
+
+#[==================================[
 # Examples
 add_example(ex001 ex001.cpp)
 add_example(ex002 ex002.cpp)
@@ -31,5 +33,7 @@ add_example(ex006 ex006.cpp)
 add_example(ex007 ex007.cpp)
 add_example(ex008 ex008.cpp)
 add_example(ex009 ex009.cpp)
+
+#]==================================]
 
 
