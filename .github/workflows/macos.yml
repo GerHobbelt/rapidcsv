@@ -34,7 +34,7 @@ jobs:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources  (os-labels : macos-12)
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
         # os: [ macos-11, macos-12 ] compiles with 'AppleClang-14' which is not available in macos-11
-        os: [ macos-11, macos-12, macOS-13 ]  #  macOS-latest  ==  macOS-13
+        os: [ macos-11, macos-12, macos-13 ]  #  macos-latest  ==  macos-13
         # https://github.com/actions/runner-images/blob/main/images/macos/macos-13-Readme.md#language-and-runtime
         # https://github.com/actions/runner-images/blob/main/images/macos/macos-12-Readme.md#language-and-runtime
         # https://github.com/actions/runner-images/blob/main/images/macos/macos-11-Readme.md#language-and-runtime
@@ -83,4 +83,4 @@ jobs:
       - name: Install [Release]
         run: cmake --install "${{github.workspace}}/build-release" --config Release
       - name: Check Work-Arounds
-        run: grep define "${{github.workspace}}/build-release/_deps/converter-build/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " _e_"
+        run: grep define "${{github.workspace}}/build-release/_deps/converter-build/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE "
