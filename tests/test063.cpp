@@ -5,11 +5,18 @@
 #include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
-template<typename T>
-using ConvertFromStr_fNaN = converter::ConvertFromStr<T, converter::S2T_Format_std_CtoT<T, converter::FailureS2Tprocess::QUIET_NAN>>;
+
+#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE
+  #define S2T_FORMATER   converter::S2T_Format_std_CtoT
+#else
+  #define S2T_FORMATER   converter::S2T_Format_std_StoT
+#endif
 
 template<typename T>
-using ConvertFromStr_gNaN = converter::ConvertFromStr<T, converter::S2T_Format_std_CtoT<T, converter::FailureS2Tprocess::VARIANT_NAN>>;
+using ConvertFromStr_fNaN = converter::ConvertFromStr<T, S2T_FORMATER<T, converter::FailureS2Tprocess::QUIET_NAN>>;
+
+template<typename T>
+using ConvertFromStr_gNaN = converter::ConvertFromStr<T, S2T_FORMATER<T, converter::FailureS2Tprocess::VARIANT_NAN>>;
 
 // Conversion function for int data to be converted to fixed-point two decimal numbers
 int ToVal(const std::string& pStr)
