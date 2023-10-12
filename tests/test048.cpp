@@ -4,8 +4,13 @@
 #include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
+#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE
 template<typename T>
 using ConvertFromStr_fNaN = converter::ConvertFromStr<T, converter::S2T_Format_std_CtoT<T, converter::FailureS2Tprocess::QUIET_NAN>>;
+#else
+template<typename T>
+using ConvertFromStr_fNaN = converter::ConvertFromStr<T, converter::S2T_Format_std_StoT<T, converter::FailureS2Tprocess::QUIET_NAN>>;
+#endif
 
 int main()
 {
