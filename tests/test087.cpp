@@ -49,71 +49,83 @@ int main()
 
   try
   {
+    std::string csv =
+      "-,A,B,C\n"
+      "1,1,10,100\n"
+      "2,0.1,0.01,0.001\n"
+    ;
+
+    unittest::WriteFile(path, csv);
+
+    rapidcsv::LabelParams labelParams(0, 0);
+    rapidcsv::SeparatorParams separatorParams;
+    rapidcsv::Document doc(path, labelParams, separatorParams);
+    unittest::ExpectEqual(float, doc.GetCell<float>("A", "2"), 0.1f);
+    unittest::ExpectEqual(float, doc.GetCell<float>("B", "2"), 0.01f);
+    unittest::ExpectEqual(float, doc.GetCell<float>("C", "2"), 0.001f);
+
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_stream<float>>("A", "2"), 0.1f);
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_stream<float>>("B", "2"), 0.01f);
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_stream<float>>("C", "2"), 0.001f);
+
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_streamClassic<float>>("A", "2"), 0.1f);
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_streamClassic<float>>("B", "2"), 0.01f);
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_streamClassic<float>>("C", "2"), 0.001f);
+
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_StoT<float>>("A", "2"), 0.1f);
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_StoT<float>>("B", "2"), 0.01f);
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_StoT<float>>("C", "2"), 0.001f);
+  }
+  catch (const std::exception& ex)
+  {
+    std::cout << "#1# unexpected EXCEPTION : " << ex.what() << std::endl;
+    return 1;
+  }
+
+  try
+  {
+    std::string csv =
+      "-;A;B;C\n"
+      "1;1;10;100\n"
+      "2;0,1;0,01;0,001\n"
+    ;
+
+    unittest::WriteFile(path, csv);
+
+    rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0),
+                            rapidcsv::SeparatorParams(';' /* pSeparator */));
+
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_userLocale<float>>("A", "2"), 0.1f);
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_userLocale<float>>("B", "2"), 0.01f);
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_userLocale<float>>("C", "2"), 0.001f);
+  }
+  catch (const std::exception& ex)
+  {
+    std::cout << "#2# unexpected EXCEPTION : " << ex.what() << std::endl;
+    return 1;
+  }
+
+  try {
+    char* C_locale = std::setlocale(LC_ALL, loc);
+    if (C_locale == nullptr)
     {
-      std::string csv =
-        "-,A,B,C\n"
-        "1,1,10,100\n"
-        "2,0.1,0.01,0.001\n"
-      ;
-
-      unittest::WriteFile(path, csv);
-
-      rapidcsv::LabelParams labelParams(0, 0);
-      rapidcsv::SeparatorParams separatorParams;
-      rapidcsv::Document doc(path, labelParams, separatorParams);
-      unittest::ExpectEqual(float, doc.GetCell<float>("A", "2"), 0.1f);
-      unittest::ExpectEqual(float, doc.GetCell<float>("B", "2"), 0.01f);
-      unittest::ExpectEqual(float, doc.GetCell<float>("C", "2"), 0.001f);
-
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_stream<float>>("A", "2"), 0.1f);
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_stream<float>>("B", "2"), 0.01f);
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_stream<float>>("C", "2"), 0.001f);
-
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_streamClassic<float>>("A", "2"), 0.1f);
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_streamClassic<float>>("B", "2"), 0.01f);
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_streamClassic<float>>("C", "2"), 0.001f);
-
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_StoT<float>>("A", "2"), 0.1f);
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_StoT<float>>("B", "2"), 0.01f);
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_StoT<float>>("C", "2"), 0.001f);
-    }
-
-    {
-      std::string csv =
-        "-;A;B;C\n"
-        "1;1;10;100\n"
-        "2;0,1;0,01;0,001\n"
-      ;
-
-      unittest::WriteFile(path, csv);
-
-      rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0),
-                             rapidcsv::SeparatorParams(';' /* pSeparator */));
-
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_userLocale<float>>("A", "2"), 0.1f);
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_userLocale<float>>("B", "2"), 0.01f);
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_userLocale<float>>("C", "2"), 0.001f);
-    }
-
-    try {
-      char* C_locale = std::setlocale(LC_ALL, loc);
-      if (C_locale == nullptr)
-      {
-        std::cout << "locale " << loc << " not available, skipping user-locale test.\n";
-        // pass test for systems without locale present. for ci testing, make.sh
-        // ensures that the necessary locale is installed.
-        return 0;
-      }
-    }
-    catch (const std::exception& ex)
-    {
-      std::cout << "locale " << loc << " not available (" << ex.what()
-                << "), skipping test.\n";
+      std::cout << "#3.1# locale " << loc << " not available, skipping user-locale test.\n";
       // pass test for systems without locale present. for ci testing, make.sh
       // ensures that the necessary locale is installed.
       return 0;
     }
+  }
+  catch (const std::exception& ex)
+  {
+    std::cout << "#3.2# locale " << loc << " not available (" << ex.what()
+              << "), skipping test.\n";
+    // pass test for systems without locale present. for ci testing, make.sh
+    // ensures that the necessary locale is installed.
+    return 0;
+  }
 
+  try
+  {
     std::string csv =
       "-;A;B;C\n"
       "1;1;10;100\n"
@@ -143,7 +155,7 @@ int main()
   }
   catch (const std::exception& ex)
   {
-    std::cout << "unexpected EXCEPTION : " << ex.what() << std::endl;
+    std::cout << "#4# unexpected EXCEPTION : " << ex.what() << std::endl;
     rv = 1;
   }
 
