@@ -95,44 +95,55 @@ int main()
       unittest::ExpectEqual(float, doc.GetCell<convertS2T_userLocale<float>>("C", "2"), 0.001f);
     }
 
-    if (std::setlocale(LC_ALL, loc) == nullptr)
+    try {
+      char* C_locale = std::setlocale(LC_ALL, loc);
+      if (C_locale == nullptr)
+      {
+        std::cout << "locale " << loc << " not available, skipping user-locale test.\n";
+        // pass test for systems without locale present. for ci testing, make.sh
+        // ensures that the necessary locale is installed.
+        return 0;
+      }
+    }
+    catch (const std::exception& ex)
     {
-      std::cout << "locale " << loc << " not available, skipping user-locale test.\n";
+      std::cout << "locale " << loc << " not available (" << ex.what()
+                << "), skipping test.\n";
       // pass test for systems without locale present. for ci testing, make.sh
       // ensures that the necessary locale is installed.
-      //return 0;
-    } else {
-      std::string csv =
-        "-;A;B;C\n"
-        "1;1;10;100\n"
-        "2;0,1;0,01;0,001\n"
-      ;
+      return 0;
+    }
 
-      unittest::WriteFile(path, csv);
+    std::string csv =
+      "-;A;B;C\n"
+      "1;1;10;100\n"
+      "2;0,1;0,01;0,001\n"
+    ;
 
-      rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0),
-                             rapidcsv::SeparatorParams(';' /* pSeparator */));
+    unittest::WriteFile(path, csv);
+
+    rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0),
+                            rapidcsv::SeparatorParams(';' /* pSeparator */));
 
 /*
-      // independent of system-locale
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_stream<float>>("A", "2"), 0.1f);
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_stream<float>>("B", "2"), 0.01f);
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_stream<float>>("C", "2"), 0.001f);
+    // independent of system-locale
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_stream<float>>("A", "2"), 0.1f);
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_stream<float>>("B", "2"), 0.01f);
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_stream<float>>("C", "2"), 0.001f);
 
-      // independent of system-locale
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_streamClassic<float>>("A", "2"), 0.1f);
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_streamClassic<float>>("B", "2"), 0.01f);
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_streamClassic<float>>("C", "2"), 0.001f);
+    // independent of system-locale
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_streamClassic<float>>("A", "2"), 0.1f);
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_streamClassic<float>>("B", "2"), 0.01f);
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_streamClassic<float>>("C", "2"), 0.001f);
 */
-      // dependent on system-locale
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_StoT<float>>("A", "2"), 0.1f);
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_StoT<float>>("B", "2"), 0.01f);
-      unittest::ExpectEqual(float, doc.GetCell<convertS2T_StoT<float>>("C", "2"), 0.001f);
-    }
+    // dependent on system-locale
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_StoT<float>>("A", "2"), 0.1f);
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_StoT<float>>("B", "2"), 0.01f);
+    unittest::ExpectEqual(float, doc.GetCell<convertS2T_StoT<float>>("C", "2"), 0.001f);
   }
   catch (const std::exception& ex)
   {
-    std::cout << ex.what() << std::endl;
+    std::cout << "unexpected EXCEPTION : " << ex.what() << std::endl;
     rv = 1;
   }
 
