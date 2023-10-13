@@ -1,7 +1,11 @@
 // test078.cpp - include Windows.h before rapidcsv.h
 
 #if defined(_MSC_VER)
-#include <Windows.h>
+  // refer https://stackoverflow.com/a/6884251/2299954
+  #ifndef NOMINMAX
+    #define NOMINMAX
+  #endif
+  #include <Windows.h>
 #endif
 
 #include <rapidcsv/rapidcsv.h>
