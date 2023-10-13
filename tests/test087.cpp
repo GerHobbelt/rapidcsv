@@ -44,6 +44,20 @@ using convertS2T_userLocale =
 int main()
 {
   int rv = 0;
+  bool testUserLocale = true;
+
+  try {
+    std::istringstream iss;
+    deLocal_iss<float>::streamUpdate(iss);
+  }
+  catch (const std::exception& ex)
+  {
+    std::cout << "#0# locale " << loc << " not available (" << ex.what()
+              << "), skipping userlocale-checks.\n";
+    // pass test for systems without locale present. for ci testing, make.sh
+    // ensures that the necessary locale is installed.
+    testUserLocale = false;
+  }
 
   std::string path = unittest::TempPath();
 
@@ -82,27 +96,28 @@ int main()
     return 1;
   }
 
-  try
-  {
-    std::string csv =
-      "-;A;B;C\n"
-      "1;1;10;100\n"
-      "2;0,1;0,01;0,001\n"
-    ;
+  if(testUserLocale) {
+    try {
+      std::string csv =
+        "-;A;B;C\n"
+        "1;1;10;100\n"
+        "2;0,1;0,01;0,001\n"
+      ;
 
-    unittest::WriteFile(path, csv);
+      unittest::WriteFile(path, csv);
 
-    rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0),
-                            rapidcsv::SeparatorParams(';' /* pSeparator */));
+      rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0),
+                              rapidcsv::SeparatorParams(';' /* pSeparator */));
 
-    unittest::ExpectEqual(float, doc.GetCell<convertS2T_userLocale<float>>("A", "2"), 0.1f);
-    unittest::ExpectEqual(float, doc.GetCell<convertS2T_userLocale<float>>("B", "2"), 0.01f);
-    unittest::ExpectEqual(float, doc.GetCell<convertS2T_userLocale<float>>("C", "2"), 0.001f);
-  }
-  catch (const std::exception& ex)
-  {
-    std::cout << "#2# unexpected EXCEPTION : " << ex.what() << std::endl;
-    return 1;
+      unittest::ExpectEqual(float, doc.GetCell<convertS2T_userLocale<float>>("A", "2"), 0.1f);
+      unittest::ExpectEqual(float, doc.GetCell<convertS2T_userLocale<float>>("B", "2"), 0.01f);
+      unittest::ExpectEqual(float, doc.GetCell<convertS2T_userLocale<float>>("C", "2"), 0.001f);
+    }
+    catch (const std::exception& ex)
+    {
+      std::cout << "#2# unexpected EXCEPTION : " << ex.what() << std::endl;
+      return 1;
+    }
   }
 
   try {
