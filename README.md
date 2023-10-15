@@ -4,7 +4,6 @@ Rapidcsv ( with Filter and Sort )
 [//]: # (<img src="images/RefactoringInProgress.jpg" width="500">)
 
 [//]: # (## Documentation is **NOT** updated to latest changes.)
-Documentation is **NOT** updated to latest changes.
 
 Check [here](doc/UpstreamRepoChanges.md) for differences with [upstream repo](https://github.com/d99kris/rapidcsv).
 
@@ -23,10 +22,10 @@ Example Usage
 =============
 Here is a simple example reading a CSV file and getting 'Close' column as a vector of floats.
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/colhdr.csv#L1-L6
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d20ff599ef09a677aecdc8eeaf4c35cb90710258/examples/colhdr.csv#L1-L6
 
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/ex001.cpp#L1-L12
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d20ff599ef09a677aecdc8eeaf4c35cb90710258/examples/ex001.cpp#L1-L12
 
 
 
@@ -107,28 +106,28 @@ as row headers one needs to use LabelParams and set pRowNameIdx to 0.
 ### Column and Row Headers
 csv file with both column and row headers
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/colrowhdr.csv#L1-L6
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d20ff599ef09a677aecdc8eeaf4c35cb90710258/examples/colrowhdr.csv#L1-L6
 
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/ex002.cpp#L1-L16
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d20ff599ef09a677aecdc8eeaf4c35cb90710258/examples/ex002.cpp#L1-L16
 
 
 ### Row Headers Only
 csv file with row header (no column header). <br>
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/rowhdr.csv#L1-L6
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d20ff599ef09a677aecdc8eeaf4c35cb90710258/examples/rowhdr.csv#L1-L6
 
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/ex003.cpp#L1-L13
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d20ff599ef09a677aecdc8eeaf4c35cb90710258/examples/ex003.cpp#L1-L13
 
 
 ### No Headers
 csv file with no column and row headers
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/nohdr.csv#L1-L5
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d20ff599ef09a677aecdc8eeaf4c35cb90710258/examples/nohdr.csv#L1-L5
 
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/ex004.cpp#L1-L15
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d20ff599ef09a677aecdc8eeaf4c35cb90710258/examples/ex004.cpp#L1-L15
 
 
 Reading a File with Custom Separator
@@ -137,10 +136,10 @@ For reading of files with custom separator (i.e. not comma), one need to
 specify the SeparatorParams argument. The following example reads a file using
 semi-colon as separator.
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/semi.csv#L1-L6
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d20ff599ef09a677aecdc8eeaf4c35cb90710258/examples/semi.csv#L1-L6
 
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/ex005.cpp#L1-L16
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d20ff599ef09a677aecdc8eeaf4c35cb90710258/examples/ex005.cpp#L1-L16
 
 
 
@@ -150,22 +149,43 @@ The internal cell representation in the Document class is using std::string
 and when other types are requested, [converter](https://github.com/panchaBhuta/converter/tree/main#supported-data-types-for-conversion) routines are used.
 The following example illustrates the supported data types.
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/colrowhdr.csv#L1-L6
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d20ff599ef09a677aecdc8eeaf4c35cb90710258/examples/colrowhdr.csv#L1-L6
 
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/ex006.cpp#L1-L21
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d20ff599ef09a677aecdc8eeaf4c35cb90710258/examples/ex006.cpp#L1-L21
 
 
 ### **std::chrono::year_month_day** is the `Date` type used
 Refer [Converter:Date types](https://github.com/panchaBhuta/converter#date-types) for more details. The default date format is _"%F"_ (i.e "%Y-%m-%d"). For configuring a different date format refer [exConv001.cpp](examples/exConv001.cpp) and [test001.cpp](tests/test001.cpp)
 
 
+For string to date, the default conversion formater is `S2T_Format_StreamYMD`. With format "%F" -> "%Y-%m-%d".
+
+```cpp
+  template<>
+  struct S2T_DefaultFormat< datelib::year_month_day, void >
+  {
+    using type = S2T_Format_StreamYMD< defYMDfmt >; // %F -> "%Y-%m-%d"
+  };
+```
+
+For date to staring, the default conversion formater is `T2S_Format_StreamYMD`. With format "%F" -> "%Y-%m-%d".
+
+```cpp
+  template<>
+  struct T2S_DefaultFormat< datelib::year_month_day, void >
+  {
+    using type = T2S_Format_StreamYMD< defYMDfmt >; // %F -> "%Y-%m-%d"
+  };
+```
+
+
 Global Custom Data Type Conversion
 ----------------------------------
-One may override conversion routines (or add new ones) by implementing ToVal() and/or ToStr(). Below is an example of int conversion, to instead provide two decimal fixed-point numbers. Also see [tests/test035.cpp](tests/test035.cpp) for test using specialized instances of `ToVal()` and `ToStr()`.
+One may override conversion routines (or add new ones) by implementing converter function ToVal() or ToStr(). Below is an example of int conversion, to instead provide two decimal fixed-point numbers. Also see [tests/test035.cpp](tests/test035.cpp).
 
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/ex008.cpp#L1-L19
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d20ff599ef09a677aecdc8eeaf4c35cb90710258/examples/ex008.cpp#L1-L19
 
 
 Custom Data Type Conversion Per Call
@@ -175,7 +195,7 @@ It is also possible to override conversions on a per-call basis, enabling more f
 [tests/test087.cpp](tests/test087.cpp) and
 [tests/test092.cpp](tests/test092.cpp)
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/ex009.cpp#L1-L43
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d20ff599ef09a677aecdc8eeaf4c35cb90710258/examples/ex009.cpp#L1-L43
 
 
 Reading CSV Data from a Stream or String
@@ -185,7 +205,7 @@ from a stream and, indirectly through stringstream, from a string. File streams
 used with rapidcsv should be opened in `std::ios::binary` mode to enable full
 functionality. Here is a simple example reading CSV data from a string:
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/ex007.cpp#L1-L25
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d20ff599ef09a677aecdc8eeaf4c35cb90710258/examples/ex007.cpp#L1-L25
 
 
 View CSV data using 'filters' and/or 'sort' on Column(s)
@@ -265,12 +285,12 @@ Refer [test091.cpp](tests/test091.cpp),  to see the effect of lowered Decimal-Pr
 
 One can also provide their own decimal precision parameter thru several ways. This is illustrated in the example [exConv001.cpp](examples/exConv001.cpp), where data conversion precision is checked by implementing a complete conversion cycle i.e    **data -> string -> data** .<br>
 
-https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/7cf48a26b130993f12c72f6a6f80f900099445ba/examples/exConv001.cpp#L1-L166
+https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d20ff599ef09a677aecdc8eeaf4c35cb90710258/examples/exConv001.cpp#L1-L166
 
 
 Locale Parsing Formats : String-to-T (i.e S2T)
 ----------------------------------------------
-**rapidcsv_FilterSort** uses [converter library](https://github.com/panchaBhuta/converter#locale-parsing-formats--string-to-t-ie-s2t) conversion functions when parsing numeric-type values from string. By default, locale parsing is not used.
+**rapidcsv_FilterSort** uses [converter library](https://github.com/panchaBhuta/converter#locale-parsing-formats--string-to-t-ie-s2t) conversion functions when parsing numeric-type values from string. By default, during parsing 'locale' is not used.
 
 ```c++
     template< typename T_C >
@@ -279,9 +299,9 @@ Locale Parsing Formats : String-to-T (i.e S2T)
             const c_sizet_or_string auto& pRowNameIdx) const
 ```
 
-`converter::t_S2Tconv_c<T_C>` maps to default-convesrion functions that are independent of any locale.
+`converter::t_S2Tconv_c<T_C>` maps to default-conversion functions that are independent of any locale.
 
-It is possible to configure **rapidcsv_FilterSort** to use locale dependent parsing by setting template-parameter `T_C` of function `Document::GetCell<T_C>(...)`, see for example [tests/test087.cpp](tests/test087.cpp).
+It is possible to configure **rapidcsv_FilterSort** to use locale dependent parsing by setting template-parameter `T_C` of function `Document::GetCell<T_C>(...)`, see example [tests/test087.cpp](tests/test087.cpp).
 
 ```c++
 template<typename T>
@@ -296,7 +316,7 @@ using convertS2T_stream =
 ```
 
 
-... or configure **rapidcsv_FilterSort** to use classic-locale parsing by setting template-parameter `T_C` of function `Document::GetCell<T_C>(...)`, see for example [tests/test087.cpp](tests/test087.cpp).
+... or configure **rapidcsv_FilterSort** to use classic-locale parsing by setting template-parameter `T_C` of function `Document::GetCell<T_C>(...)`, see example [tests/test087.cpp](tests/test087.cpp).
 
 ```c++
 template<typename T>
@@ -311,7 +331,7 @@ using convertS2T_streamClassic =
 ```
 
 
-... or configure **rapidcsv_FilterSort** to any of `std::stoi`, `std::stoll`, `std::sto*` for numeric-types. These functions uses System-locale for parsing. Set template-parameter `T_C` of function `Document::GetCell<T_C>(...)`, see for example [tests/test087.cpp](tests/test087.cpp).
+... or configure **rapidcsv_FilterSort** to any of `std::stoi`, `std::stoll`, `std::sto*` for numeric-types. These functions uses current locale for formatting. Set template-parameter `T_C` of function `Document::GetCell<T_C>(...)`, see example [tests/test087.cpp](tests/test087.cpp).
 
 ```c++
 template<typename T>
@@ -325,7 +345,7 @@ using convertS2T_StoT =
 ```
 
 
-... or specify any specific locale, see for example [tests/test087.cpp](tests/test087.cpp) and [tests/test092.cpp](tests/test092.cpp)
+... or specify a specific locale, see example [tests/test087.cpp](tests/test087.cpp) and [tests/test092.cpp](tests/test092.cpp)
 
 ```c++
 static constexpr char loc[] = "de_DE.UTF-8"; // uses comma (,) as decimal separator
@@ -340,153 +360,193 @@ using convertS2T_userLocale =
   doc.GetCell<convertS2T_userLocale<float>>("A", "2");
 ```
 
-
-For date, the default conversion format is `S2T_Format_StreamYMD`. With format "%F" -> "%Y-%m-%d".
-
-```cpp
-  template<>
-  struct S2T_DefaultFormat< datelib::year_month_day, void >
-  {
-    using type = S2T_Format_StreamYMD< defYMDfmt >; // %F -> "%Y-%m-%d"
-  };
-```
-
 Locale Parsing Formats : T-to-String (i.e T2S)
 ----------------------------------------------
-**rapidcsv_FilterSort** uses `std::sto[T^]()` conversion functions when parsing numeric-type values from string by default.
+**rapidcsv_FilterSort** uses [converter library](https://github.com/panchaBhuta/converter#locale-parsing-formats--t-to-string-ie-t2s) conversion functions when parsing numeric-type values to string. By default, during parsing 'locale' is not used.
 
-```cpp
+```c++
+    template< typename T_C >
+    void SetCell(const c_sizet_or_string auto& pColumnNameIdx,
+                 const c_sizet_or_string auto& pRowNameIdx,
+                 const typename converter::t_T2Sconv_c<T_C>::input_type& pCell)
+```
 
-template<c_floating_point T>
-struct T2S_DefaultFormat< T, void >
-{
-  using type = T2S_Format_StreamDecimalPrecision<T>;    // check the warning note below
-};
+`converter::t_T2Sconv_c<T_C>` maps to default-conversion functions that are independent of any locale.
 
+It is possible to configure **rapidcsv_FilterSort** to use locale dependent parsing by setting template-parameter `T_C` of function `Document::SetCell<T_C>(...)`.
+
+```c++
+template<typename T>
+using convertT2S_stream =
+    converter::ConvertFromVal<T,
+                              converter::T2S_Format_StreamAsIs<char>
+                             >;
+...
+  doc.SetCell<convertT2S_stream<float>>("A", "2", 1.2f);
+```
+
+
+... or configure **rapidcsv_FilterSort** to use classic-locale parsing by setting template-parameter `T_C` of function `Document::SetCell<T_C>(...)`.
+
+```c++
+template<typename T>
+using convertT2S_streamClassic =
+    converter::ConvertFromVal<T,
+                              converter::T2S_Format_StreamUseClassicLocale<char>
+                             >;
+...
+  doc.SetCell<convertT2S_streamClassic<float>>("A", "2", 1.2f);
+```
+
+
+... or configure **rapidcsv_FilterSort** to use `std::to_string(val)` for integer-types. These functions uses current locale for formatting. Set template-parameter `T_C` of function `Document::SetCell<T_C>(...)`.
+
+```c++
 template<c_integer_type T>
-struct T2S_DefaultFormat< T, void >
+using convertT2S_TtoS =
+    converter::ConvertFromVal<T,
+                              converter::T2S_Format_std_TtoS
+                             >;
+...
+  doc.SetCell<convertT2S_TtoS<long>>("A", "2", 1234567L);
+```
+
+
+... or specify a specific locale
+
+```c++
+static constexpr char loc[] = "de_DE.UTF-8"; // uses comma (,) as decimal separator
+
+template<typename T>
+using deLocal_oss = converter::T2S_Format_StreamUserLocale<char, loc>;
+
+template<typename T>
+using convertT2S_userLocale =
+    converter::ConvertFromVal<T, deLocal_oss<T> >;
+...
+  doc.SetCell<convertT2S_userLocale<float>>("A", "2", 1.234f);
+```
+
+
+... or override the default precision for floating-point types , with user defined precision. Check example [tests/test091.cpp](tests/test091.cpp)
+
+```c++
+template<converter::c_floating_point T>
+constexpr int getLowerDecimalPrecision()
 {
-  using type = T2S_Format_std_TtoS;         //    uses 'std::to_string(...)' for conversion
-};
+  if constexpr (std::is_same_v<T, float>)
+    return FLT_DIG;
+  else
+  if constexpr (std::is_same_v<T, double>)
+    return DBL_DIG;
+  else
+  if constexpr (std::is_same_v<T, long double>)
+    return LDBL_DIG;
+}
+template<converter::c_floating_point T>
+using T2S_Format_ldp = converter::T2S_Format_StreamDecimalPrecision<T, getLowerDecimalPrecision<T>() >;
 
-.......
-
-template<typename T, typename T2S_FORMAT = typename T2S_DefaultFormat<T>::type >
-struct ConvertFromVal;
-std::string ConvertFromVal< T,
-                            T2S_FORMAT = typename T2S_DefaultFormat<T>::type
-                          >::ToStr(const T& val);
-
-// "T2S_DefaultFormat<T>::type" for floating-types evaluates to  "converter::T2S_Format_StreamDecimalPrecision<T>"
-// "T2S_DefaultFormat<T>::type" for  integer-types evaluates to  "converter::T2S_Format_std_TtoS"
+template<converter::c_floating_point T>
+using ConvertFromVal_lDP = converter::ConvertFromVal<T, T2S_Format_ldp<T> >;
+...
+  doc.SetCell< ConvertFromVal_lDP<long double> >("A", "ld", 3.14159265358979323846L);
 ```
 
-### WARNING
-With floating point types `std::to_string(...)` may yield unexpected results as the number of significant digits in the returned string can be zero, for e.g: `pVal = 1e-09`. The return value may differ significantly from what `std::cout` prints by default. That's why this particular specialization is disabled by default. In case if this is needed, enable it by defining macro `ENABLE_STD_TtoS`. <br> <br>
+... or even combine two formats using `converter::T2S_Format_floating_StreamCombine<...>`
 
-It is possible to configure **rapidcsv_FilterSort** to use locale dependent parsing by changing template-parameter `T2S_FORMAT=T2S_Format_StreamAsIs`.
+```c++
+static constexpr char loc[] = "de_DE.UTF-8"; // uses comma (,) as decimal separator
 
-```cpp
-  doc.SetCell< converter::ConvertFromVal< float,
-                                          converter::T2S_Format_StreamAsIs
-                                        >
-             >("A", "2", 1.234f);
-```
-... or configure **rapidcsv_FilterSort** to use either classic-locale parsing by setting template-parameter `T2S_FORMAT=T2S_Format_StreamUseClassicLocale`,
+template<typename T>
+using deLocal_oss = converter::T2S_Format_StreamUserLocale<char, loc>;
 
-```cpp
-  doc.SetCell< converter::ConvertFromVal< double,
-                                          converter::T2S_Format_StreamUseClassicLocale
-                                        >
-             >("A", "2", 1.23456789);
-```
+template<converter::c_floating_point T>
+constexpr int getLowerDecimalPrecision()
+{
+  if constexpr (std::is_same_v<T, float>)
+    return FLT_DIG;
+  else
+  if constexpr (std::is_same_v<T, double>)
+    return DBL_DIG;
+  else
+  if constexpr (std::is_same_v<T, long double>)
+    return LDBL_DIG;
+}
+template<converter::c_floating_point T>
+using T2S_Format_ldp = converter::T2S_Format_StreamDecimalPrecision<T, getLowerDecimalPrecision<T>() >;
 
-... or specify any specific locale
+template<converter::c_floating_point T>
+using T2S_Format_DE_ldp = converter::T2S_Format_floating_StreamCombine<T, deLocal_oss<T>, T2S_Format_ldp<T> >;
 
-```cpp
-constexpr char de_Loc[] = "de_DE";  // string literal object with static storage duration
-
-  using deLocal_iss = converter::T2S_Format_StreamUserLocale<de_Loc>;
-
-  doc.SetCell< converter::ConvertFromVal< float,
-                                          deLocal_iss
-                                        >
-             >("A", "2", 1.234f);
-```
-
-For date, the default conversion format is `T2S_Format_StreamYMD`. With format "%F" -> "%Y-%m-%d".
-
-```cpp
-  template<>
-  struct T2S_DefaultFormat< datelib::year_month_day, void >
-  {
-    using type = T2S_Format_StreamYMD< defYMDfmt >; // %F -> "%Y-%m-%d"
-  };
+template<converter::c_floating_point T>
+using ConvertFromVal_DE_lDP = converter::ConvertFromVal<T, T2S_Format_DE_ldp<T> >;
+...
+  doc.SetCell< ConvertFromVal_DE_lDP<long double> >("A", "ld", 3.14159265358979323846L);
 ```
 
 
 
 Reading a File with Invalid Numbers (e.g. Empty Cells) as Numeric Data
 ----------------------------------------------------------------------
-By default rapidcsv throws an exception if one tries to convert non-numeric text to numeric data type, as it basically propagates the underlying conversion routines' exceptions to the calling application.
+By default rapidcsv throws an exception if one tries to convert non-numeric text to numeric data type, as it basically propagates the underlying conversion routines' exceptions to the calling application. Read about [Invalid Numbers](https://github.com/panchaBhuta/converter#reading-a-string-with-invalid-numbers-eg-empty-string-as-numeric-data) from converter.
 
 The reason for this is to ensure data correctness. If one wants to be able
 to identify cells with invalid numbers for numeric data types, one can either use 
-`ConvertFromStr_fNaN` or `ConvertFromStr_gNaN`.
+`ConvertFromStr_fNaN<T>` from [test048.cpp](tests/test048.cpp)
+OR
+`ConvertFromStr_gNaN` from [test049.cpp](tests/test049.cpp).
+
+For floating-types which supports `std::numeric_limits<T>::signaling_NaN()`, consider using template-typename `ConvertFromStr_fNaN<T>`, if _signaling_NaN()_ (NaN -> Not a Number) return-value is required, instead of an error thrown.
 
 ```c++
-  template<c_signaling_NaN T, typename S2T_FORMAT = typename S2T_DefaultFormat<T>::type >
-  struct ConvertFromStr_fNaN
-  {
-    inline static    T
-    ToVal(const std::string& str);
-  };
-
-  template<c_NOT_string T, typename S2T_FORMAT = typename S2T_DefaultFormat<T>::type >
-  struct ConvertFromStr_gNaN
-  {
-    inline static    std::variant<T, std::string>
-    ToVal(const std::string& str);
-  };
+template<typename T>
+using ConvertFromStr_fNaN =
+    converter::ConvertFromStr<T,
+                              converter::S2T_Format_std_CtoT<T, converter::FailureS2Tprocess::QUIET_NAN>
+                             >;
 ```
 
-For floating-types which supports `std::numeric_limits<T>::signaling_NaN()`, consider using template-typename `ConvertFromStr_fNaN<T, S2T_FORMAT>`, if _signaling_NaN()_ (NaN -> Not a Number) return-value is required, instead of an error thrown.
+Alternatively, template-typename `ConvertFromStr_gNaN<T>` can be used for all types(integer, floating, bool) to either read the underlying valid-number or the string which raised the conversion-error. The function `ConvertFromStr_gNaN<T>::ToVal(...)` returns `std::variant<T, std::string>`.
 
-Alternatively, template-typename `ConvertFromStr_gNaN<T, S2T_FORMAT>` can be used for all types(integer, floating, bool) to either read the underlying valid-number or the string which raised the conversion-error. The function `ConvertFromStr_gNaN<T, S2T_FORMAT>::ToVal` returns `std::variant<T, std::string>`.
+```c++
+template<typename T>
+using ConvertFromStr_gNaN =
+    converter::ConvertFromStr<T,
+                              converter::S2T_Format_std_CtoT<T, converter::FailureS2Tprocess::VARIANT_NAN>
+                             >;
+```
 
 Usage Example:
 
-```cpp
+```c++
 rapidcsv::Document doc("file.csv", rapidcsv::LabelParams(),
                        rapidcsv::SeparatorParams());
 ...
-float cellVal_f = doc.GetCell<float, converter::ConvertFromStr_fNaN<float>::ToVal>("colName", rowIdx);
+float cellVal_f = doc.GetCell< ConvertFromStr_fNaN<float> >("colName", rowIdx);
 ...
-std::variant<int, std::string> cellVal_i = doc.GetCell<int, converter::ConvertFromStr_gNaN<int>::ToVal>("colName", rowIdx);
+std::variant<int, std::string> cellVal_i = doc.GetCell< ConvertFromStr_gNaN<int> >("colName", rowIdx);
 ...
-std::variant<double, std::string> cellVal_d = doc.GetCell<double, converter::ConvertFromStr_gNaN<double>::ToVal>("colName", rowIdx);
+std::variant<double, std::string> cellVal_d = doc.GetCell< ConvertFromStr_gNaN<double> >("colName", rowIdx);
 ```
 
-Refer [test048.cpp](tests/test048.cpp) and [test049.cpp](tests/test049.cpp) for sample code.
 
 Writing a File with Invalid Numbers (e.g. Empty Cells) as Numeric Data
 ----------------------------------------------------------------------
-By default rapidcsv would not write to file non-numeric text, as it basically propagates the underlying conversion routines' exceptions to the calling application.
+By default rapidcsv would not write to file non-numeric text, as it basically propagates the underlying conversion routines' exceptions to the calling application. Read about [Invalid Numbers](https://github.com/panchaBhuta/converter#output-string-conversion-with-invalid-valuesnumbers-eg-empty-cells-as-input-numeric-data) from converter.
 
-The reason for this is to ensure data correctness. If one wants to be able
-to identify cells with invalid numbers for numeric data types, one can use 
-`ConvertFromVal_gNaN`.
-
+1. `NaN` for floating types
 ```c++
-  template<c_NOT_string T, typename T2S_FORMAT = typename T2S_DefaultFormat<T>::type >
-  struct ConvertFromVal_gNaN
-  {
-    inline static std::string
-    ToStr(const std::variant<T, std::string>& val)
-  };
+double dNaN =  std::numeric_limits<double>::quiet_NaN();
+doc.SetCell< double >("colName", "rowName", dNaN);   //  cell will have string value as 'nan'
 ```
 
-Template-typename `ConvertFromVal_gNaN<T, T2S_FORMAT>` can be used for all types(integer, floating, bool) to write the underlying valid-number or the string which raised the conversion-error. The function `ConvertFromVal_gNaN<T, T2S_FORMAT>::ToStr` has input-type `std::variant<T, std::string>`.
+2. `std::variant` for any type
+```c++
+std::variant<int, std::string> iInvalid("NotAnInteger");
+doc.SetCell<  std::variant<double,std::string>
+           >("colName", "rowName", iInvalid);   //  cell will have string value as 'NotAnInteger'
+```
+
 
 
 Architecture Components and Overview
@@ -518,7 +578,7 @@ Architecture Components and Overview
    Separator between rows are defined using `LineReaderParams`. This are optional with default values. <br>
    In addittion UTF-16 and UTF-8 encoding can be enabled or disabled.
 
-2. For _string-to-Type_ and _Type-to-string_ conversions, these are delegated to [conveter](https://github.com/panchaBhuta/converter), which is a header only library. Refer it's [architecture](https://github.com/panchaBhuta/converter#architecture-components-and-overview) documenttion.  <br>
+2. For _string-to-Type_ and _Type-to-string_ conversions, these are delegated to [converter](https://github.com/panchaBhuta/converter), which is a header only library. Refer it's [architecture](https://github.com/panchaBhuta/converter#architecture-components-and-overview) documenttion.  <br>
 
 3. `FilterDocument`     : this view of data excludes the elements filtered out. <br>
    `SortDocument`       : this view of data sorts the elements by order defined. <br>
@@ -528,14 +588,6 @@ Architecture Components and Overview
 
 # API Documentation
 The following classes makes up the Rapidcsv interface:
-
-## Convertor classes
- - [class converter::ConvertFromStr< T, S2T_FORMAT >](doc/converter/converter_ConvertFromStr.md)
- - [class converter::ConvertFromStr_fNaN< T, S2T_FORMAT >](doc/converter/converter_ConvertFromStr_fNaN.md)
- - [class converter::ConvertFromStr_gNaN< T, S2T_FORMAT >](doc/converter/converter_ConvertFromStr_gNaN.md)
- - [class converter::ConvertFromVal< T, T2S_FORMAT >](doc/converter/rapidcsv_ConverterToVal.md)
- - [class converter::ConvertFromVal_gNaN< T, T2S_FORMAT >](doc/converter/converter_ConvertFromVal_gNaN.md)
- - [class converter::ConvertFromTuple< T_C >](doc/converter/converter_ConvertFromTuple.md)
 
  ## CSV Document classes
  - [class rapidcsv::Document](doc/document/rapidcsv_Document.md)
