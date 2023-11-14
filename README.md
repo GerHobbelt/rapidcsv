@@ -39,12 +39,17 @@ Rapidcsv is implemented using C++20 with the intention of being portable. It's b
 |  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-(12,13)** | **macOS-11** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
 |------------|------------------|--------------|--------------|-------------------------------|-------------------------------|
 | **g++ (11,12)** | ✅ (default:11) | ✅ | ✅ | - | - |
-| **clang++ (13,14)** | ✅ | - | - | - | - |
+| **g++ 13** | ✅ | ✅ | NA | - | - |
+| **clang++ (**<span style="color:grey">13\#,14\#</span>**)** | ❌ | - | - | - | - |
+| **clang++ 15** | ✅ | - | - | - | - |
 | **AppleClang 14** | NA | ✅ (default) | NA | NA | NA |
-| **msvc 19** | NA | NA | NA | ✅ (default) | - |
+| **msvc 19** | NA | NA | NA | ✅ (default) | NA |
 | **clangCL 12** | - | - | - | - | ✅ |
 | **clangCL 16** | - | - | - | ✅ | - |
 
+<span style="color:grey">clang++ 13\#</span> : Last successful run with [Clang 13.0.1](https://github.com/panchaBhuta/converter/actions/runs/6524732682/job/17716666880) and `OS-id-version=Linux-6.2.0-1012-azure`. **\<chorno>** headers stopped compiling in Newer Ubuntu-image OS-version. Refer [ubuntu-latest runners have an incompatible combination of clang and libstdc++](https://github.com/actions/runner-images/issues/8659).
+
+<span style="color:grey">clang++ 14\#</span> : Last successful run with [Clang 14.0.0](https://github.com/panchaBhuta/converter/actions/runs/6524732682/job/17716666951) and `OS-id-version=Linux-6.2.0-1012-azure`. **\<chorno>** headers stopped compiling in Newer Ubuntu-image OS-version. Refer [ubuntu-latest runners have an incompatible combination of clang and libstdc++](https://github.com/actions/runner-images/issues/8659).
 
 
 [//]:  ❌
@@ -113,7 +118,7 @@ https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d20ff599ef09a677aecdc8ee
 
 
 ### Row Headers Only
-csv file with row header (no column header). <br>
+csv file with row header; i.e. no column header<br>
 
 https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d20ff599ef09a677aecdc8eeaf4c35cb90710258/examples/rowhdr.csv#L1-L6
 

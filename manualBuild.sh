@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ./manualBuild.sh tests test001   > err.log 2>&1
-# ./manualBuild.sh tests test001 -DENABLE_STD_TtoS
+# ./manualBuild.sh tests test001 [-DENABLE_STD_TtoS]
 # ./manualBuild.sh tests ptest001
 
 #[=============================[    find which standards my GCC compiler supports?

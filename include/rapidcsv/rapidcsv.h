@@ -2,7 +2,7 @@
  * rapidcsv.h
  *
  * URL:      https://github.com/panchaBhuta/rapidcsv_FilterSort
- * Version:  v3.0.8080
+ * Version:  v3.1.8080
  *
  * Copyright (C) 2022-2023 Gautam Dhar
  * All rights reserved.
@@ -46,7 +46,7 @@ typedef SSIZE_T ssize_t;
 #include <converter/converter.h>
 
 #define RAPIDCSV_VERSION_MAJOR 3
-#define RAPIDCSV_VERSION_MINOR 0
+#define RAPIDCSV_VERSION_MINOR 1
 #define RAPIDCSV_VERSION_PATCH 8080
 
 //  Project path is removed from the __FILE__

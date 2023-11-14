@@ -22,8 +22,6 @@ set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
 set(windows_os "$<BOOL:${WIN32}>")
 
 
-set(_e_DISABLE_FEATURE_    0)
-set(_e_ENABLE_FEATURE_     1)
 
 function(rapidcsv_getversion version_arg)
     # Parse the current version from the rapidcsv header
@@ -88,7 +86,7 @@ macro(fetch_dependencies)
     include( FetchContent )
     FetchContent_Declare( ${CONVERTERLIB}
 		          GIT_REPOSITORY https://github.com/panchaBhuta/converter.git
-		          GIT_TAG        v1.2.9)  # adjust tag/branch/commit as needed
+		          GIT_TAG        v1.2.10)  # adjust tag/branch/commit as needed
     FetchContent_MakeAvailable(${CONVERTERLIB})
 
     #[==================[
@@ -98,7 +96,7 @@ macro(fetch_dependencies)
     #  add_subdirectory(${${CONVERTERLIB}_SOURCE_DIR} ${${CONVERTERLIB}_BINARY_DIR} EXCLUDE_FROM_ALL)
     endif()
     #]==================]
-    
+
     #if (NOT TARGET converter::converter)
     #    find_package(converter REQUIRED)
     #endif()
@@ -396,8 +394,8 @@ function(rapidcsv_install_logic)
     set(CPACK_PACKAGE_VENDOR "rapidcsv developers")
     set(CPACK_PACKAGE_DESCRIPTION "${PROJECT_DESCRIPTION}")
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
-    set(CPACK_PACKAGE_VERSION_MAJOR "${rapidcsv_VERSION_MAJOR}")
-    set(CPACK_PACKAGE_VERSION_MINOR "${rapidcsv_VERSION_MINOR}")
+    set(CPACK_PACKAGE_VERSION_MAJOR "${RAPIDCSV_VERSION_MAJOR}")
+    set(CPACK_PACKAGE_VERSION_MINOR "${RAPIDCSV_VERSION_MINOR}")
     set(CPACK_SOURCE_GENERATOR "TGZ")
 
     set(CPACK_DEBIAN_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
