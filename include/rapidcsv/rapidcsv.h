@@ -2,7 +2,7 @@
  * rapidcsv.h
  *
  * URL:      https://github.com/panchaBhuta/rapidcsv_FilterSort
- * Version:  v3.1.8080
+ * Version:  v3.2.8080
  *
  * Copyright (C) 2022-2023 Gautam Dhar
  * All rights reserved.
@@ -46,7 +46,7 @@ typedef SSIZE_T ssize_t;
 #include <converter/converter.h>
 
 #define RAPIDCSV_VERSION_MAJOR 3
-#define RAPIDCSV_VERSION_MINOR 1
+#define RAPIDCSV_VERSION_MINOR 2
 #define RAPIDCSV_VERSION_PATCH 8080
 
 //  Project path is removed from the __FILE__
@@ -451,7 +451,7 @@ namespace rapidcsv
     /**
      * @brief   Get column either by it's index or name.
      * @tparam  T_C                   T can be data-type such as int, double etc ;  xOR
-     *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
+     *                                C -> Conversion class satisfying concept 'c_S2Tconverter'.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @returns 'vector<R>' of column data. By default, R is usually same type as T.
      *          Else if 'C ≃ converter::ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
@@ -508,7 +508,7 @@ namespace rapidcsv
     /**
      * @brief   Set column either by it's index or name.
      * @tparam  T_C                   T can be data-type such as int, double etc ;   xOR
-     *                                C -> Conversion class statisfying concept 'c_T2Sconverter'.
+     *                                C -> Conversion class satisfying concept 'c_T2Sconverter'.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pColumn               'vector<R>' of column data. By default, R is usually same type as T.
      *                                Else if 'C ≃ converter::ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
@@ -581,7 +581,7 @@ namespace rapidcsv
     /**
      * @brief   Insert column at specified index.
      * @tparam  T_C                   can be data-type such as int, double etc ;   xOR
-     *                                C -> Conversion class statisfying concept 'c_T2Sconverter'.
+     *                                C -> Conversion class satisfying concept 'c_T2Sconverter'.
      * @param   pColumnIdx            zero-based column index.
      * @param   pColumn               'vector<R>' of column data (optional argument). By default, R is usually same type as T.
      *                                Else if 'C ≃ converter::ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
@@ -705,7 +705,7 @@ namespace rapidcsv
     /**
      * @brief   Get row either by it's index or name.
      * @tparam  T_C                   T can be data-type such as int, double etc ;   xOR
-     *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
+     *                                C -> Conversion class satisfying concept 'c_S2Tconverter'.
      * @param   pRowNameIdx           row-name or zero-based row index.
      * @returns 'tuple<R...>' of row data. By default, R is usually same type as T.
      *          Else if 'C ≃ converter::ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
@@ -770,7 +770,7 @@ namespace rapidcsv
     /**
      * @brief   Set row either by it's index or name.
      * @tparam  T_C                   T can be data-type such as int, double etc ;  xOR
-     *                                C -> Conversion class statisfying concept 'c_T2Sconverter'.
+     *                                C -> Conversion class satisfying concept 'c_T2Sconverter'.
      * @param   pRowNameIdx           row-name or zero-based row index.
      * @param   pRow                  'tuple<R...>' of row data. By default, R is usually same type as T.
      *                                Else if 'C ≃ converter::ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
@@ -844,7 +844,7 @@ namespace rapidcsv
     /**
      * @brief   Insert row at specified index.
      * @tparam  T_C                   T can be data-type such as int, double etc ;    xOR
-     *                                C -> Conversion class statisfying concept 'c_T2Sconverter'.
+     *                                C -> Conversion class satisfying concept 'c_T2Sconverter'.
      * @param   pRowIdx               zero-based row index.
      * @param   pRow                  'tuple<R...>' of row data. By default, R is usually same type as T.
      *                                Else if 'C ≃ converter::ConvertFromVal_gNaN<T>', then 'R = std::variant<T, std::string>'.
@@ -967,7 +967,7 @@ namespace rapidcsv
     /**
      * @brief   Get cell either by it's index or name.
      * @tparam  T_C                   T can be data-type such as int, double etc ;   xOR
-     *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
+     *                                C -> Conversion class satisfying concept 'c_S2Tconverter'.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pRowNameIdx           row-name or zero-based row-index.
      * @returns cell data of type R. By default, R is usually same type as T.
@@ -1012,7 +1012,7 @@ namespace rapidcsv
     /**
      * @brief   Set cell either by it's index or name.
      * @tparam  T_C                   T can be data-type such as int, double etc ;     xOR
-     *                                C -> Conversion class statisfying concept 'c_T2Sconverter'.
+     *                                C -> Conversion class satisfying concept 'c_T2Sconverter'.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pRowNameIdx           row-name or zero-based row-index.
      * @param   pCell                 cell data. By default, R is usually same type as T.

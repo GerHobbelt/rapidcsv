@@ -5,7 +5,7 @@
 
 bool isFirstCellPositive(const rapidcsv::Document::t_dataRow& dataRow)
 {
-  // NOTE : at index=1 as zero-index is label
+  // NOTE : raw-index=1 , as zero-(raw)index is used for 'label'
   return (std::stoi(dataRow.at(1))) >= 0;
 }
 

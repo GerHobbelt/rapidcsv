@@ -5,7 +5,7 @@ template<f_EvalBoolExpr evaluateBooleanExpression, c_SortParams ... SPtypes>
 FilterSortDocument
 ```
 
-Class representing a CSV document filtered-sort-view. The underlying 'Document' is viewed after applying filter on rows and then sorted on minimum one column, based on cell values after type-conversion.  
+Class representing a CSV document filtered-sort-view. The underlying 'Document' is viewed after applying filter on rows and then sorted on minimum one column, based on cell values after type-conversion.
 
 **Template Parameters**
 - `evaluateBooleanExpression`  boolean function which determines row filtering.
@@ -18,22 +18,22 @@ t_S2Tconv_c<T_C>::return_type
 GetCell_IndexKey (const c_sizet_or_string auto & pColumnNameIdx,
                   const t_sortKey & pRowKey)
 ```
-Get cell either by it's index or name. 
+Get cell either by it's index or name.
 
 **Template Parameters**
 - `T_C`    T can be data-type such as int, double etc ; xOR <br>
-            C -> Conversion class statisfying concept 'c_S2Tconverter'. 
+            C -> Conversion class satisfying concept 'c_S2Tconverter'.
 
 **Parameters**
-- `pColumnNameIdx` column-name or zero-based column-index. 
-- `pRowKey` tuple representing indexed-key to data-row. 
+- `pColumnNameIdx` column-name or zero-based column-index.
+- `pRowKey` tuple representing indexed-key to data-row.
 
 **Returns:**
 - cell data of type R. By default, R is usually same type as T. <br>
  Else if *`C ≃ ConvertFromStr_gNaN<T>`*, then *`R = std::variant<T, std::string>`*. <br>
  On conversion success variant has the converted value, <br>
  else the string value which caused failure during conversion. <br>
- If `pRowKey` belongs to a filtered out row, then 'out_of_range' error is thrown. 
+ If `pRowKey` belongs to a filtered out row, then 'out_of_range' error is thrown.
 
 ---
 
@@ -43,21 +43,21 @@ std::invoke_result_t< decltype(CONV_S2T), const std::string& >
 GetCell_IndexKey (const c_sizet_or_string auto & pColumnNameIdx,
                   const t_sortKey & pRowKey)
 ```
-Get cell either by it's index or name. 
+Get cell either by it's index or name.
 
 **Template Parameters**
-- `CONV_S2T`   conversion function. 
+- `CONV_S2T`   conversion function.
 
 **Parameters**
-- `pColumnNameIdx` column-name or zero-based column-index. 
-- `pRowKey` tuple representing indexed-key to data-row. 
+- `pColumnNameIdx` column-name or zero-based column-index.
+- `pRowKey` tuple representing indexed-key to data-row.
 
 **Returns:**
 - cell data of type R. By default, R is usually same type as T. <br>
  Else if *`CONV_S2T ≃ ConvertFromStr_gNaN<T>::ToVal`*, then *`R = std::variant<T, std::string>`*. <br>
  On conversion success variant has the converted value, <br>
  else the string value which caused failure during conversion. <br>
- If `pRowKey` belongs to a filtered out row, then 'out_of_range' error is thrown. 
+ If `pRowKey` belongs to a filtered out row, then 'out_of_range' error is thrown.
 
 ---
 
@@ -66,21 +66,21 @@ template<typename ... T_C>
 std::tuple<typename t_S2Tconv_c<T_C>::return_type ...>
 GetRow_IndexKey (const typename SortKeyFactory< SPtypes ... >::t_sortKey & pRowKey)
 ```
-Get row either by it's index or name. 
+Get row either by it's index or name.
 
 **Template Parameters**
 - `T_C`    T can be data-type such as int, double etc ;   xOR <br>
-            C -> Conversion class statisfying concept 'c_S2Tconverter'. 
+            C -> Conversion class satisfying concept 'c_S2Tconverter'.
 
 **Parameters**
-- `pRowKey` tuple representing indexed-key to data-row. 
+- `pRowKey` tuple representing indexed-key to data-row.
 
 **Returns:**
 - *`tuple<R...>`* of row data. By default, R is usually same type as T. <br>
  Else if *`C ≃ ConvertFromStr_gNaN<T>`*, then *`R = std::variant<T, std::string>`*. <br>
  On conversion success variant has the converted value, <br>
  else the string value which caused failure during conversion. <br>
- If `pRowKey` belongs to a filtered out row, then 'out_of_range' error is thrown. 
+ If `pRowKey` belongs to a filtered out row, then 'out_of_range' error is thrown.
 
 ---
 
@@ -89,20 +89,20 @@ template<auto ... CONV_S2T>
 std::tuple< typename f_S2Tconv_c< CONV_S2T >::return_type... >
 GetRow_IndexKey (const typename SortKeyFactory< SPtypes ... >::t_sortKey & pRowKey)
 ```
-Get row either by it's index or name. 
+Get row either by it's index or name.
 
 **Template Parameters**
-- `CONV_S2T`   conversion function of type 'R (*CONV_S2T)(const std::string&)'. 
+- `CONV_S2T`   conversion function of type 'R (*CONV_S2T)(const std::string&)'.
 
 **Parameters**
-- `pRowKey` tuple representing indexed-key to data-row. 
+- `pRowKey` tuple representing indexed-key to data-row.
 
 **Returns:**
 - *`tuple<R...>`* of row data. By default, R is usually same type as T. <br>
  Else if *`C ≃ ConvertFromStr_gNaN<T>`*, then *`R = std::variant<T, std::string>`*. <br>
  On conversion success variant has the converted value, <br>
  else the string value which caused failure during conversion. <br>
- If `pRowKey` belongs to a filtered out row, then 'out_of_range' error is thrown. 
+ If `pRowKey` belongs to a filtered out row, then 'out_of_range' error is thrown.
 
 ---
 
@@ -110,14 +110,14 @@ Get row either by it's index or name.
 std::vector<std::string>
 GetRow_IndexKey_VecStr (const typename SortKeyFactory< SPtypes ... >::t_sortKey & pRowKey)
 ```
-Get row either by it's index or name. 
+Get row either by it's index or name.
 
 **Parameters**
-- `pRowKey` tuple representing indexed-key to data-row. 
+- `pRowKey` tuple representing indexed-key to data-row.
 
 **Returns:**
 - `vector<std::string>` of row data. <br>
-If 'pRowKey' belongs to a filtered out row, then 'out_of_range' error is thrown. 
+If 'pRowKey' belongs to a filtered out row, then 'out_of_range' error is thrown.
 
 ---
 

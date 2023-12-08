@@ -53,7 +53,7 @@ Get cell either by it's index or name.
 
 **Template Parameters**
 - `T_C`    T can be data-type such as int, double etc ; xOR <br>
-            C -> Conversion class statisfying concept 'c_S2Tconverter'. 
+            C -> Conversion class satisfying concept 'c_S2Tconverter'.
 
 **Parameters**
 - `pColumnNameIdx` column-name or zero-based column-index. 
@@ -97,7 +97,7 @@ Get column either by it's index or name.
 
 **Template Parameters**
 - `T_C`    T can be data-type such as int, double etc ;   xOR <br>
-            C -> Conversion class statisfying concept 'c_S2Tconverter'. 
+            C -> Conversion class satisfying concept 'c_S2Tconverter'. 
 
 **Parameters**
 - `pColumnNameIdx` column-name or zero-based column-index. 
@@ -184,7 +184,7 @@ Get row either by it's index or name.
 
 **Template Parameters**
 - `T_C`    T can be data-type such as int, double etc ; xOR <br>
-            C -> Conversion class statisfying concept 'c_S2Tconverter'. 
+            C -> Conversion class satisfying concept 'c_S2Tconverter'. 
 
 **Parameters**
 - `pRowNameIdx` row-name or zero-based row index. 
@@ -287,7 +287,7 @@ Insert column at specified index.
 
 **Template Parameters**
 - `T_C`    T can be data-type such as int, double etc ; xOR <br>
-           C -> Conversion class statisfying concept *`c_T2Sconverter`*. 
+           C -> Conversion class satisfying concept *`c_T2Sconverter`*. 
 
 **Parameters**
 - `pColumnIdx`      zero-based column index. 
@@ -329,7 +329,7 @@ Insert row at specified index.
 
 **Template Parameters:**
 - `T_C`    T can be data-type such as int, double etc ; xOR <br>
-            C -> Conversion class statisfying concept *`c_T2Sconverter`*. 
+            C -> Conversion class satisfying concept *`c_T2Sconverter`*. 
 
 **Parameters**
 - `pRowIdx`         zero-based row index. 
@@ -458,7 +458,7 @@ Set cell either by it's index or name.
 
 **Template Parameters**
 - `T_C`                    T can be data-type such as int, double etc ; xOR <br>
-                             C -> Conversion class statisfying concept *`c_T2Sconverter`*. 
+                             C -> Conversion class satisfying concept *`c_T2Sconverter`*. 
 
 **Parameters**
 - `pColumnNameIdx` column-name or zero-based column-index. 
@@ -498,7 +498,7 @@ Set column either by it's index or name.
 
 **Template Parameters**
 - `T_C`               T can be data-type such as int, double etc ; xOR <br>
-                       C -> Conversion class statisfying concept *`c_T2Sconverter`*. 
+                       C -> Conversion class satisfying concept *`c_T2Sconverter`*. 
 
 **Parameters**
 - `pColumnNameIdx`     column-name or zero-based column-index. 
@@ -546,7 +546,7 @@ Set row either by it's index or name.
 
 **Template Parameters**
 - `T_C`                   T can be data-type such as int, double etc ; xOR <br>
-                           C -> Conversion class statisfying concept *`c_T2Sconverter`*. 
+                           C -> Conversion class satisfying concept *`c_T2Sconverter`*. 
 
 **Parameters**
 - `pRowNameIdx`              row-name or zero-based row index. 

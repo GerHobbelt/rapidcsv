@@ -35,7 +35,7 @@ namespace rapidcsv
    * @brief     Class representing sort/ordering parameters of CSV document.
    * @tparam    T_C             type info of the column to be sorted.
    *                            T -> can be data-type such as int, double etc ; xOR
-   *                            C -> Conversion class statisfying concept 'c_S2Tconverter'.
+   *                            C -> Conversion class satisfying concept 'c_S2Tconverter'.
    * @tparam    SORT_ORDER      ascending or descending order. Default ascending.
    */
   template< typename T_C,
@@ -46,7 +46,7 @@ namespace rapidcsv
 
   public:
     /**
-     * @brief       Conversion class statisfying concept 'c_S2Tconverter' for a column
+     * @brief       Conversion class satisfying concept 'c_S2Tconverter' for a column
      */
     using S2Tconv_type = converter::t_S2Tconv_c<T_C>;
     /**
@@ -259,7 +259,7 @@ namespace rapidcsv
     /**
      * @brief   Get column by index.
      * @tparam  T_C                   T can be data-type such as int, double etc ;  xOR
-     *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
+     *                                C -> Conversion class satisfying concept 'c_S2Tconverter'.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @returns 'vector<R>' of column data.
      *              'FilterDocument' excludes the elements filtered out.
@@ -382,7 +382,7 @@ namespace rapidcsv
     /**
      * @brief   Get row either by it's index or name.
      * @tparam  T_C                   T can be data-type such as int, double etc ;  xOR
-     *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
+     *                                C -> Conversion class satisfying concept 'c_S2Tconverter'.
      * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index after removing filtered rows and/or sorting the csv-rows).
      *                                'FilterDocument' excludes the elements filtered out.
      *                                'SortDocument' sorts the elements by order defined.
@@ -444,7 +444,7 @@ namespace rapidcsv
     /**
      * @brief   Get cell by column index and row-name/zero-based-row-view-index.
      * @tparam  T_C                   T can be data-type such as int, double etc ;  xOR
-     *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
+     *                                C -> Conversion class satisfying concept 'c_S2Tconverter'.
      * @param   pColumnNameIdx        column-name or zero-based column index.
      * @param   pRowName_ViewRowIdx   row-name or zero-based row-view-index(i.e index after removing filtered rows and/or sorting the csv-rows).
      *                                'FilterDocument' excludes the elements filtered out.
@@ -617,7 +617,7 @@ namespace rapidcsv
     /**
      * @brief   Get row either by it's index or name.
      * @tparam  T_C                   T can be data-type such as int, double etc ;  xOR
-     *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
+     *                                C -> Conversion class satisfying concept 'c_S2Tconverter'.
      * @param   pRowKey               tuple representing indexed-key to data-row.
      * @returns tuple<R...> of row data. By default, R is usually same type as T.
      *          Else if 'C = converter::ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
@@ -682,7 +682,7 @@ namespace rapidcsv
     /**
      * @brief   Get cell either by it's index or name.
      * @tparam  T_C                   T can be data-type such as int, double etc ;    xOR
-     *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
+     *                                C -> Conversion class satisfying concept 'c_S2Tconverter'.
      * @param   pColumnNameIdx        column-name or zero-based column-index.
      * @param   pRowKey               tuple representing indexed-key to data-row.
      * @returns cell data of type R. By default, R is usually same type as T.

@@ -212,15 +212,6 @@ functionality. Here is a simple example reading CSV data from a string:
 
 https://github.com/panchaBhuta/rapidcsv_FilterSort/blob/d20ff599ef09a677aecdc8eeaf4c35cb90710258/examples/ex007.cpp#L1-L25
 
-
-View CSV data using 'filters' and/or 'sort' on Column(s)
---------------------------------------------------------- 
-Similar to 'WHERE' clause in SQL, 'rapidcsv::FilterDocument' applies filters on one or more columns. <br>
-Similar to 'ORDER BY' clause in SQL, 'rapidcsv::SortDocument' applies sorting on one or more columns. <br>
-Similar to 'ORDER BY' clause in SQL, 'rapidcsv::FilterSortDocument' applies sorting on one or more columns. <br>
-Refer [tests/testView001.cpp](tests/testView001.cpp)
-
-
 Check if a Column Exists
 ------------------------
 Rapidcsv provides the methods GetColumnNames() and GetRowNames() to retrieve
@@ -551,8 +542,70 @@ std::variant<int, std::string> iInvalid("NotAnInteger");
 doc.SetCell<  std::variant<double,std::string>
            >("colName", "rowName", iInvalid);   //  cell will have string value as 'NotAnInteger'
 ```
+<br>
+<br>
 
+View CSV data using 'filters' and/or 'sort' on Column(s)
+========================================================
+rapidcsv::FilterDocument
+------------------------
+Similar to 'WHERE' clause in SQL, [rapidcsv::FilterDocument](doc/view/rapidcsv_FilterDocument.md) applies filters on one or more columns.<br>
+A filter is defined by a boolean function(refer `isFirstCellPositive`) which is template parameter to [rapidcsv::FilterDocument](doc/view/rapidcsv_FilterDocument.md).
 
+Refer [tests/testView001.cpp](tests/testView001.cpp) <br>
+
+```cpp
+bool isFirstCellPositive(const rapidcsv::Document::t_dataRow& dataRow)
+{
+  // NOTE : raw-index=1 as   raw-index=0   is used for 'label' : refer-> rapidcsv::LabelParams(0, 0)
+  return (std::stoi(dataRow.at(1))) >= 0;
+}
+...
+    rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0));
+
+    /////  Filter
+    rapidcsv::FilterDocument<isFirstCellPositive> viewdoc(doc);
+```
+
+rapidcsv::SortDocument
+----------------------
+Similar to 'ORDER BY' clause in SQL, `rapidcsv::SortDocument` applies sorting on one or more columns. <br>
+[rapidcsv::SortParams](doc/view/rapidcsv_SortParams.md) is used to define column on which sorting needs by applied, the data-type of that column and sorting-order(default is ascending).
+
+Refer [tests/testView001.cpp](tests/testView001.cpp) <br>
+```cpp
+    const rapidcsv::SortParams<int> spA(1);
+    rapidcsv::SortDocument<decltype(spA)> viewdoc1(doc, spA);   // `<decltype(spA)>` mandatory for clang
+```
+
+Multiple columns can vebew specified for sorting(similar to 'ORDER BY' clause in SQL) thru variadic-arguments. Below snippet is for 2 columns.<br>
+First column is 'Company-name' : [column-raw-index = 1] , [type -> std::string] , [order(default) -> rapidcsv::e_SortOrder::ASCEND]
+Second column is 'trading-date' : [column-raw-index = 2] , [type -> std::chrono::year_month_day] , [order -> rapidcsv::e_SortOrder::DESCEND]
+```c++
+  rapidcsv::Document csvDoc(path, rapidcsv::LabelParams(0, 0));
+
+  const rapidcsv::SortParams<std::string> spCompanyName(1);
+  // sorts latest Traded data first
+  const rapidcsv::SortParams<std::chrono::year_month_day> spTradingDate(2, rapidcsv::e_SortOrder::DESCEND);
+  rapidcsv::SortDocument<decltype(spChangeDate), decltype(spCompanyName)> viewdoc(csvDoc, spChangeDate, spCompanyName);
+```
+
+rapidcsv::FilterSortDocument
+----------------------------
+When both filter and sorting is needed [rapidcsv::FilterSortDocument](doc/view/rapidcsv_FilterSortDocument.md). <br>
+Both the filter-function and sort-details are passed to [rapidcsv::FilterSortDocument](doc/view/rapidcsv_FilterSortDocument.md)
+
+Refer [tests/testView001.cpp](tests/testView001.cpp) <br>
+```cpp
+    /////  Filter + Sort
+    const rapidcsv::SortParams<int, rapidcsv::e_SortOrder::DESCEND> spD(1);
+    rapidcsv::FilterSortDocument<isFirstCellPositive, decltype(spD)> viewdoc2(doc, spD);
+```
+
+Similar to `rapidcsv::SortDocument`, multiple columns can vebew specified for sorting thru variadic-arguments.
+
+<br>
+<br>
 
 Architecture Components and Overview
 ====================================
@@ -561,17 +614,16 @@ Architecture Components and Overview
    The _Getter_ template can be instantiated either using `data-type`, `convertor-type` or `convertor-function-address`.
    ```c++
    document.Get***<T>(...);            //  1. T is 'data-type' such as int, long, float, double, ...
-   document.Get***<C>(...);            //  2. C is 'convertor-type' statisfying concept 'converter::c_S2Tconverter'
+   document.Get***<C>(...);            //  2. C is 'convertor-type' satisfying concept 'converter::c_S2Tconverter'
                                        //          C can also be "a user defined Converter class"
    document.Get***<&CONV_S2T>(...);    //  3. CONV_S2T is 'function-address' of signature 'R (*CONV_S2T)(const std::string&)'
                                        //     R  is either type 'T' or 'std::variant<T, std::string>'
-
    ```
 
    The _Setter_ template can be instantiated either using `data-type`, `convertor-type` or `convertor-function-address`.
    ```c++
    document.Set***<T>(...);            //  1. T is 'data-type' such as int, long, float, double, ...
-   document.Set***<C>(...);            //  2. C is 'convertor-type' statisfying concept 'converter::c_T2Sconverter'
+   document.Set***<C>(...);            //  2. C is 'convertor-type' satisfying concept 'converter::c_T2Sconverter'
                                        //          C can also be "a user defined Converter class"
    document.Set***<&CONV_T2S>(...);    //  3. CONV_T2S is 'function-address' of signature 'std::string (*CONV_T2S)(const R&)'
                                        //     R  is either type 'T' or 'std::variant<T, std::string>'
@@ -590,6 +642,8 @@ Architecture Components and Overview
    `FilterSortDocument` : this view of data excludes the elements filtered out, and sorts the remaining elements by order defined.
 
 
+<br>
+<br>
 
 # API Documentation
 The following classes makes up the Rapidcsv interface:
@@ -608,6 +662,8 @@ The following classes makes up the Rapidcsv interface:
  - [class rapidcsv::FilterDocument](doc/view/rapidcsv_FilterDocument.md)
  - [class rapidcsv::FilterSortDocument](doc/view/rapidcsv_FilterSortDocument.md)
 
+<br>
+<br>
 
 Technical Details
 =================
@@ -633,6 +689,8 @@ Rapidcsv uses Uncrustify to ensure consistent code formatting:
 uncrustify -c uncrustify.cfg --no-backup include/rapidcsv/rapidcsv.h
 ```
 
+<br>
+<br>
 
 Alternatives
 ============
