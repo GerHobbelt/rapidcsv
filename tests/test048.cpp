@@ -27,7 +27,7 @@ int main()
 
   try
   {
-    rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0), rapidcsv::SeparatorParams());
+    rapidcsv::Document doc(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT), rapidcsv::SeparatorParams());
     unittest::ExpectEqual(std::string, doc.GetCell<std::string>(0, 0), "");
     unittest::ExpectEqual(std::string, doc.GetCell<std::string>(1, 0), "x");
     unittest::ExpectEqual(std::string, doc.GetCell<std::string>(2, 0), "#");

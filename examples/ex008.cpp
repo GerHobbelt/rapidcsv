@@ -11,7 +11,7 @@ int ToVal(const std::string& pStr)
 
 int main()
 {
-  rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(0, 0));
+  rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
 
   std::vector<int> close = doc.GetColumn< &ToVal >("Close");
   std::cout << "close[0]  = " << close[0] << std::endl;

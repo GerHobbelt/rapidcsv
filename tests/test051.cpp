@@ -18,7 +18,7 @@ int main()
 
   try
   {
-    rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0));
+    rapidcsv::Document doc(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
     std::vector<std::string> columnNames = doc.GetColumnNames();
     unittest::ExpectEqual(size_t, columnNames.size(), 3);
     unittest::ExpectEqual(std::string, columnNames[0], "A");
@@ -30,7 +30,7 @@ int main()
     unittest::ExpectEqual(std::string, rowNames[0], "1");
     unittest::ExpectEqual(std::string, rowNames[1], "2");
 
-    rapidcsv::Document doc2(path, rapidcsv::LabelParams(0, -1));
+    rapidcsv::Document doc2(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_MISSING));
     std::vector<std::string> columnNames2 = doc2.GetColumnNames();
     unittest::ExpectEqual(size_t, columnNames2.size(), 4);
     unittest::ExpectEqual(std::string, columnNames2[0], "-");
@@ -38,7 +38,7 @@ int main()
     unittest::ExpectEqual(std::string, columnNames2[2], "B");
     unittest::ExpectEqual(std::string, columnNames2[3], "C");
 
-    rapidcsv::Document doc3(path, rapidcsv::LabelParams(-1, 0));
+    rapidcsv::Document doc3(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_MISSING, rapidcsv::FlgRowName::RN_PRESENT));
     std::vector<std::string> rowNames2 = doc3.GetRowNames();
     unittest::ExpectEqual(size_t, rowNames2.size(), 3);
     unittest::ExpectEqual(std::string, rowNames2[0], "-");

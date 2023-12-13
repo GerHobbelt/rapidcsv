@@ -27,7 +27,7 @@ int main()
   {
     rapidcsv::SeparatorParams separatorParams;
     separatorParams.mQuoteChar = '\'';
-    rapidcsv::Document doc(path, rapidcsv::LabelParams(-1, -1), separatorParams);
+    rapidcsv::Document doc(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_MISSING, rapidcsv::FlgRowName::RN_MISSING), separatorParams);
 
     unittest::ExpectEqual(std::string, doc.GetCell<std::string>(0, 0), "1997");
     unittest::ExpectEqual(std::string, doc.GetCell<std::string>(1, 0), "Ford");

@@ -5,8 +5,7 @@
 
 bool isFirstCellPositive(const rapidcsv::Document::t_dataRow& dataRow)
 {
-  // NOTE : at index=1 as zero-index is label
-  return (std::stoi(dataRow.at(1))) >= 0;
+  return (std::stoi(dataRow.at(0))) >= 0;
 }
 
 int main()
@@ -34,10 +33,10 @@ int main()
     // -,  A,  B,  C   ← Column Label
     // 1,  3,  9,  81
     // 2, -4,  16, 256
-    rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0));
+    rapidcsv::Document doc(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
 
     /////  Filter + Sort
-    const rapidcsv::SortParams<int, rapidcsv::e_SortOrder::DESCEND> spD(1);
+    const rapidcsv::SortParams<int, rapidcsv::e_SortOrder::DESCEND> spD(0);
     rapidcsv::FilterSortDocument<isFirstCellPositive, decltype(spD)> viewdoc2(doc, spD);
 
     ExpectExceptionMsg(viewdoc2.GetViewRowIdx("-"), std::out_of_range,

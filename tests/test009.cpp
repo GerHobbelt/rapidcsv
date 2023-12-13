@@ -19,7 +19,7 @@ int main()
 
   try
   {
-    rapidcsv::Document doc("", rapidcsv::LabelParams(0, 0), rapidcsv::SeparatorParams(',', false, false));
+    rapidcsv::Document doc("", rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT), rapidcsv::SeparatorParams(',', false, false));
 
     doc.SetRow<int, int>(0, std::tuple<int, int>{ 2, 4 });
     doc.SetRow<int, int, unsigned int, long>(1, std::tuple<int, int, unsigned int, long>{ 3, 9, 81, 6561 });

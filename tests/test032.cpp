@@ -18,7 +18,7 @@ int main()
 
   try
   {
-    rapidcsv::Document doc("", rapidcsv::LabelParams(-1, -1), rapidcsv::SeparatorParams(',', false, false));
+    rapidcsv::Document doc("", rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_MISSING, rapidcsv::FlgRowName::RN_MISSING), rapidcsv::SeparatorParams(',', false, false));
 
     doc.SetColumn<int>(0, std::vector<int>({ 2, 3 }));
     doc.SetColumn<int>(1, std::vector<int>({ 4, 9, 16, 25 }));

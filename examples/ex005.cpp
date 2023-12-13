@@ -5,7 +5,7 @@
 
 int main()
 {
-  rapidcsv::Document doc("examples/semi.csv", rapidcsv::LabelParams(0, 0),
+  rapidcsv::Document doc("examples/semi.csv", rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT),
                          rapidcsv::SeparatorParams(';'));
 
   std::vector<float> close = doc.GetColumn<float>("Close");

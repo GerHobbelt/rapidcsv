@@ -5,7 +5,6 @@
 
 bool isFirstCellPositive(const rapidcsv::Document::t_dataRow& dataRow)
 {
-  // NOTE : at index=0 as zero-index is label
   return (std::stoi(dataRow.at(0))) >= 0;
 }
 
@@ -32,7 +31,7 @@ int main()
     std::tuple<int, unsigned, long> ints;
     std::vector<std::string> strs;
 
-    rapidcsv::Document doc(path, rapidcsv::LabelParams(-1, -1));
+    rapidcsv::Document doc(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_MISSING, rapidcsv::FlgRowName::RN_MISSING));
 
     /////  Filter
     rapidcsv::FilterDocument<isFirstCellPositive> viewdoc(doc);
@@ -44,7 +43,7 @@ int main()
     unittest::ExpectEqual(long, std::get<2>(ints), 625);
 
     ExpectExceptionMsg(viewdoc.GetViewRow<int COMMA unsigned COMMA long>("1"), std::out_of_range,
-                       "rapidcsv::Document::GetRowIdx(pRowName) row not found for 'pRowName'");
+                       "rapidcsv::Document::GetRowIdx(pRowName) : '_mLabelParams.mRowNameFlg' is set as 'FlgRowName::RN_MISSING'");
     /*
        unittest::ExpectEqual(size_t, ints.size(), 3);
        unittest::ExpectEqual(int, ints.at(0), 3);
@@ -58,9 +57,6 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(1), "9");
     unittest::ExpectEqual(std::string, strs.at(2), "81");
 
-    // ExpectExceptionMsg(viewdoc.GetViewRow<int COMMA unsigned COMMA long>("2"), std::out_of_range,
-    //                    "rapidcsv::Document::GetRowIdx(pRowName) row not found for 'pRowName'");
-
     /////   Sort
     const rapidcsv::SortParams<int> spA(0);
     rapidcsv::SortDocument<decltype(spA)> viewdoc1(doc, spA);   // `<decltype(spA)>` mandatory for clang
@@ -71,8 +67,6 @@ int main()
     unittest::ExpectEqual(unsigned, std::get<1>(ints), 36);
     unittest::ExpectEqual(long, std::get<2>(ints), 1296);
 
-    ExpectExceptionMsg(viewdoc1.GetViewRow<int COMMA unsigned COMMA long>("1"), std::out_of_range,
-                       "rapidcsv::Document::GetRowIdx(pRowName) row not found for 'pRowName'");
     /*
        unittest::ExpectEqual(size_t, ints.size(), 3);
        unittest::ExpectEqual(int, ints.at(0), 3);
@@ -96,8 +90,6 @@ int main()
     unittest::ExpectEqual(unsigned, std::get<1>(ints), 49);
     unittest::ExpectEqual(long, std::get<2>(ints), 2401);
 
-    ExpectExceptionMsg(viewdoc2.GetViewRow<int COMMA unsigned COMMA long>("1"), std::out_of_range,
-                       "rapidcsv::Document::GetRowIdx(pRowName) row not found for 'pRowName'");
     /*
        unittest::ExpectEqual(size_t, ints.size(), 3);
        unittest::ExpectEqual(int, ints.at(0), 3);
@@ -110,9 +102,6 @@ int main()
     unittest::ExpectEqual(std::string, strs.at(0), "9");
     unittest::ExpectEqual(std::string, strs.at(1), "81");
     unittest::ExpectEqual(std::string, strs.at(2), "6561");
-
-    // ExpectExceptionMsg(viewdoc.GetViewRow<int COMMA unsigned COMMA long>("2"), std::out_of_range,
-    //                    "rapidcsv::Document::GetRowIdx(pRowName) row not found for 'pRowName'");
 
   }
   catch (const std::exception& ex)

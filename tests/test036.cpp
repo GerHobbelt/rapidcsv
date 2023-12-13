@@ -66,7 +66,7 @@ int main()
 
   try
   {
-    rapidcsv::Document doc(path, rapidcsv::LabelParams(-1, -1));
+    rapidcsv::Document doc(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_MISSING, rapidcsv::FlgRowName::RN_MISSING));
 
     unittest::ExpectEqual(int, doc.GetCell<int>(1, 0), 32767);
     checkRoundTripConversion_txt2Val2txt(0, GET_TYPENAME(int),

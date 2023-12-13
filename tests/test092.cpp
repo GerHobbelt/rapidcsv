@@ -54,7 +54,7 @@ int main()
 
       unittest::WriteFile(path, csv);
 
-      rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0),
+      rapidcsv::Document doc(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT),
                              rapidcsv::SeparatorParams(';' /* pSeparator */));
       unittest::ExpectEqual(float, doc.GetCell<converter::ConvertFromStr<float COMMA deLocal_iss<float>>>("A", "2"), 0.1f);
       unittest::ExpectEqual(float, doc.GetCell<converter::ConvertFromStr<float COMMA deLocal_iss<float>>>("B", "2"), 0.01f);
@@ -72,7 +72,7 @@ int main()
 
       unittest::WriteFile(path, csv);
 
-      rapidcsv::LabelParams labelParams(0, 0);
+      rapidcsv::LabelParams labelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT);
       rapidcsv::SeparatorParams separatorParams;
       rapidcsv::Document doc(path, labelParams, separatorParams);
       unittest::ExpectEqual(float, doc.GetCell<converter::ConvertFromStr<float COMMA converter::S2T_Format_StreamAsIs<float COMMA converter::FailureS2Tprocess::THROW_ERROR COMMA char>>>("A", "2"), 0.1f);

@@ -595,14 +595,44 @@ rapidcsv::FilterSortDocument
 When both filter and sorting is needed [rapidcsv::FilterSortDocument](doc/view/rapidcsv_FilterSortDocument.md). <br>
 Both the filter-function and sort-details are passed to [rapidcsv::FilterSortDocument](doc/view/rapidcsv_FilterSortDocument.md)
 
-Refer [tests/testView001.cpp](tests/testView001.cpp) <br>
-```cpp
+Refer [tests/testView001.cpp](tests/testView001.cpp)
+```c++
     /////  Filter + Sort
     const rapidcsv::SortParams<int, rapidcsv::e_SortOrder::DESCEND> spD(1);
     rapidcsv::FilterSortDocument<isFirstCellPositive, decltype(spD)> viewdoc2(doc, spD);
 ```
+<br>
 
-Similar to `rapidcsv::SortDocument`, multiple columns can vebew specified for sorting thru variadic-arguments.
+Similar to `rapidcsv::SortDocument`, multiple columns can be sorted thru variadic-arguments. Refer [tests/testViewB001.cpp](tests/testViewB001.cpp)
+```c++
+    rapidcsv::Document doc(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT,
+                                                       rapidcsv::FlgRowName::RN_PRESENT));
+
+    /////  Filter + Sort
+    const rapidcsv::SortParams<int> spA(0);
+    const rapidcsv::SortParams<int, rapidcsv::e_SortOrder::DESCEND> spD(1);
+    rapidcsv::FilterSortDocument<isFirstCellPositive,
+                                 rapidcsv::SortParams<int>,
+                                 rapidcsv::SortParams<int, rapidcsv::e_SortOrder::DESCEND> > viewdoc1(doc, spA, spD);
+```
+<br>
+
+If the sorted column has NaN (Not-A-Number) values, one can still sort using `converter::FailureS2Tprocess::VARIANT_NAN` template parameter. Refer [tests/testViewfNaN001.cpp](tests/testViewfNaN001.cpp)
+```c++
+template <typename T>
+using _ConvS2T_NAN =
+      converter::ConvertFromStr
+          < T,
+            converter::S2T_Format_std_CtoT
+                < T,
+                  converter::FailureS2Tprocess::VARIANT_NAN
+                >
+          >;
+...
+    /////  Filter + Sort
+    const rapidcsv::SortParams<_ConvS2T_NAN<int>, rapidcsv::e_SortOrder::DESCEND> spD(0);
+    rapidcsv::FilterSortDocument<isCellPositive, decltype(spD)> viewdoc2(doc, spD);
+```
 
 <br>
 <br>
@@ -616,7 +646,8 @@ Architecture Components and Overview
    document.Get***<T>(...);            //  1. T is 'data-type' such as int, long, float, double, ...
    document.Get***<C>(...);            //  2. C is 'convertor-type' satisfying concept 'converter::c_S2Tconverter'
                                        //          C can also be "a user defined Converter class"
-   document.Get***<&CONV_S2T>(...);    //  3. CONV_S2T is 'function-address' of signature 'R (*CONV_S2T)(const std::string&)'
+   document.Get***<&CONV_S2T>(...);    //  3. CONV_S2T is 'function-address' of signature
+                                       //          'R (*CONV_S2T)(const std::string&)'.
                                        //     R  is either type 'T' or 'std::variant<T, std::string>'
    ```
 
@@ -625,7 +656,8 @@ Architecture Components and Overview
    document.Set***<T>(...);            //  1. T is 'data-type' such as int, long, float, double, ...
    document.Set***<C>(...);            //  2. C is 'convertor-type' satisfying concept 'converter::c_T2Sconverter'
                                        //          C can also be "a user defined Converter class"
-   document.Set***<&CONV_T2S>(...);    //  3. CONV_T2S is 'function-address' of signature 'std::string (*CONV_T2S)(const R&)'
+   document.Set***<&CONV_T2S>(...);    //  3. CONV_T2S is 'function-address' of signature
+                                      //           'std::string (*CONV_T2S)(const R&)'.
                                        //     R  is either type 'T' or 'std::variant<T, std::string>'
    ```
 

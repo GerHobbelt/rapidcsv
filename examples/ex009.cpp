@@ -23,7 +23,7 @@ MyStruct ConvMyStruct(const std::string& pStr)
 
 int main()
 {
-  rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(0, 0));
+  rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
 
   std::cout << "regular         = " << doc.GetCell<int>("Close", "2017-02-21") << "\n";
   std::cout << "fixpointfunc    = " << doc.GetCell<&ConvFixPoint>("Close", "2017-02-21") << "\n";

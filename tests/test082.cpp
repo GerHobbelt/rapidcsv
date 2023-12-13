@@ -19,12 +19,12 @@ int main()
 
   try
   {
-    rapidcsv::Document doc("", rapidcsv::LabelParams(0, 0), rapidcsv::SeparatorParams(',', false, false));
+    rapidcsv::Document doc("", rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT), rapidcsv::SeparatorParams(',', false, false));
 
     doc.InsertRow<int, int, unsigned int, long>(0, std::tuple<int, int, unsigned int, long>{ 3, 9, 81, 6561 }, "1");
     doc.InsertRow<int, int, unsigned int, long>(0, std::tuple<int, int, unsigned int, long>{ 2, 4, 16, 256 }, "0");
 
-    doc.InsertRow<int, int, unsigned int, long>(2);
+    doc.InsertRow<int, int, unsigned int, long>(2, std::tuple<int, int, unsigned int, long>{ }, "_2_");
     doc.SetRow<int, int, unsigned int, long>(2, std::tuple<int, int, unsigned int, long>{ 4, 16, 256, 65536 });
     doc.SetRowName(2, "2");
 

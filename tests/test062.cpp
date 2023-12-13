@@ -18,7 +18,7 @@ int main()
 
   try
   {
-    rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0));
+    rapidcsv::Document doc(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
     unittest::ExpectEqual(int, doc.GetCell<int>("A", 0), 3);
     unittest::ExpectEqual(int, doc.GetCell<int>("B", 0), 9);
     unittest::ExpectEqual(int, doc.GetCell<int>("C", 0), 81);

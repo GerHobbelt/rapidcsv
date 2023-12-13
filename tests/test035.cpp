@@ -33,7 +33,7 @@ int main()
 
   try
   {
-    rapidcsv::Document doc(path, rapidcsv::LabelParams(-1, -1));
+    rapidcsv::Document doc(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_MISSING, rapidcsv::FlgRowName::RN_MISSING));
 
     unittest::ExpectEqual(int, doc.GetCell<&ConvertFromStr_m100_ToVal>(0, 0), 100);
     unittest::ExpectEqual(int, doc.GetCell<&ConvertFromStr_m100_ToVal>(1, 0), 1000);

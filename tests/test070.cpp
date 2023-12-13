@@ -23,7 +23,7 @@ int main()
     // -,  A,  B,  C   ← Column Label
     // 1,  3,  9,  81
     // 2,  4,  16, 256
-    rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0));
+    rapidcsv::Document doc(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
 
     ExpectException(doc.GetRowIdx("-"), std::out_of_range);
     unittest::ExpectEqual(size_t, doc.GetRowIdx("1"), 0);

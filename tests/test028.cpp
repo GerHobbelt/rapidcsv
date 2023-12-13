@@ -22,7 +22,7 @@ int main()
 
   try
   {
-    rapidcsv::Document doc(path, rapidcsv::LabelParams(-1, -1));
+    rapidcsv::Document doc(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_MISSING, rapidcsv::FlgRowName::RN_MISSING));
 
     doc.SetRow<int, int, unsigned int>(0, std::tuple<int, int, unsigned int>{ 3, 9, 81 });
     doc.SetRow_VecStr(1, std::vector<std::string>{ "4", "16", "256" });

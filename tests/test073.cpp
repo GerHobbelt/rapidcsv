@@ -3,6 +3,13 @@
 #include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
+    /*
+     * After introducing enum's rapidcsv::FlgColumnName and rapidcsv::FlgRowName ;
+     * constructor for rapidcsv::LabelParams has changed accordingly and no longer
+     * supports arbitary row-header or column-header.
+     * This test is no longer applicable.
+     */
+
 int main()
 {
   int rv = 0;

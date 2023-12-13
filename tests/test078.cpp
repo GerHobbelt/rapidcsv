@@ -26,7 +26,7 @@ int main()
 
   try
   {
-    rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0));
+    rapidcsv::Document doc(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
 
     // below functions should use all template functions
     unittest::ExpectEqual(int, doc.GetColumn<int>(0).at(0), 3);

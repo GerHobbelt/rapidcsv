@@ -31,7 +31,7 @@ int main()
   {
     rapidcsv::SeparatorParams seppar;
     seppar.mQuotedLinebreaks = true;
-    rapidcsv::Document doc(path, rapidcsv::LabelParams(-1, -1), seppar);
+    rapidcsv::Document doc(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_MISSING, rapidcsv::FlgRowName::RN_MISSING), seppar);
 
     unittest::ExpectEqual(size_t, doc.GetRowCount(), 4);
     unittest::ExpectEqual(size_t, doc.GetColumnCount(), 4);

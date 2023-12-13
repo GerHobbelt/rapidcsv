@@ -24,7 +24,7 @@ int main()
     std::vector<unsigned long> volume;
     std::vector<long double> adjClose;
 
-    rapidcsv::Document doc("../../tests/msft.csv", rapidcsv::LabelParams(0, -1));
+    rapidcsv::Document doc("../../tests/msft.csv", rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_MISSING));
 
     /////  Filter
     rapidcsv::FilterDocument<isYear2016> viewdoc(doc);

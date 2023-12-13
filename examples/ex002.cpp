@@ -5,7 +5,7 @@
 
 int main()
 {
-  rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(0, 0));
+  rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
 
   std::tuple<float, float, float, float, unsigned long, float>
      hlocVa = doc.GetRow<float, float, float, float, unsigned long, float>("2017-02-22");

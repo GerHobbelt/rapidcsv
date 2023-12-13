@@ -59,7 +59,7 @@ int main()
 
   try
   {
-    rapidcsv::Document doc1(path, rapidcsv::LabelParams(0, 0));
+    rapidcsv::Document doc1(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
 
     //std::string tstr = converter::ConvertFromVal<double,format_type>::ToStr(1.2e10);
     //std::string tstr = converter::ConvertFromVal<double>::ToStr(1.2e10);
@@ -70,7 +70,7 @@ int main()
 
     doc1.Save();
 
-    rapidcsv::Document doc2(path, rapidcsv::LabelParams(0, 0));
+    rapidcsv::Document doc2(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
 
     double eps1 = 1.0e7;
     double exp1 = 1.2e10;

@@ -18,6 +18,7 @@ macro(add_unit_test testname)
     FILE(GLOB sources ${testname}*.cpp)
     add_executable(${testname} ${sources})
     add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/tests/${testname}")
+    #target_compile_options(${testname} PRIVATE OPTION_CONVERTER_DEBUG_LOG=ON)
     target_link_libraries(${testname} PUBLIC rapidcsv)
     set_target_properties(${testname} PROPERTIES  LINKER_LANGUAGE CXX)
   endif()
@@ -48,6 +49,8 @@ else()
   message(STATUS "Skip check for C++ include codecvt - C++${CMAKE_CXX_STANDARD}")
 endif()
 #]===========================================]
+
+
 
 
 # Unit tests
@@ -137,7 +140,7 @@ add_unit_test(test061)
 add_unit_test(test062)
 add_unit_test(test063)
 add_unit_test(test064)
-add_unit_test(test065)
+#add_unit_test(test065)  // labels at Nth row and column are no longer supported, since v3.3.0
 add_unit_test(test066)
 add_unit_test(test067)
 add_unit_test(test068)
@@ -145,7 +148,7 @@ add_unit_test(test069)
 add_unit_test(test070)
 add_unit_test(test071)
 add_unit_test(test072)
-add_unit_test(test073)
+#add_unit_test(test073)  // labels at Nth row and column are no longer supported, since v3.3.0
 add_unit_test(test074)
 add_unit_test(test075)
 add_unit_test(test076)
@@ -167,7 +170,7 @@ add_unit_test(test089)
 add_unit_test(test090)
 add_unit_test(test091)
 add_unit_test(test092)
-add_unit_test(test093)
+#add_unit_test(test093)  // labels at Nth row and column are no longer supported, since v3.3.0
 add_unit_test(test094)
 add_unit_test(test095)
 
@@ -186,6 +189,7 @@ add_unit_test(testView070)
 add_unit_test(testView071)
 
 add_unit_test(testViewB001)
+add_unit_test(testViewfNaN001)
 add_unit_test(testViewYmd001)
 add_unit_test(testViewYmd003)
 add_unit_test(testViewYmd005)

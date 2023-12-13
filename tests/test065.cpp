@@ -3,6 +3,13 @@
 #include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
+    /*
+     * After introducing enum's rapidcsv::FlgColumnName and rapidcsv::FlgRowName ;
+     * constructor for rapidcsv::LabelParams has changed accordingly and no longer
+     * supports arbitary row-header or column-header.
+     * This test is no longer applicable.
+     */
+
 int main()
 {
   int rv = 0;
@@ -15,12 +22,12 @@ int main()
   try
   {
     // empty doc, column header index 0, no row header
-    rapidcsv::Document doc1(path, rapidcsv::LabelParams(0, -1));
+    rapidcsv::Document doc1(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_MISSING));
     unittest::ExpectEqual(size_t, doc1.GetRowCount(), 0);
     unittest::ExpectEqual(size_t, doc1.GetColumnCount(), 0);
 
     // empty doc, row header index 0, no row header
-    rapidcsv::Document doc2(path, rapidcsv::LabelParams(-1, 0));
+    rapidcsv::Document doc2(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_MISSING, rapidcsv::FlgRowName::RN_PRESENT));
     unittest::ExpectEqual(size_t, doc2.GetRowCount(), 0);
     unittest::ExpectEqual(size_t, doc2.GetColumnCount(), 0);
 

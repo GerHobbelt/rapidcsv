@@ -5,7 +5,7 @@
 
 int main()
 {
-  rapidcsv::Document doc("examples/nohdr.csv", rapidcsv::LabelParams(-1, -1));
+  rapidcsv::Document doc("examples/nohdr.csv", rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_MISSING, rapidcsv::FlgRowName::RN_MISSING));
 
   std::vector<float> close = doc.GetColumn<float>(5);
   std::cout << "Read " << close.size() << " values." << std::endl;

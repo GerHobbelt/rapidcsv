@@ -5,8 +5,7 @@
 
 bool isFirstCellPositive(const rapidcsv::Document::t_dataRow& dataRow)
 {
-  // NOTE : raw-index=1 , as zero-(raw)index is used for 'label'
-  return (std::stoi(dataRow.at(1))) >= 0;
+  return (std::stoi(dataRow.at(0))) >= 0;
 }
 
 
@@ -30,7 +29,7 @@ int main()
 
   try
   {
-    rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0));
+    rapidcsv::Document doc(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
 
     /////  Filter
     rapidcsv::FilterDocument<isFirstCellPositive> viewdoc(doc);
@@ -54,7 +53,7 @@ int main()
     unittest::ExpectEqual(std::string, viewdoc.GetViewCell<std::string>(2, 3), "6561");
 
     /////   Sort
-    const rapidcsv::SortParams<int> spA(1);
+    const rapidcsv::SortParams<int> spA(0);
     rapidcsv::SortDocument<decltype(spA)> viewdoc1(doc, spA);   // `<decltype(spA)>` mandatory for clang
 
     unittest::ExpectEqual(size_t, viewdoc1.GetViewRowCount(), 7);
@@ -76,7 +75,7 @@ int main()
     unittest::ExpectEqual(std::string, viewdoc1.GetViewCell<std::string>(2, 6), "6561");
 
     /////  Filter + Sort
-    const rapidcsv::SortParams<int, rapidcsv::e_SortOrder::DESCEND> spD(1);
+    const rapidcsv::SortParams<int, rapidcsv::e_SortOrder::DESCEND> spD(0);
     rapidcsv::FilterSortDocument<isFirstCellPositive, decltype(spD)> viewdoc2(doc, spD);
 
     unittest::ExpectEqual(size_t, viewdoc2.GetViewRowCount(), 4);

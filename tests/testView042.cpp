@@ -5,7 +5,11 @@
 
 bool isFirstCellPositive(const rapidcsv::Document::t_dataRow& dataRow)
 {
-  // NOTE : at index=1 as zero-index is label
+  return (std::stoi(dataRow.at(0))) >= 0;
+}
+
+bool isSecondCellPositive(const rapidcsv::Document::t_dataRow& dataRow)
+{
   return (std::stoi(dataRow.at(1))) >= 0;
 }
 
@@ -29,18 +33,18 @@ int main()
 
   try
   {
-    rapidcsv::Document doc1(path, rapidcsv::LabelParams(0, 0));
+    rapidcsv::Document doc1(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
     /////   Sort
-    const rapidcsv::SortParams<int> spA(1);
+    const rapidcsv::SortParams<int> spA(0);
     rapidcsv::SortDocument<decltype(spA)> viewdoc1(doc1, spA);   // `<decltype(spA)>` mandatory for clang
 
     unittest::ExpectEqual(size_t, doc1.GetColumnCount(), 3);
     unittest::ExpectEqual(size_t, viewdoc1.GetViewRowCount(), 7);
 
-    rapidcsv::Document doc2(path, rapidcsv::LabelParams(-1, -1));
+    rapidcsv::Document doc2(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_MISSING, rapidcsv::FlgRowName::RN_MISSING));
     /////  Filter + Sort
-    const rapidcsv::SortParams<int, rapidcsv::e_SortOrder::DESCEND> spD(1);
-    rapidcsv::FilterSortDocument<isFirstCellPositive, decltype(spD)> viewdoc2(doc2, spD);
+    const rapidcsv::SortParams<int, rapidcsv::e_SortOrder::DESCEND> spD(0);
+    rapidcsv::FilterSortDocument<isSecondCellPositive, decltype(spD)> viewdoc2(doc2, spD);
 
     unittest::ExpectEqual(size_t, doc2.GetColumnCount(), 4);
     unittest::ExpectEqual(size_t, viewdoc2.GetViewRowCount(), 4);

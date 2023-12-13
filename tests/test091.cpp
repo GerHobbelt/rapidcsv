@@ -73,7 +73,7 @@ int test_a()
   try
   {
     {
-      rapidcsv::Document doc1(path, rapidcsv::LabelParams(0, 0));
+      rapidcsv::Document doc1(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
 
       doc1.SetCell<float>("A", "f", f1);
       doc1.SetCell<float>("B", "f", f2);
@@ -91,7 +91,7 @@ int test_a()
     }
 
     {
-      rapidcsv::Document doc2(path, rapidcsv::LabelParams(0, 0));
+      rapidcsv::Document doc2(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
 
       unittest::ExpectEqual(float, (f1_ddp = doc2.GetCell<float>("A", "f")), f1);
       unittest::ExpectEqual(float, (f2_ddp = doc2.GetCell<float>("B", "f")), f2);
@@ -134,7 +134,7 @@ int test_b()
   try
   {
     {
-      rapidcsv::Document doc1(path, rapidcsv::LabelParams(0, 0));
+      rapidcsv::Document doc1(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
 
       doc1.SetCell< ConvertFromVal_lDP<float> >("A", "f", f1);
       doc1.SetCell< ConvertFromVal_lDP<float> >("B", "f", f2);
@@ -152,7 +152,7 @@ int test_b()
     }
 
     {
-      rapidcsv::Document doc2(path, rapidcsv::LabelParams(0, 0));
+      rapidcsv::Document doc2(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
 
 /*
       unittest::ExpectEqual(float, doc2.GetCell<float>("A", "f"), f1);

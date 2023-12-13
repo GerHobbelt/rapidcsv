@@ -5,7 +5,7 @@
 
 int main()
 {
-  rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(0, 0));
+  rapidcsv::Document doc("examples/colrowhdr.csv", rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
 
   std::cout << doc.GetCell<std::string>("Volume", "2017-02-22") << std::endl;
   std::cout << doc.GetCell<int>("Volume", "2017-02-22") << std::endl;

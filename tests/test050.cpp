@@ -18,16 +18,16 @@ int main()
 
   try
   {
-    rapidcsv::Document doc(path, rapidcsv::LabelParams(0, 0));
+    rapidcsv::Document doc(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
     unittest::ExpectEqual(std::string, doc.GetColumnName(0), "A");
     unittest::ExpectEqual(std::string, doc.GetColumnName(1), "B");
     unittest::ExpectEqual(std::string, doc.GetColumnName(2), "C");
     ExpectException(doc.GetColumnName(3), std::out_of_range);
 
-    rapidcsv::Document doc2(path, rapidcsv::LabelParams(-1, -1));
+    rapidcsv::Document doc2(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_MISSING, rapidcsv::FlgRowName::RN_MISSING));
     ExpectException(doc2.GetColumnName(0), std::out_of_range);
 
-    rapidcsv::Document doc3(path, rapidcsv::LabelParams(0, -1));
+    rapidcsv::Document doc3(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_MISSING));
     unittest::ExpectEqual(std::string, doc3.GetColumnName(0), "-");
     unittest::ExpectEqual(std::string, doc3.GetColumnName(1), "A");
     unittest::ExpectEqual(std::string, doc3.GetColumnName(2), "B");

@@ -2,7 +2,7 @@
  * _ViewDocument.h
  *
  * URL:      https://github.com/panchaBhuta/rapidcsv_FilterSort
- * Version:  v2.03.fs
+ * Version:  v3.3
  *
  * Copyright (C) 2022-2023 Gautam Dhar
  * All rights reserved.
@@ -20,7 +20,6 @@
 
 #include <rapidcsv/rapidcsv.h>
 
-//TODO documentation
 
 namespace rapidcsv
 {
@@ -240,11 +239,6 @@ namespace rapidcsv
         _mapViewRowIdx2RowIdx(), _mapRowIdx2ViewRowIdx()
     {}
 
-    inline RawIdx _getDataRowIndex(const size_t pRowIdx) const
-    {
-      return _document._getDataRowIndex(pRowIdx);
-    }
-
   public:
     /**
      * @brief   Get number of view rows (excluding label rows).
@@ -276,22 +270,20 @@ namespace rapidcsv
     GetViewColumn(const c_sizet_or_string auto& pColumnNameIdx) const
     {
       const size_t pColumnIdx = _document.GetColumnIdx(pColumnNameIdx);
-      const size_t dataColumnIdx = _document._getDataColumnIndex(pColumnIdx).dataIdx;
-      const size_t firstRowIdx = _document._getDataRowIndex(0).dataIdx;
       std::vector< typename converter::t_S2Tconv_c<T_C>::return_type > column;
       for (auto itViewRowIdx = _mapViewRowIdx2RowIdx.begin();
            itViewRowIdx != _mapViewRowIdx2RowIdx.end(); ++itViewRowIdx)
       {
-        const size_t rowIdx = firstRowIdx + static_cast<size_t>(*itViewRowIdx);
-        const rapidcsv::Document::t_dataRow& row = _document._mData.at(rowIdx);
-        if (dataColumnIdx < row.size())
+        const size_t rowIdx = static_cast<size_t>(*itViewRowIdx);
+        const rapidcsv::Document::t_dataRow& row = _mData.at(rowIdx);
+        if (pColumnIdx < row.size())
         {
-          const std::string& cellStrVal = row.at(dataColumnIdx);
+          const std::string& cellStrVal = row.at(pColumnIdx);
           typename converter::t_S2Tconv_c<T_C>::return_type val = converter::t_S2Tconv_c<T_C>::ToVal(cellStrVal);
           column.push_back(val);
         } else {
           static const std::string errMsg("rapidcsv::_ViewDocument::GetViewColumn() : requested column index is more than row.size()");
-          RAPIDCSV_DEBUG_LOG(errMsg << " : pColumnNameIdx='" << pColumnNameIdx << "' , dataColumnIdx=" << dataColumnIdx << " , row.size()=" << row.size());
+          RAPIDCSV_DEBUG_LOG(errMsg << " : pColumnNameIdx='" << pColumnNameIdx << "' , pColumnIdx=" << pColumnIdx << " , row.size()=" << row.size());
           throw std::out_of_range(errMsg);
         }
       }
@@ -515,8 +507,7 @@ namespace rapidcsv
     {
       size_t rowIdx = 0;
       ssize_t viewRowIdx = 0;
-      const ssize_t rowIdxStart = static_cast<ssize_t>(_getDataRowIndex(0).dataIdx);
-      for (auto itRow  = _mData.begin() + rowIdxStart;
+      for (auto itRow  = _mData.begin();
                 itRow != _mData.end(); ++itRow, ++rowIdx)
       {
         if (evaluateBooleanExpression(*itRow))
@@ -581,8 +572,7 @@ namespace rapidcsv
       : _ViewDocument(document), _sortPredicate(), _sortedData(_sortPredicate)
     {
       size_t rowIdx = 0;
-      const ssize_t rowIdxStart = static_cast<ssize_t>(_getDataRowIndex(0).dataIdx);
-      for (auto itRow  = _mData.begin() + rowIdxStart;
+      for (auto itRow  = _mData.begin();
                 itRow != _mData.end(); ++itRow, ++rowIdx)
       {
         if (evaluateBooleanExpression(*itRow))

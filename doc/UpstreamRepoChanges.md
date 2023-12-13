@@ -20,7 +20,8 @@ void Converter<T>::ToStr(const T& pVal, std::string& pStr) const;
                     AND
 void Converter<T>::ToVal(const std::string& pStr, T& pVal) const;
 ```
----
+
+<br>
 
 ## Removed `struct ConverterParams`
 `struct ConverterParams`, which had several member variables to determine the run time conversion behavior has been done away with. <br> <br>
@@ -49,14 +50,33 @@ _T2S_Format_StreamAsIs_ &nbsp; , &nbsp; _T2S_Format_StreamUseClassicLocale_ &nbs
 <br> <br>
 
 One can also provide their own implementations of _T2S_FORMAT_ or _S2T_FORMAT_. For implentation details, refer **exConv001.cpp, ex008.cpp, ex009.cpp**.
-<br> <br>
 
----
+<br>
+
+
 ## Removed `class no_converter : public std::exception`
 For types which are not supported will generate compile-time error. This approach is better then getting a run-time exception.
 
----
-## Performance gains
+<br>
+
+## Refactored constructor of `LabelParams`
+In the upstream repo, the labels-usage for row and column could be turned off by passing `-1`. Instead of `int` , enum's `FlgColumnName` and `FlgRowName` are passed to the constrcutor.
+
+```c++
+  enum FlgColumnName { CN_PRESENT, CN_MISSING };
+  enum FlgRowName    { RN_PRESENT, RN_MISSING };
+...
+    explicit LabelParams(const FlgColumnName pColumnNameFlg = FlgColumnName::CN_PRESENT,
+                         const FlgRowName    pRowNameFlg    = FlgRowName::RN_MISSING)
+```
+
+`FlgColumnName::CN_PRESENT` would imply that the column labels(headers) are available in the first row of the CSV file.
+`FlgRowName::RN_PRESENT` would imply that the row labels are available in the first column of the CSV file.
+
+
+<br>
+
+# Performance gains
 Removed header `<typeinfo>` and calls to function `typeid(...)`.
 In template based code, calling any _RTTI_ functions such as `typeid(...)` is unnecessary, as templates are working with _types_ itself. 
 

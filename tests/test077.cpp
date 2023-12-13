@@ -5,7 +5,7 @@
 
 rapidcsv::Document LoadDoc(const std::string& p_Path)
 {
-  rapidcsv::Document doc = rapidcsv::Document(p_Path, rapidcsv::LabelParams(0, 0));
+  rapidcsv::Document doc = rapidcsv::Document(p_Path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
   return doc;
 }
 

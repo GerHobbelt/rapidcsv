@@ -16,7 +16,7 @@ int main()
     {
       timer.Start();
 
-      rapidcsv::Document doc("../../tests/msft.csv", rapidcsv::LabelParams(0, 0));
+      rapidcsv::Document doc("../../tests/msft.csv", rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
       [[maybe_unused]] 	const std::vector<double> column = doc.GetColumn<double>("Close");
       [[maybe_unused]] 	const std::tuple<float, float, float, float, unsigned long, float>
              row = doc.GetRow<float, float, float, float, unsigned long, float>("2016-05-23");

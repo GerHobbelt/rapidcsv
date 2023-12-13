@@ -19,12 +19,12 @@ int main()
 
   try
   {
-    rapidcsv::Document doc("", rapidcsv::LabelParams(0, 0), rapidcsv::SeparatorParams(',', false, false));
+    rapidcsv::Document doc("", rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT), rapidcsv::SeparatorParams(',', false, false));
 
     doc.InsertColumn<int>(0, std::vector<int>({ 4, 9, 16, 25 }), "B");
     doc.InsertColumn<int>(0, std::vector<int>({ 2, 3, 4, 5 }), "A");
 
-    doc.InsertColumn<int>(2);
+    doc.InsertColumn<int>(2, std::vector<int>(), "c");
     doc.SetColumn<int>(2, std::vector<int>({ 16, 81, 256, 625 }));
     doc.SetColumnName(2, "C");
 
