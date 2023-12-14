@@ -19,7 +19,11 @@ macro(add_unit_test testname)
     add_executable(${testname} ${sources})
     add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/tests/${testname}")
     #target_compile_options(${testname} PRIVATE OPTION_CONVERTER_DEBUG_LOG=ON)
-    target_link_libraries(${testname} PUBLIC rapidcsv)
+    target_link_libraries(${testname} rapidcsv) # donot specify PUBLIC here,
+    # executable ${testname} has to have transitive association to all its dependencies(aka library chain)
+    # refer   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements
+    # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
+    # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
     set_target_properties(${testname} PROPERTIES  LINKER_LANGUAGE CXX)
   endif()
 endmacro(add_unit_test)
@@ -30,7 +34,11 @@ macro(add_perf_test testname)
     FILE(GLOB sources ${testname}*.cpp)
     add_executable(${testname} ${sources})
     add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/tests/${testname}")
-    target_link_libraries(${testname} PUBLIC rapidcsv)
+    target_link_libraries(${testname} rapidcsv) # donot specify PUBLIC here,
+    # executable ${testname} has to have transitive association to all its dependencies(aka library chain)
+    # refer   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements
+    # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
+    # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
   endif()
 endmacro(add_perf_test)
 

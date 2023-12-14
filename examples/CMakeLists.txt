@@ -15,7 +15,11 @@
 macro(add_example testname)
   if(CMAKE_BUILD_TYPE MATCHES "Debug")
     add_executable(${testname} ${testname}.cpp)
-    target_link_libraries(${testname} PUBLIC rapidcsv)
+    target_link_libraries(${testname} rapidcsv) # donot specify PUBLIC here,
+    # executable ${testname} has to have transitive association to all its dependencies(aka library chain)
+    # refer   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements
+    # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
+    # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
   endif()
 endmacro(add_example)
 
