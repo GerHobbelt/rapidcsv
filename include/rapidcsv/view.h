@@ -2,12 +2,12 @@
  * _ViewDocument.h
  *
  * URL:      https://github.com/panchaBhuta/rapidcsv_FilterSort
- * Version:  v3.3
+ * Version:  v4.0.0
  *
  * Copyright (C) 2022-2023 Gautam Dhar
  * All rights reserved.
  *
- * rapidcsv_CT is distributed under the BSD 3-Clause license, see LICENSE for details.
+ * rapidcsv is distributed under the BSD 3-Clause license, see LICENSE for details.
  *
  */
 
@@ -238,6 +238,17 @@ namespace rapidcsv
       : _document(document),     _mData(document._mData),
         _mapViewRowIdx2RowIdx(), _mapRowIdx2ViewRowIdx()
     {}
+
+    /**
+     * @brief   Destructor
+     */
+    virtual ~_ViewDocument()
+    {
+      //_document.Clear();
+      //_mData.clear();
+      _mapViewRowIdx2RowIdx.clear();
+      _mapRowIdx2ViewRowIdx.clear();
+    }
 
   public:
     /**
@@ -520,6 +531,12 @@ namespace rapidcsv
         }
       }
     }
+
+    /**
+     * @brief   Destructor
+     */
+    virtual ~FilterDocument()
+    {}
   };
 
 /*  not needed
@@ -561,6 +578,14 @@ namespace rapidcsv
              t_sortPredicate > _sortedData;
 
   public:
+
+    /**
+     * @brief   Destructor
+     */
+    virtual ~FilterSortDocument()
+    {
+      _sortedData.clear();
+    }
 
     /**
      * @brief   Constructor. After excluding the rows as defined by 'evaluateBooleanExpression',

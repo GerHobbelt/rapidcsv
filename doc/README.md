@@ -14,3 +14,7 @@ The following classes makes up the Rapidcsv interface:
  - [class rapidcsv::_ViewDocument](doc/view/rapidcsv__ViewDocument.md)
  - [class rapidcsv::FilterDocument](doc/view/rapidcsv_FilterDocument.md)
  - [class rapidcsv::FilterSortDocument](doc/view/rapidcsv_FilterSortDocument.md)
+
+ ## Property classes
+ - [class properties::Properties](doc/properties/properties_Properties.md)
+ - [class properties::PropertyFile](doc/properties/properties_PropertyFile.md)

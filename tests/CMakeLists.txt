@@ -28,6 +28,23 @@ macro(add_unit_test testname)
   endif()
 endmacro(add_unit_test)
 
+# Test macro add_unit_test
+macro(add_unit_test_properties testname)
+  if(CMAKE_BUILD_TYPE MATCHES "Debug")
+  #if(BUILD_TESTING)
+    FILE(GLOB sources ${testname}*.cpp)
+    add_executable(${testname} ${sources})
+    add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/tests/${testname}" "${PROJECT_SOURCE_DIR}/tests/properties")
+    #target_compile_options(${testname} PRIVATE OPTION_CONVERTER_DEBUG_LOG=ON)
+    target_link_libraries(${testname} rapidcsv) # donot specify PUBLIC here,
+    # executable ${testname} has to have transitive association to all its dependencies(aka library chain)
+    # refer   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements
+    # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
+    # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
+    set_target_properties(${testname} PROPERTIES  LINKER_LANGUAGE CXX)
+  endif()
+endmacro(add_unit_test_properties)
+
 # Test macro add_perf_test
 macro(add_perf_test testname)
   if(CMAKE_BUILD_TYPE MATCHES "Release")
@@ -57,6 +74,7 @@ else()
   message(STATUS "Skip check for C++ include codecvt - C++${CMAKE_CXX_STANDARD}")
 endif()
 #]===========================================]
+
 
 
 
@@ -203,6 +221,8 @@ add_unit_test(testViewYmd003)
 add_unit_test(testViewYmd005)
 
 
+add_unit_test(PropertiesTest)
+add_unit_test_properties(PropertiesParserTest)
 
 
 # perf tests

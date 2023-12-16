@@ -637,6 +637,80 @@ using _ConvS2T_NAN =
 <br>
 <br>
 
+cpp-properties (Recursive-Variable)
+===================================
+A small C++ properties parser. The parser also supports one property embedded into the value of another
+property. The embedded property will be replaced by its value recursively. 
+
+
+## Examples
+__input.properties__
+```
+key1=value1
+key2=value2
+key3=value3
+key4=value4
+dir1=dname1
+dir2=dname2
+dir3=dname3
+dir123=${dir1}/${dir2}/${dir3}
+dir123123=${dir123}/${dir123}
+```
+
+__output.properties__
+```
+key100=value100
+key200=value200
+key300=value300
+```
+
+__Main.cpp__
+```c++
+#include <iostream>
+#include <vector>
+#include <string>
+#include <rapidcsv/Properties.h>
+
+
+void TestRead() {
+    properties::Properties props = properties::PropertyFile::deserialization("input.properties");
+    std::vector<std::string> names = props.GetPropertyNames();
+    for (std::vector<std::string>::const_iterator i = names.begin(); i != names.end(); ++i) {
+        cout << *i << " = " << props.GetProperty(*i) << endl;
+    }
+}
+
+void TestPropertyExpanded() {
+    properties::Properties props = properties::PropertyFile::deserialization("input.properties");
+    std::vector<std::string> names = props.GetPropertyNames();
+    for (std::vector<std::string>::const_iterator i = names.begin(); i != names.end(); ++i) {
+        cout << *i << " = " << props.GetPropertyExpanded(*i) << endl;
+    }
+}
+
+void TestWrite() {
+    properties::Properties props;
+    props.AddProperty("key100", "value100");
+    props.AddProperty("key200", "value200");
+    props.AddProperty("key300", "value300");
+    properties::PropertyFile::serialization("output.properties", props);
+}
+
+int main() {
+    TestRead();
+    TestPropertyExpanded();
+    TestWrite();
+    return 0;
+}
+```
+
+
+
+
+
+<br>
+<br>
+
 Architecture Components and Overview
 ====================================
 1. The CSV data is read by a object of `Document` class, either from file or stream. <br>
@@ -673,6 +747,8 @@ Architecture Components and Overview
    `SortDocument`       : this view of data sorts the elements by order defined. <br>
    `FilterSortDocument` : this view of data excludes the elements filtered out, and sorts the remaining elements by order defined.
 
+4. `Properties`         : Container for name-value pairs. <br>
+   `PropertyFile`       : to deserialization(Read) and serialization(Write) `Properties` container to a file.
 
 <br>
 <br>
@@ -693,6 +769,10 @@ The following classes makes up the Rapidcsv interface:
  - [class rapidcsv::_ViewDocument](doc/view/rapidcsv__ViewDocument.md)
  - [class rapidcsv::FilterDocument](doc/view/rapidcsv_FilterDocument.md)
  - [class rapidcsv::FilterSortDocument](doc/view/rapidcsv_FilterSortDocument.md)
+
+ ## Property classes
+ - [class properties::Properties](doc/properties/properties_Properties.md)
+ - [class properties::PropertyFile](doc/properties/properties_PropertyFile.md)
 
 <br>
 <br>

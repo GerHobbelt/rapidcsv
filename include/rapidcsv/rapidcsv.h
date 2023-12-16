@@ -2,7 +2,7 @@
  * rapidcsv.h
  *
  * URL:      https://github.com/panchaBhuta/rapidcsv_FilterSort
- * Version:  v3.3.0
+ * Version:  v4.0.0
  *
  * Copyright (C) 2022-2023 Gautam Dhar
  * All rights reserved.
@@ -45,9 +45,9 @@ typedef SSIZE_T ssize_t;
 
 #include <converter/converter.h>
 
-#define RAPIDCSV_VERSION_MAJOR 3
-#define RAPIDCSV_VERSION_MINOR 3
-#define RAPIDCSV_VERSION_PATCH 2
+#define RAPIDCSV_VERSION_MAJOR 4
+#define RAPIDCSV_VERSION_MINOR 0
+#define RAPIDCSV_VERSION_PATCH 0
 
 #define UPSTREAM___RAPIDCSV__VERSION 8.80
 
@@ -114,7 +114,8 @@ namespace rapidcsv
      *                                it to FlgRowName::RN_MISSING prevents row lookup by label name, and gives access
      *                                to all columns as document data. Default: FlgRowName::RN_MISSING
      */
-    explicit LabelParams(const FlgColumnName pColumnNameFlg = FlgColumnName::CN_PRESENT, const FlgRowName pRowNameFlg = FlgRowName::RN_MISSING)
+    explicit LabelParams(const FlgColumnName pColumnNameFlg = FlgColumnName::CN_PRESENT,
+                         const FlgRowName    pRowNameFlg    = FlgRowName::RN_MISSING)
       : mColumnNameFlg(pColumnNameFlg)
       , mRowNameFlg(pRowNameFlg)
     {}
@@ -387,6 +388,15 @@ namespace rapidcsv
       mIsLE = false;
 #endif
       _mHasUtf8BOM = false;
+    }
+
+    /**
+     * @brief   Destructor.
+     *
+     */
+    virtual ~Document()
+    {
+      Clear();
     }
 
     /*
