@@ -6,7 +6,7 @@ include(FetchContent)
 FetchContent_Declare(
   rapidcsv
   GIT_REPOSITORY "https://github.com/panchaBhuta/rapidcsv_FilterSort.git"
-  GIT_TAG        "v3.3.2"
+  GIT_TAG        "v4.0.1"
 )
 FetchContent_MakeAvailable(rapidcsv)
 

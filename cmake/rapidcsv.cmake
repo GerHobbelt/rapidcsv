@@ -86,7 +86,7 @@ macro(fetch_dependencies)
     include( FetchContent )
     FetchContent_Declare( ${CONVERTERLIB}
 		          GIT_REPOSITORY https://github.com/panchaBhuta/converter.git
-		          GIT_TAG        v1.2.13)  # adjust tag/branch/commit as needed
+		          GIT_TAG        v1.2.14)  # adjust tag/branch/commit as needed
     FetchContent_MakeAvailable(${CONVERTERLIB})
 
     #[==================[
@@ -189,10 +189,10 @@ macro(rapidcsv_build)
     endif()
     #message(STATUS "_DEBUG_LOG=${_DEBUG_LOG}")
     # for _DEBUG_LOG can't use generator-expression as its computed during build-stage, but we need it during config-stage
-    option(OPTION_RAPIDCSV_DEBUG_LOG  "Set to ON for debugging logs"  ${_DEBUG_LOG})
-    message(STATUS "OPTION_RAPIDCSV_DEBUG_LOG=${OPTION_RAPIDCSV_DEBUG_LOG}")
+    option(OPTION_RAPIDCSV_debug_log  "Set to ON for debugging logs"  ${_DEBUG_LOG})
+    message(STATUS "OPTION_RAPIDCSV_debug_log=${OPTION_RAPIDCSV_debug_log}")
     #[===========[  donot use generator-expressions in option() functions
-    # option(OPTION_RAPIDCSV_DEBUG_LOG  "Set to ON for debugging logs"   "$<AND:$<CONFIG:Debug>,$<RAPIDCSV_STANDALONE_PROJECT>>")
+    # option(OPTION_RAPIDCSV_debug_log  "Set to ON for debugging logs"   "$<AND:$<CONFIG:Debug>,$<RAPIDCSV_STANDALONE_PROJECT>>")
     #]===========]
 
     #[==================================================================================[
@@ -223,7 +223,7 @@ macro(rapidcsv_build)
     target_compile_definitions(rapidcsv INTERFACE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
         $<$<CONFIG:Release>:RELEASE_BUILD>
-        FLAG_RAPIDCSV_DEBUG_LOG=$<BOOL:${OPTION_RAPIDCSV_DEBUG_LOG}>)
+        FLAG_RAPIDCSV_debug_log=$<BOOL:${OPTION_RAPIDCSV_debug_log}>)
     #[==================================================================================[
     # refer https://cmake.org/cmake/help/v3.27/manual/cmake-generator-expressions.7.html#genex:COMPILE_LANG_AND_ID
     # This specifies the use of different compile definitions based on both the compiler id and compilation language.

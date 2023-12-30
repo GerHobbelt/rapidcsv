@@ -47,7 +47,7 @@ typedef SSIZE_T ssize_t;
 
 #define RAPIDCSV_VERSION_MAJOR 4
 #define RAPIDCSV_VERSION_MINOR 0
-#define RAPIDCSV_VERSION_PATCH 0
+#define RAPIDCSV_VERSION_PATCH 1
 
 #define UPSTREAM___RAPIDCSV__VERSION 8.80
 
@@ -68,7 +68,7 @@ typedef SSIZE_T ssize_t;
 #define RAPIDCSV_PREFERRED_PATH    (std::filesystem::path(RAPIDCSV_FILE).make_preferred().string())
 
 
-#if FLAG_RAPIDCSV_DEBUG_LOG == 1
+#if FLAG_RAPIDCSV_debug_log == 1
   #define RAPIDCSV_DEBUG_LOG(aMessage) { std::cout << aMessage << " :: file:" << RAPIDCSV_PREFERRED_PATH << ":" << __LINE__ << std::endl; }
 #else
   #define RAPIDCSV_DEBUG_LOG(aMessage)
@@ -474,7 +474,7 @@ namespace rapidcsv
           column.push_back(val);
         } else {
           static const std::string errMsg("rapidcsv::Document::GetColumn(pColumnNameIdx) : column not found for 'pColumnNameIdx'");
-          #if FLAG_RAPIDCSV_DEBUG_LOG == 1
+          #if FLAG_RAPIDCSV_debug_log == 1
             const size_t adjRowSize = itRow->size();
             RAPIDCSV_DEBUG_LOG(errMsg << " : pColumnNameIdx='" << pColumnNameIdx << "' : pColumnIdx{" << pColumnIdx << "} >= rowSize{"  \
                                       << adjRowSize << "} : (number of columns on row index=" << rowIdx << ")");
