@@ -85,8 +85,8 @@ macro(fetch_dependencies)
 
     include( FetchContent )
     FetchContent_Declare( ${CONVERTERLIB}
-		          GIT_REPOSITORY https://github.com/panchaBhuta/converter.git
-		          GIT_TAG        v1.2.14)  # adjust tag/branch/commit as needed
+                          GIT_REPOSITORY https://github.com/panchaBhuta/converter.git
+                          GIT_TAG        v1.2.16)  # adjust tag/branch/commit as needed
     FetchContent_MakeAvailable(${CONVERTERLIB})
 
     #[==================[
@@ -393,11 +393,11 @@ function(rapidcsv_install_logic)
     install(TARGETS         rapidcsv
         CONFIGURATIONS      Debug
         #RUNTIME DESTINATION Debug/bin
-    	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rapidcsv)
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rapidcsv)
     install(TARGETS         rapidcsv
         CONFIGURATIONS      Release
         #RUNTIME DESTINATION Release/bin
-    	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rapidcsv)
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rapidcsv)
 
 
     # https://cmake.org/cmake/help/v3.27/command/export.html#command:export

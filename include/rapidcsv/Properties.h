@@ -104,7 +104,7 @@ namespace properties
      *          else the string value which caused failure during conversion.
      * @throws  `std::out_of_range` exception when a given key does not exist.
      */
-    template<converter::c_NOT_string T_C>
+    template<converter::c_NOT_basic_string T_C>
     typename converter::t_S2Tconv_c<T_C>::return_type
     GetPropertyConv(const std::string& key) const
     {
@@ -144,7 +144,7 @@ namespace properties
      *          else the string value which caused failure during conversion.
      * @throws  `std::out_of_range` exception when a given key does not exist.
      */
-    template<converter::c_NOT_string T_C>
+    template<converter::c_NOT_basic_string T_C>
     typename converter::t_S2Tconv_c<T_C>::return_type
     GetPropertyConv(const std::string& key,
                     const typename converter::t_S2Tconv_c<T_C>::return_type& defaultValue) const
@@ -206,7 +206,7 @@ namespace properties
      *                        On conversion success variant has the converted value,
      *                        else the string value which caused failure during conversion.
      */
-    template<converter::c_NOT_string T_C>
+    template<converter::c_NOT_basic_string T_C>
     inline void AddPropertyConv(const std::string& key,
                                 const typename converter::t_T2Sconv_c<T_C>::input_type& value)
     {
