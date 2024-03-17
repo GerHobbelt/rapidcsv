@@ -2,6 +2,7 @@
 .vscode/
 
 build*/
+examples/cmake-add-subdirectory/rapidcsv_FilterSort
 
 ### Linux ###
 *~

@@ -29,6 +29,47 @@ cmake --version
 
 Merge Conflicting Files
 =======================
+https://github.com/panchaBhuta/rapidcsv_FilterSort
+select branch 'd99kris_master'
+select 'Sync fork' >>> click 'Update branch' 
+
+
+vishnu:rapidcsv_FilterSort$ git branch
+------------------------------------------------------------
+* master
+
+vishnu:rapidcsv_FilterSort$ git log --oneline -5
+------------------------------------------------------------
+980bf6f (HEAD -> master) minor update
+8debef9 (tag: v4.0.4, origin/master, origin/HEAD, backup/master) bumped 'converter' version to v1.2.18
+ed2ea11 (tag: v4.0.3) new converter version v1.2.17
+f883afb (tag: v4.0.2) bumped upto converter version v1.2.16
+4e9b50c (tag: v4.0.1) tiding up of CMake build
+
+(below command will also create local branch if needed)
+vishnu:rapidcsv_FilterSort$ git checkout d99kris_master
+------------------------------------------------------------
+Branch 'd99kris_master' set up to track remote branch 'd99kris_master' from 'origin'.
+Switched to a new branch 'd99kris_master'
+vishnu:rapidcsv_FilterSort$ git branch
+* d99kris_master
+  master
+
+vishnu:rapidcsv_FilterSort$ git remote -v
+------------------------------------------------------------
+backup	/media/vishnu/Elements/gd/_D_drive/repositories/code/_Projects/rapidcsv_FilterSort.git/ (fetch)
+backup	/media/vishnu/Elements/gd/_D_drive/repositories/code/_Projects/rapidcsv_FilterSort.git/ (push)
+origin	git@github.com:panchaBhuta/rapidcsv_FilterSort.git (fetch)
+origin	git@github.com:panchaBhuta/rapidcsv_FilterSort.git (push)
+
+vishnu:rapidcsv_FilterSort$ git pull origin 
+------------------------------------------------------------
+d99kris_master   HEAD             master           
+
+vishnu:rapidcsv_FilterSort$ git pull origin d99kris_master 
+------------------------------------------------------------
+
+
 https://stackoverflow.com/questions/22215651/why-doesnt-git-diff-show-anything-for-unmerged-paths
 REFER:::   git ls-files -s  somefile.txt
 
