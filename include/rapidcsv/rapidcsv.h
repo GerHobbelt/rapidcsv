@@ -13,9 +13,9 @@
  * ***********************************************************************************
  *
  * URL:      https://github.com/d99kris/rapidcsv
- * Version:  8.80
+ * Version:  8.82
  *
- * Copyright (C) 2017-2023 Kristofer Berggren
+ * Copyright (C) 2017-2024 Kristofer Berggren
  * All rights reserved.
  *
  * rapidcsv is distributed under the BSD 3-Clause license, see LICENSE for details.
@@ -47,9 +47,9 @@ typedef SSIZE_T ssize_t;
 
 #define RAPIDCSV_VERSION_MAJOR 4
 #define RAPIDCSV_VERSION_MINOR 0
-#define RAPIDCSV_VERSION_PATCH 4
+#define RAPIDCSV_VERSION_PATCH 5
 
-#define UPSTREAM___RAPIDCSV__VERSION 8.80
+#define UPSTREAM___RAPIDCSV__VERSION 8.82
 
 //  Project path is removed from the __FILE__
 //  Resulting file-path is relative path from project-root-folder.
@@ -1343,6 +1343,15 @@ namespace rapidcsv
             {
               quoted = !quoted;
             }
+            else if (_mSeparatorParams.mTrim)
+            {
+              // allow whitespace before first mQuoteChar
+              const auto firstQuote = std::find(cell.begin(), cell.end(), _mSeparatorParams.mQuoteChar);
+              if (std::all_of(cell.begin(), firstQuote, [](int ch) { return isspace(ch); }))
+              {
+                quoted = !quoted;
+              }
+            }
             cell += buffer[i];
           }
           else if (buffer[i] == _mSeparatorParams.mSeparator)
@@ -1409,12 +1418,26 @@ namespace rapidcsv
         p_FileLength -= readLength;
       }
 
-      // Handle last line without linebreak
-      if (!cell.empty() || !row.empty())
+      // Handle last cell without linebreak
+      if (!cell.empty())
       {
         row.push_back(_unquote(_trim(cell)));
         cell.clear();
-        _mData.push_back(row);
+      }
+
+      // Handle last line without linebreak
+      if (!row.empty())
+      {
+        if (_mLineReaderParams.mSkipCommentLines && !row.at(0).empty() &&
+            (row.at(0)[0] == _mLineReaderParams.mCommentPrefix))
+        {
+          // skip comment line
+        }
+        else
+        {
+          _mData.push_back(row);
+        }
+
         row.clear();
       }
 

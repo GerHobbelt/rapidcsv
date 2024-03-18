@@ -31,8 +31,8 @@ echo "################### g++ compiler ##########################"
                          -Wcast-qual -Wno-missing-braces -Wswitch-default -Wcast-align \
                          -Wunreachable-code -Wundef -Wuninitialized -Wold-style-cast \
                          -Wsign-conversion -Weffc++ \
-     -DCONVERTER_USE_FILEPREFIXMAP=1 -fmacro-prefix-map="$(pwd)/"= -DENABLE_CONVERTER_DEBUG_LOG=1 ${3} \
-     -DRAPIDCSV_USE_FILEPREFIXMAP=1 -DENABLE_RAPIDCSV_DEBUG_LOG=1 \
+     -DCONVERTER_USE_FILEPREFIXMAP=1 -fmacro-prefix-map="$(pwd)/"= -DFLAG_CONVERTER_debug_log=1 ${3} \
+     -DRAPIDCSV_USE_FILEPREFIXMAP=1 -DFLAG_RAPIDCSV_debug_log=1 \
      --std=gnu++2a -fconcepts \
      -I "$(pwd)/include" -I "$(pwd)/build-debug/_deps/date-src/include/" -I "$(pwd)/build-debug/include/" \
      -I "$(pwd)/build-debug/_deps/converter-src/include/" -I "$(pwd)/build-debug/_deps/converter-build/include/" \
@@ -47,8 +47,8 @@ echo "################### gcc compiler ##########################"
                          -Wcast-qual -Wno-missing-braces -Wswitch-default -Wcast-align \
                          -Wunreachable-code -Wundef -Wuninitialized -Wold-style-cast \
                          -Wsign-conversion -Weffc++ \
-     -DCONVERTER_USE_FILEPREFIXMAP=1 -fmacro-prefix-map="$(pwd)/"= -DENABLE_CONVERTER_DEBUG_LOG=1 ${3} \
-     -DRAPIDCSV_USE_FILEPREFIXMAP=1 -DENABLE_RAPIDCSV_DEBUG_LOG=1 \
+     -DCONVERTER_USE_FILEPREFIXMAP=1 -fmacro-prefix-map="$(pwd)/"= -DFLAG_CONVERTER_debug_log=1 ${3} \
+     -DRAPIDCSV_USE_FILEPREFIXMAP=1 -DFLAG_RAPIDCSV_debug_log=1 \
     --std=gnu++2a -fconcepts \
      -I "$(pwd)/include" -I "$(pwd)/build-debug/_deps/date-src/include/" -I "$(pwd)/build-debug/include/" \
      -I "$(pwd)/build-debug/_deps/converter-src/include/" -I "$(pwd)/build-debug/_deps/converter-build/include/" \
@@ -63,8 +63,8 @@ echo "################### clang compiler ##########################"
                              -Wcast-qual -Wno-missing-braces -Wswitch-default -Wcast-align \
                              -Wunreachable-code -Wundef -Wuninitialized -Wold-style-cast \
                              -Wsign-conversion -Weffc++ \
-     -DCONVERTER_USE_FILEPREFIXMAP=1 -fmacro-prefix-map="$(pwd)/"= -DENABLE_CONVERTER_DEBUG_LOG=1 ${3} \
-     -DRAPIDCSV_USE_FILEPREFIXMAP=1 -DENABLE_RAPIDCSV_DEBUG_LOG=1 \
+     -DCONVERTER_USE_FILEPREFIXMAP=1 -fmacro-prefix-map="$(pwd)/"= -DFLAG_CONVERTER_debug_log=1 ${3} \
+     -DRAPIDCSV_USE_FILEPREFIXMAP=1 -DFLAG_RAPIDCSV_debug_log=1 \
      --std=gnu++2a \
      -I "$(pwd)/include" -I "$(pwd)/build-debug/_deps/date-src/include/" -I "$(pwd)/build-debug/include/" \
      -I "$(pwd)/build-debug/_deps/converter-src/include/" -I "$(pwd)/build-debug/_deps/converter-build/include/" \
