@@ -129,7 +129,8 @@ vishnu:rapidcsv_FilterSort$ git cat-file blob 2a72d8f7bd0423fab2029c48688af8c546
 
 vishnu:rapidcsv_FilterSort$ cp CMakeLists.txt _CMakeLists_autoMerged.txt
 
-open in meld 2 way compare ::: _CMakeLists_commonAncestor.txt : _CMakeLists_theirHead.txt   >>>>  apply diff to _CMakeLists_myHead.txt.txt AND tests/CMakeLists.txt
+open in meld 2 way compare ::: _CMakeLists_commonAncestor.txt : _CMakeLists_theirHead.txt   >>>>  apply diff to _CMakeLists_myHead.txt
+vishnu:rapidcsv_FilterSort$ cp _CMakeLists_myHead.txt tests/CMakeLists.txt
 
 
 vishnu:rapidcsv_FilterSort$ rm _CMakeLists_*.txt

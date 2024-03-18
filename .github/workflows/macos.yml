@@ -41,17 +41,24 @@ jobs:
           # clang++ == 'AppleClang-14'
           # default : [ macos-11 -> AppleClang-13 ,
           #             macos-12 -> AppleClang-14 ,
-          #             macos-13 -> AppleClang-14 ]
+          #             macos-13 -> AppleClang-15 ]
         compiler: [ default, g++-11, g++-12, g++-13 ]
         exclude:
           - os: macos-11
             compiler : default # AppleClang-13 : does not compile
           - os: macos-11
             compiler : g++-13  # compiler not available
+          - os: macos-13            # was working previously, but now gives compilation-error
+            compiler : g++-11       # error-> ld: Assertion failed: (resultIndex < sectData.atoms.size()), function findAtom, file Relocations.cpp, line 1336.
+          - os: macos-13            # was working previously, but now gives compilation-error
+            compiler : g++-12       # error-> ld: Assertion failed: (resultIndex < sectData.atoms.size()), function findAtom, file Relocations.cpp, line 1336.
+          - os: macos-13            # was working previously, but now gives compilation-error
+            compiler : g++-13       # error-> ld: Assertion failed: (resultIndex < sectData.atoms.size()), function findAtom, file Relocations.cpp, line 1336.
+            # NOTE : for macos-13 and g++{11,12,13} enable the run later when the 'ld' gets fixed. This problem was observed on 18-Mar-2024
     runs-on: ${{matrix.os}}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Get Version
         run: uname -a && cmake --version
       - name: Check Generators
