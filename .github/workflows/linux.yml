@@ -33,7 +33,7 @@ jobs:
         # https://github.com/actions/runner-images#available-images
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources  (os-labels : ubuntu-22.04)
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
-        os: [ ubuntu-22.04 ]  #  ubuntu-latest  ==  ubuntu-22.04
+        os: [ ubuntu-24.04, ubuntu-22.04 ]  #  ubuntu-latest  ==  ubuntu-22.04
         #  https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md#installed-software
           #  GNU C++: 9.5.0, 10.5.0, 11.4.0, 12.3.0, 13.1.0
           #  Clang: 13.0.1, 14.0.0, 15.0.7
@@ -42,10 +42,31 @@ jobs:
         #compiler: [ default, g++-12, g++-13, clang++-13, clang++-14, clang++-15 ]
         #     clang++-13 and clang++-14  ubuntu-latest runners have an incompatible combination of clang and libstdc++
         #     refer  https://github.com/actions/runner-images/issues/8659
-        compiler: [ default, g++-12, g++-13, clang++-15 ]
-        #include:
-        #  - os: ubuntu-20.04
-        #    compiler : clang++-12    ::: error: no member named 'year_month_day' in namespace 'std::chrono'
+        compiler: [ g++-14 ]  # cannot be empty list
+        exclude:
+          - os: ubuntu-22.04
+            compiler : g++-14
+        include:
+          - os: ubuntu-24.04
+            compiler : default         #    g++-13
+          - os: ubuntu-24.04
+            compiler : g++-12
+          - os: ubuntu-24.04
+            compiler : clang++         #    clang++-18
+          - os: ubuntu-24.04
+            compiler : clang++-17
+          - os: ubuntu-24.04
+            compiler : clang++-16
+          - os: ubuntu-22.04
+            compiler : g++-12
+          - os: ubuntu-22.04
+            compiler : default         #    g++-11
+          - os: ubuntu-22.04
+            compiler : clang++-15
+          - os: ubuntu-22.04
+            compiler : clang++         #    clang++-14
+          - os: ubuntu-22.04
+            compiler : clang++-13
     runs-on: ${{matrix.os}}
     steps:
       - name: Checkout Repo

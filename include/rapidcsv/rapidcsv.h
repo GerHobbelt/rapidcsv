@@ -2,9 +2,9 @@
  * rapidcsv.h
  *
  * URL:      https://github.com/panchaBhuta/rapidcsv_FilterSort
- * Version:  v4.0.0
+ * Version:  v4.0.6
  *
- * Copyright (C) 2022-2023 Gautam Dhar
+ * Copyright (C) 2022-2024 Gautam Dhar
  * All rights reserved.
  * 
  * rapidcsv_FilterSort is distributed under the BSD 3-Clause license, see LICENSE for details.
@@ -13,7 +13,7 @@
  * ***********************************************************************************
  *
  * URL:      https://github.com/d99kris/rapidcsv
- * Version:  8.82
+ * Version:  8.84
  *
  * Copyright (C) 2017-2024 Kristofer Berggren
  * All rights reserved.
@@ -1418,16 +1418,15 @@ namespace rapidcsv
         p_FileLength -= readLength;
       }
 
-      // Handle last cell without linebreak
-      if (!cell.empty())
+      // Handle last row / cell without linebreak
+      if (row.empty() && cell.empty())
+      {
+        // skip empty trailing line
+      }
+      else
       {
         row.push_back(_unquote(_trim(cell)));
-        cell.clear();
-      }
 
-      // Handle last line without linebreak
-      if (!row.empty())
-      {
         if (_mLineReaderParams.mSkipCommentLines && !row.at(0).empty() &&
             (row.at(0)[0] == _mLineReaderParams.mCommentPrefix))
         {
@@ -1438,7 +1437,9 @@ namespace rapidcsv
           _mData.push_back(row);
         }
 
+        cell.clear();
         row.clear();
+        quoted = false;
       }
 
       // Assume CR/LF if at least half the linebreaks have CR
@@ -1581,7 +1582,8 @@ namespace rapidcsv
     {
       if (_mSeparatorParams.mAutoQuote &&
           ((cellVal.find(_mSeparatorParams.mSeparator) != std::string::npos) ||
-           (cellVal.find(' ') != std::string::npos)))
+           (cellVal.find(' ') != std::string::npos) ||
+           (cellVal.find('\n') != std::string::npos)))
       {
         // escape quotes in string
         const std::string quoteCharStr = std::string(1, _mSeparatorParams.mQuoteChar);

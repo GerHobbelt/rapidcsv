@@ -69,13 +69,18 @@ d99kris_master   HEAD             master
 vishnu:rapidcsv_FilterSort$ git pull origin d99kris_master 
 ------------------------------------------------------------
 
+vishnu:rapidcsv_FilterSort$ git checkout master
+------------------------------------------------------------
+
 vishnu:rapidcsv_FilterSort$ git merge d99kris_master 
 ------------------------------------------------------------
 Auto-merging CMakeLists.txt
 CONFLICT (content): Merge conflict in CMakeLists.txt
 CONFLICT (modify/delete): src/rapidcsv.h deleted in HEAD and modified in d99kris_master.  Version d99kris_master of src/rapidcsv.h left in tree.
 Automatic merge failed; fix conflicts and then commit the result.
+
 vishnu:rapidcsv_FilterSort$ git status
+------------------------------------------------------------
 On branch master
 Your branch is ahead of 'backup/master' by 1 commit.
   (use "git push" to publish your local commits)

@@ -2,7 +2,7 @@
 
 # make.sh
 #
-# Copyright (C) 2023-2023 Gautam Dhar
+# Copyright (C) 2023-2024 Gautam Dhar
 # All rights reserved.
 #
 # See LICENSE for redistribution information.
@@ -175,7 +175,11 @@ if [[ "${INSTALL}" == "1" ]]; then
   if [ "${OS}" == "Linux" ]; then
     cd build-release && sudo cmake --install . && cd .. || exiterr "install failed (linux), exiting."
   elif [ "${OS}" == "Darwin" ]; then
-    cd build-release && cmake --install . && cd .. || exiterr "install failed (mac), exiting."
+    GHSUDO=""
+    if [[ "${GITHUB_ACTIONS}" == "true" ]]; then
+      GHSUDO="sudo"
+    fi
+    cd build-release && ${GHSUDO} cmake --install . && cd .. || exiterr "install failed (mac), exiting."
   else
     exiterr "install failed (unsupported os ${OS}), exiting."
   fi
