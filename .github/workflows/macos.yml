@@ -33,7 +33,7 @@ jobs:
         # https://github.com/actions/runner-images#available-images
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources  (os-labels : macos-12)
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
-        os: [ macos-14-large, macos-13, macos-12 ]  #  macos-latest  ==  macos-14
+        os: [ macos-14, macos-13, macos-12 ]  #  macos-latest  ==  macos-14
         # https://github.com/actions/runner-images/blob/main/images/macos/macos-13-Readme.md#language-and-runtime
         # https://github.com/actions/runner-images/blob/main/images/macos/macos-12-Readme.md#language-and-runtime
         # https://github.com/actions/runner-images/blob/main/images/macos/macos-11-Readme.md#language-and-runtime
