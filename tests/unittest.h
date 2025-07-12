@@ -19,6 +19,8 @@
 #define COMMA ,
 
 #define ExpectEqual(t, a, b) ExpectEqualFun<t>(a, b, #a, #b, __FILE__, __LINE__)
+#define ExpectEqual_FP(t, a, b) ExpectEqualFun_FP<t>(a, b, #a, #b, __FILE__, __LINE__)
+#define ExpectEqual_FP_WIN_GNU(t, a, b) ExpectEqualFun_FP_WIN_GNU<t>(a, b, #a, #b, __FILE__, __LINE__)
 #define ExpectTrue(a) ExpectTrueFun(a, #a, __FILE__, __LINE__)
 
 #define ExpectException(expr, excp)                                                           \
@@ -193,9 +195,9 @@ namespace unittest
   {
     // the machine epsilon has to be scaled to the magnitude of the values used
     // and multiplied by the desired precision in ULPs (units in the last place)
-    return std::fabs(pTest - pRef) <= std::numeric_limits<T>::epsilon() * std::fabs(pTest + pRef) * ulp
+    return (std::fabs(pTest - pRef) <= (std::numeric_limits<T>::epsilon() * std::fabs(pTest + pRef) * ulp))
         // unless the result is subnormal
-        || std::fabs(pTest - pRef) < std::numeric_limits<T>::min();
+        || ((std::fabs(pTest - pRef) * std::pow(10.0L, ulp)) < 1.0L);
   }
 
   template<typename T>
