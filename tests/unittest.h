@@ -206,6 +206,9 @@ namespace unittest
   template<c_floating_point T>
   inline bool compareEqual(T pTest, T pRef, int ulp = std::numeric_limits<T>::digits10)
   {
+    std::cout << std::setprecision(std::numeric_limits<long double>::digits10 + 1);
+    std::cout << "(std::fabs(" << pTest << " - " << pRef << ") * std::pow(10.0L, " << ulp << ")) = "
+              <<  (std::fabs(pTest - pRef) * std::pow(10.0L, ulp)) << std::endl;
     // the machine epsilon has to be scaled to the magnitude of the values used
     // and multiplied by the desired precision in ULPs (units in the last place)
     return (std::fabs(pTest - pRef) <= (std::numeric_limits<T>::epsilon() * std::fabs(pTest + pRef) * ulp))
