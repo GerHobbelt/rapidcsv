@@ -103,7 +103,7 @@ int main()
     checkRoundTripConversion_txt2Val2txt(8, GET_TYPENAME(long double),
                           input[8], doc.GetCell<long double>(1, 8));
 
-    unittest::ExpectEqual(long double, doc.GetCell<long double>(1, 9), 1.6e+308L);
+    unittest::ExpectEqual_FP_WIN_GNU(long double, doc.GetCell<long double>(1, 9), 1.6e+308L, std::numeric_limits<long double>::digits10 -1);
     checkRoundTripConversion_txt2Val2txt(9, GET_TYPENAME(long double),
                           input[9], doc.GetCell<long double>(1, 9));
 

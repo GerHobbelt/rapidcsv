@@ -27,7 +27,7 @@ int main()
 
     unittest::ExpectEqual(double, viewdoc.GetViewCell<double>(1, 0), 62.959999);
     unittest::ExpectEqual(unsigned long, viewdoc.GetViewCell<unsigned long>(5, 0), 25579900);
-    unittest::ExpectEqual(long double, viewdoc.GetViewCell<long double>(6, 0), 61.765546L);
+    unittest::ExpectEqual_FP_WIN_GNU(long double, viewdoc.GetViewCell<long double>(6, 0), 61.765546L, std::numeric_limits<long double>::digits10 -1);
 
     unittest::ExpectEqual(double, viewdoc.GetViewCell<double>("Open", 1), 62.860001);
     unittest::ExpectEqual(unsigned long, viewdoc.GetViewCell<unsigned long>("Volume", 1), 10250600);

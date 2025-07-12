@@ -52,7 +52,7 @@ int main()
 
     adjClose = viewdoc.GetViewColumn<long double>("Adj Close");
     unittest::ExpectEqual(size_t, adjClose.size(), 252);
-    unittest::ExpectEqual(long double, adjClose.at(0), 61.765546L);
+    unittest::ExpectEqual_FP_WIN_GNU(long double, adjClose.at(0), 61.765546L, std::numeric_limits<long double>::digits10 -1);
     unittest::ExpectEqual(long double, adjClose.at(1), 62.520968L);
     unittest::ExpectEqual(long double, adjClose.at(2), 62.610426L);
     unittest::ExpectEqual(long double, adjClose.at(3), 62.898675L);

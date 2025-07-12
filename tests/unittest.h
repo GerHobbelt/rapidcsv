@@ -16,12 +16,19 @@
 #include <type_traits>
 #include <chrono>
 
+#include "osIdx_TemplateID.h"
+
 #define COMMA ,
 
 #define ExpectEqual(t, a, b) ExpectEqualFun<t>(a, b, #a, #b, __FILE__, __LINE__)
-#define ExpectEqual_FP(t, a, b) ExpectEqualFun_FP<t>(a, b, #a, #b, __FILE__, __LINE__)
-#define ExpectEqual_FP_WIN_GNU(t, a, b) ExpectEqualFun_FP_WIN_GNU<t>(a, b, #a, #b, __FILE__, __LINE__)
+#define ExpectEqual_FP(t, a, b, c) ExpectEqualFun<t>(a, b, #a, #b, __FILE__, __LINE__, c)
 #define ExpectTrue(a) ExpectTrueFun(a, #a, __FILE__, __LINE__)
+
+#ifndef BUILD_ENV_MSYS2_GNU
+  #define ExpectEqual_FP_WIN_GNU(t, a, b, c)   ExpectEqualFun<t>(a, b, #a, #b, __FILE__, __LINE__)
+#else
+  #define ExpectEqual_FP_WIN_GNU(t, a, b, c)   ExpectEqualFun<t>(a, b, #a, #b, __FILE__, __LINE__, c)
+#endif
 
 #define ExpectException(expr, excp)                                                           \
   do                                                                                          \
@@ -202,9 +209,10 @@ namespace unittest
 
   template<typename T>
   inline void ExpectEqualFun(T pTest, T pRef, const std::string& testName,
-                             const std::string& refName, const std::string& filePath, int lineNo)
+                             const std::string& refName, const std::string& filePath, int lineNo,
+                             int ulp = std::numeric_limits<T>::digits10)
   {
-    if (!compareEqual(pTest, pRef))
+    if (!compareEqual<T>(pTest, pRef, ulp))
     {
       std::stringstream ss;
       ss << std::setprecision(std::numeric_limits<long double>::digits10 + 1);
