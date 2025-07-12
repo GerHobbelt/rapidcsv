@@ -101,7 +101,7 @@ int test_a()
       unittest::ExpectEqual(double, (d2_ddp = doc2.GetCell<double>("B", "d")), d2);
       unittest::ExpectEqual(double, (d3_ddp = doc2.GetCell<double>("C", "d")), d3);
 
-      unittest::ExpectEqual_FP_WIN_GNU(long double, (ld1_ddp = doc2.GetCell<long double>("A", "ld")), ld1, std::numeric_limits<long double>::digits10 -1);
+      unittest::ExpectEqual(long double, (ld1_ddp = doc2.GetCell<long double>("A", "ld")), ld1);
       unittest::ExpectEqual(long double, (ld2_ddp = doc2.GetCell<long double>("B", "ld")), ld2);
       unittest::ExpectEqual(long double, (ld3_ddp = doc2.GetCell<long double>("C", "ld")), ld3);
     }
