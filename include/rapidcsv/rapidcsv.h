@@ -2,11 +2,11 @@
  * rapidcsv.h
  *
  * URL:      https://github.com/panchaBhuta/rapidcsv_FilterSort
- * Version:  v4.0.6
+ * Version:  v4.0
  *
  * Copyright (C) 2022-2024 Gautam Dhar
  * All rights reserved.
- * 
+ *
  * rapidcsv_FilterSort is distributed under the BSD 3-Clause license, see LICENSE for details.
  *
  *
@@ -49,7 +49,7 @@ typedef SSIZE_T ssize_t;
 
 #define RAPIDCSV_VERSION_MAJOR 4
 #define RAPIDCSV_VERSION_MINOR 0
-#define RAPIDCSV_VERSION_PATCH 5
+#define RAPIDCSV_VERSION_PATCH 8
 
 #define UPSTREAM___RAPIDCSV__VERSION 8.82
 
@@ -235,8 +235,8 @@ namespace rapidcsv
   /**
    * @brief       To restrict a type to either numeric or string value.
    *              This mechanism reduces code duplicity of getter and setter functions,
-   *              i.e 'Get...(c_sizet_or_string nameIdx, ...)' 
-   *              and 'Set...(c_sizet_or_string nameIdx, ...)' 
+   *              i.e 'Get...(c_sizet_or_string nameIdx, ...)'
+   *              and 'Set...(c_sizet_or_string nameIdx, ...)'
    *              Instead of 'function-overload', we have 'variable-type-overload'.
    */
   template <typename SI>
@@ -721,7 +721,7 @@ namespace rapidcsv
      * @param   pRowNameIdx           row-name or zero-based row index.
      * @returns 'tuple<R...>' of row data. By default, R is usually same type as T.
      *          Else if 'C ≃ converter::ConvertFromStr_gNaN<T>', then 'R = std::variant<T, std::string>'.
-     *          On conversion success variant has the converted value, 
+     *          On conversion success variant has the converted value,
      *          else the string value which caused failure during conversion.
      */
     template< typename ... T_C >
@@ -753,7 +753,7 @@ namespace rapidcsv
      * @param   pRowNameIdx           row-name or zero-based row index.
      * @returns 'tuple<R...>' of row data. By default, R is usually same type as T.
      *          Else if 'CONV_S2T ≃ converter::ConvertFromStr_gNaN<T>::ToVal', then 'R = std::variant<T, std::string>'.
-     *          On conversion success variant has the converted value, 
+     *          On conversion success variant has the converted value,
      *          else the string value which caused failure during conversion.
      */
     template< auto ... CONV_S2T >
