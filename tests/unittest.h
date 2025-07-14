@@ -225,9 +225,10 @@ namespace unittest
     std::cout << "FLOATING POINT : equality-test :: (pTest{" << pTest 
               << "} - pRef{" << pRef << "})= " << (diffAB) << std::endl;
 
-    const T nxt = std::nextafter(pTest, pRef);
-    std::cout << "FLOATING POINT : std::nextafter(pTest, pRef) = " << nxt << std::endl;
-    if(nxt == pRef)
+    const T nxt = std::nextafter(std::min(pTest, pRef), +INFINITY);
+    std::cout << "FLOATING POINT : std::nextafter(std::min(pTest, pRef), +INFINITY){" << nxt 
+              << "} == std::max(pTest, pRef){" << std::max(pTest, pRef) << "}" << std::endl;
+    if(nxt == std::max(pTest, pRef))
       return true;
 
     //  https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon.html
