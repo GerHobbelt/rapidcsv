@@ -204,16 +204,60 @@ namespace unittest
   }
 
   template<c_floating_point T>
-  inline bool compareEqual(T pTest, T pRef, int ulp = std::numeric_limits<T>::digits10)
+  inline bool compareEqual(T pTest, T pRef, int btd = std::numeric_limits<T>::digits10)
   {
-    std::cout << std::setprecision(std::numeric_limits<long double>::digits10 + 1);
-    std::cout << "(std::fabs(" << pTest << " - " << pRef << ") * std::pow(10.0L, " << ulp << ")) = "
-              <<  (std::fabs(pTest - pRef) * std::pow(10.0L, ulp)) << std::endl;
+    /*
+        Previously, the logic of this function has been commented out.
+        here, default ulp = std::numeric_limits<T>::digits10
     // the machine epsilon has to be scaled to the magnitude of the values used
     // and multiplied by the desired precision in ULPs (units in the last place)
-    return (std::fabs(pTest - pRef) <= (std::numeric_limits<T>::epsilon() * std::fabs(pTest + pRef) * ulp))
+    return std::fabs(pTest - pRef) <= std::numeric_limits<T>::epsilon() * std::fabs(pTest + pRef) * ulp
         // unless the result is subnormal
-        || ((std::fabs(pTest - pRef) * std::pow(10.0L, ulp)) < 1.0L);
+        || std::fabs(pTest - pRef) < std::numeric_limits<T>::min();
+    */
+
+    if (pTest == pRef)
+      return true;
+
+    using t_ldb = long double;
+    t_ldb diffAB = t_ldb(pTest) - t_ldb(pRef);
+    std::cout << std::setprecision(std::numeric_limits<t_ldb>::digits10 + 1);
+    std::cout << "FLOATING POINT : equality-test :: std::fabs(pTest{" << pTest 
+              << "} - pRef{" << pRef << "})= " << std::fabs(diffAB) << std::endl;
+
+    //  https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon.html
+    // Since `epsilon()` is the gap size (ULP, unit in the last place)
+    // of floating-point numbers in interval [1, 2), we can scale it to
+    // the gap size in interval [2^e, 2^{e+1}), where `e` is the exponent
+    // of `pTest` and `pRef`.
+ 
+    // If `pTest` and `pRef` have different gap sizes (which means they have
+    // different exponents), we take the smaller one. Taking the bigger
+    // one is also reasonable, I guess.
+    const T m = std::min(std::fabs(pTest), std::fabs(pRef));
+ 
+    // Subnormal numbers have fixed exponent, which is `min_exponent - 1`.
+    const int exp = m < std::numeric_limits<T>::min()
+                  ? std::numeric_limits<T>::min_exponent - 1
+                  : std::ilogb(m);
+
+    /*
+    // We consider `pTest` and `pRef` equal if the difference between them is
+    // within `n` ULPs.
+    return std::fabs(pTest - pRef) <= n * std::ldexp(std::numeric_limits<T>::epsilon(), exp);
+    */
+    const t_ldb ulpRatio =   std::fabs(diffAB)
+                                 / std::ldexp(std::numeric_limits<T>::epsilon(), exp);
+    std::cout << "FLOATING POINT : ulpRatio=" << ulpRatio << " <= 1.5L ? "
+              << std::boolalpha << bool(ulpRatio <= 1.5L) << std::noboolalpha << std::endl;
+    if( ulpRatio <= 1.5L )
+      return true;
+
+    const t_ldb normalizedDiff =  std::pow(t_ldb(10.0L), t_ldb(btd)) * std::fabs(diffAB)
+                                 / (t_ldb(pRef) + diffAB/(2.0L)); // (pTest + pRef)/2
+    std::cout << "FLOATING POINT : normalizedDiff=" << normalizedDiff << " <= 1.0L ? "
+              << std::boolalpha << bool(normalizedDiff <= 1.0L) << std::noboolalpha << std::endl;
+    return (normalizedDiff <= 1.0L);
   }
 
   template<typename T>
