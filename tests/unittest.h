@@ -222,8 +222,13 @@ namespace unittest
     using t_ldb = long double;
     t_ldb diffAB = t_ldb(pTest) - t_ldb(pRef);
     std::cout << std::setprecision(std::numeric_limits<t_ldb>::digits10 + 1);
-    std::cout << "FLOATING POINT : equality-test :: std::fabs(pTest{" << pTest 
-              << "} - pRef{" << pRef << "})= " << std::fabs(diffAB) << std::endl;
+    std::cout << "FLOATING POINT : equality-test :: (pTest{" << pTest 
+              << "} - pRef{" << pRef << "})= " << (diffAB) << std::endl;
+
+    const T nxt = std::nextafter(pTest, pRef);
+    std::cout << "FLOATING POINT : std::nextafter(pTest, pRef) = " << nxt << std::endl;
+    if(nxt == pRef)
+      return true;
 
     //  https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon.html
     // Since `epsilon()` is the gap size (ULP, unit in the last place)
@@ -248,14 +253,14 @@ namespace unittest
     */
     const t_ldb ulpRatio =   std::fabs(diffAB)
                                  / std::ldexp(std::numeric_limits<T>::epsilon(), exp);
-    std::cout << "FLOATING POINT : ulpRatio=" << ulpRatio << " <= 1.5L ? "
+    std::cout << "FLOATING POINT : ulpRatio{" << ulpRatio << "} <= 1.5L ? "
               << std::boolalpha << bool(ulpRatio <= 1.5L) << std::noboolalpha << std::endl;
     if( ulpRatio <= 1.5L )
       return true;
 
     const t_ldb normalizedDiff =  std::pow(t_ldb(10.0L), t_ldb(btd)) * std::fabs(diffAB)
                                  / (t_ldb(pRef) + diffAB/(2.0L)); // (pTest + pRef)/2
-    std::cout << "FLOATING POINT : normalizedDiff=" << normalizedDiff << " <= 1.0L ? "
+    std::cout << "FLOATING POINT : normalizedDiff{" << normalizedDiff << "} <= 1.0L ? "
               << std::boolalpha << bool(normalizedDiff <= 1.0L) << std::noboolalpha << std::endl;
     return (normalizedDiff <= 1.0L);
   }
