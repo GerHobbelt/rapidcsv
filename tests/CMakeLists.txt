@@ -15,8 +15,9 @@
 macro(add_unit_test testname)
   if(CMAKE_BUILD_TYPE MATCHES "Debug")
   #if(BUILD_TESTING)
-    FILE(GLOB sources ${testname}*.cpp)
-    add_executable(${testname} ${sources})
+    FILE(GLOB sourcesExe  ${testname}.cpp ${ARGN})
+    # ARGN here contains list of additional cpp files(includes the extension) if any
+    add_executable(${testname} ${sourcesExe})
     add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/tests/${testname}")
     #target_compile_options(${testname} PRIVATE OPTION_CONVERTER_DEBUG_LOG=ON)
     target_link_libraries(${testname} rapidcsv) # donot specify PUBLIC here,
@@ -32,8 +33,9 @@ endmacro(add_unit_test)
 macro(add_unit_test_properties testname)
   if(CMAKE_BUILD_TYPE MATCHES "Debug")
   #if(BUILD_TESTING)
-    FILE(GLOB sources ${testname}*.cpp)
-    add_executable(${testname} ${sources})
+    FILE(GLOB sourcesExe  ${testname}.cpp ${ARGN})
+    # ARGN here contains list of additional cpp files(includes the extension) if any
+    add_executable(${testname} ${sourcesExe})
     add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/tests/${testname}" "${PROJECT_SOURCE_DIR}/tests/properties")
     #target_compile_options(${testname} PRIVATE OPTION_CONVERTER_DEBUG_LOG=ON)
     target_link_libraries(${testname} rapidcsv) # donot specify PUBLIC here,
@@ -48,8 +50,9 @@ endmacro(add_unit_test_properties)
 # Test macro add_perf_test
 macro(add_perf_test testname)
   if(CMAKE_BUILD_TYPE MATCHES "Release")
-    FILE(GLOB sources ${testname}*.cpp)
-    add_executable(${testname} ${sources})
+    FILE(GLOB sourcesExe  ${testname}.cpp ${ARGN})
+    # ARGN here contains list of additional cpp files(includes the extension) if any
+    add_executable(${testname} ${sourcesExe})
     add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/tests/${testname}")
     target_link_libraries(${testname} rapidcsv) # donot specify PUBLIC here,
     # executable ${testname} has to have transitive association to all its dependencies(aka library chain)
@@ -141,7 +144,7 @@ add_unit_test(test036)
 add_unit_test(test037)
 add_unit_test(test038)
 add_unit_test(test039)
-add_unit_test(test040)
+add_unit_test(test040 test040b.cpp)
 add_unit_test(test041)
 add_unit_test(test042)
 add_unit_test(test043)
@@ -214,7 +217,7 @@ add_unit_test(testView016)
 add_unit_test(testView023)
 add_unit_test(testView025)
 add_unit_test(testView027)
-add_unit_test(testView040)
+add_unit_test(testView040 testView040b.cpp)
 add_unit_test(testView042)
 add_unit_test(testView070)
 add_unit_test(testView071)
@@ -233,4 +236,12 @@ add_unit_test_properties(PropertiesParserTest)
 # perf tests
 add_perf_test(ptest001)
 add_perf_test(ptest002)
+
+
+#[===========================================[
+add_unit_test(test036)
+add_unit_test(test091)
+add_unit_test(testViewYmd001)
+add_unit_test(testViewYmd003)
+#]===========================================]
 

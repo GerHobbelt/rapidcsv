@@ -9,6 +9,7 @@
 #include <cmath>
 #include <cstdlib>
 
+#include <iostream>
 #include <fstream>
 #include <iomanip>
 #include <string>
@@ -151,7 +152,7 @@ namespace unittest
     inline static const T& getVal(const T& val) { return val; }
   };
 
-  
+
   template <typename T>
   concept c_xchar = (std::is_same_v<T, unsigned char> ||
                      std::is_same_v<T, signed char> ||
@@ -171,9 +172,12 @@ namespace unittest
     }
   };
 
-  template<>
-  struct SScompatible<std::chrono::year_month_day> {
-    inline static std::string getVal(const std::chrono::year_month_day& val)
+  template <typename T>
+  concept c_is_base_of_ymd_inclusive = std::is_base_of_v<std::chrono::year_month_day, T>;
+
+  template<c_is_base_of_ymd_inclusive T>
+  struct SScompatible<T> {
+    inline static std::string getVal(const T& val)
     {
       std::ostringstream oss;
       oss << std::setfill('0') << std::setw(4) << static_cast<int>(val.year()) << "-";
@@ -191,7 +195,7 @@ namespace unittest
   concept c_floating_point = std::is_floating_point_v<T>;
 
   template<typename T>
-  constexpr int getULP()
+  constexpr int getBTD()  // BTD -> base-10 digits
   {
     if constexpr (std::is_floating_point_v<T>)
 #ifndef BUILD_ENV_MSYS2_GNU
@@ -208,7 +212,7 @@ namespace unittest
   {
     /*
         Previously, the logic of this function has been commented out.
-        here, default ulp = std::numeric_limits<T>::digits10
+        here, default ulp = std::numeric_limits<T>::digits10                      ULPs -> units in the last place
     // the machine epsilon has to be scaled to the magnitude of the values used
     // and multiplied by the desired precision in ULPs (units in the last place)
     return std::fabs(pTest - pRef) <= std::numeric_limits<T>::epsilon() * std::fabs(pTest + pRef) * ulp
@@ -222,11 +226,11 @@ namespace unittest
     using t_ldb = long double;
     t_ldb diffAB = t_ldb(pTest) - t_ldb(pRef);
     std::cout << std::setprecision(std::numeric_limits<t_ldb>::digits10 + 1);
-    std::cout << "FLOATING POINT : equality-test :: (pTest{" << pTest 
+    std::cout << "FLOATING POINT : equality-test :: (pTest{" << pTest
               << "} - pRef{" << pRef << "})= " << (diffAB) << std::endl;
 
     const T nxt = std::nextafter(std::min(pTest, pRef), +INFINITY);
-    std::cout << "FLOATING POINT : std::nextafter(std::min(pTest, pRef), +INFINITY){" << nxt 
+    std::cout << "FLOATING POINT : std::nextafter(std::min(pTest, pRef), +INFINITY){" << nxt
               << "} == std::max(pTest, pRef){" << std::max(pTest, pRef) << "}" << std::endl;
     if(nxt == std::max(pTest, pRef))
       return true;
@@ -236,12 +240,12 @@ namespace unittest
     // of floating-point numbers in interval [1, 2), we can scale it to
     // the gap size in interval [2^e, 2^{e+1}), where `e` is the exponent
     // of `pTest` and `pRef`.
- 
+
     // If `pTest` and `pRef` have different gap sizes (which means they have
     // different exponents), we take the smaller one. Taking the bigger
     // one is also reasonable, I guess.
     const T m = std::min(std::fabs(pTest), std::fabs(pRef));
- 
+
     // Subnormal numbers have fixed exponent, which is `min_exponent - 1`.
     const int exp = m < std::numeric_limits<T>::min()
                   ? std::numeric_limits<T>::min_exponent - 1
@@ -269,9 +273,9 @@ namespace unittest
   template<typename T>
   inline void ExpectEqualFun(T pTest, T pRef, const std::string& testName,
                              const std::string& refName, const std::string& filePath, int lineNo,
-                             int ulp = getULP<T>())
+                             int btd = getBTD<T>())
   {
-    if (!compareEqual<T>(pTest, pRef, ulp))
+    if (!compareEqual<T>(pTest, pRef, btd))
     {
       std::stringstream ss;
       ss << std::setprecision(std::numeric_limits<long double>::digits10 + 1);
@@ -284,8 +288,8 @@ namespace unittest
     }
   }
 
-  inline void ExpectTrueFun(bool pTest, const std::string& testName, const std::string& filePath,
-                            int lineNo)
+  inline void ExpectTrueFun(bool pTest, const std::string& testName,
+                            const std::string& filePath, int lineNo)
   {
     if (!pTest)
     {

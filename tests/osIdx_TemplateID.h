@@ -1,3 +1,4 @@
+#pragma once
 
 #define MACH_PRE_MACOS14_GNU        0   // also default when OS not macos (i.e ubuntu or windows)
 #define MACH_PRE_MACOS14_CLANG      1

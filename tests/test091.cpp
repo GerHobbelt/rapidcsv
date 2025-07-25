@@ -2,26 +2,8 @@
 
 #include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
+#include "utilities.h"
 
-#define GET_TYPENAME(T) #T
-
-template<typename T>
-void checkRoundTripConversion_Val1Val2(
-            int testID, const std::string& type,
-            const std::string& expected_str,
-            const T& val_ddp, const T& val_ldp)
-{
-  // val_ddp -> value read from text using Default Decimal Precision
-  // val_ldp -> value read from text using Lower   Decimal Precision
-  if( val_ddp != val_ldp )
-  {
-    std::cout << std::setprecision(LDBL_DIG+5);
-    std::cout << "test091 :: round conversion value does not match for testID=" << testID << " type=" << type << " ..." << std::endl;
-    std::cout << "           assgn_val{" << expected_str  << "} ->  val_ddp{" << val_ddp << "}" << std::endl;
-    std::cout << "           assgn_val{" << expected_str  << "} ->  val_ldp{" << val_ldp << "}" << std::endl;
-    std::cout << "             val_ddp{" << val_ddp << "} != val_ldp{" << val_ldp  << "}" << std::endl << std::endl;
-  }
-}
 
 template<converter::c_floating_point T>
 constexpr int getLowerDecimalPrecision()
@@ -134,6 +116,7 @@ int test_b()
   try
   {
     {
+      // test with different conversion parameters than the default.
       rapidcsv::Document doc1(path, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
 
       doc1.SetCell< ConvertFromVal_lDP<float> >("A", "f", f1);
@@ -168,26 +151,35 @@ int test_b()
       unittest::ExpectEqual(long double, doc2.GetCell<long double>("C", "ld"), ld3);
 */
 
-      checkRoundTripConversion_Val1Val2(1, GET_TYPENAME(float), "3.14159f",
-                                        f1_ddp, doc2.GetCell<float>("A", "f"));
-      checkRoundTripConversion_Val1Val2(2, GET_TYPENAME(float), "3.1415926535f",
-                                        f2_ddp, doc2.GetCell<float>("B", "f")); 
-      checkRoundTripConversion_Val1Val2(3, GET_TYPENAME(float), "3.141592653589793f",
-                                        f3_ddp, doc2.GetCell<float>("C", "f"));
+      unittest::STRING2VALUECHECK(float, "test091-01",              \
+            "3.14159f", doc2.GetCell<float>("A", "f"), 3.14159f,    \
+            doc2.GetCell<std::string>("A", "f"));
+      unittest::STRING2VALUECHECK(float, "test091-02",                     \
+            "3.1415926535f", doc2.GetCell<float>("B", "f"), 3.1415926535f, \
+            doc2.GetCell<std::string>("B", "f"));
+      unittest::STRING2VALUECHECK(float, "test091-03",                               \
+            "3.141592653589793f", doc2.GetCell<float>("C", "f"), 3.141592653589793f, \
+            doc2.GetCell<std::string>("C", "f"));
 
-      checkRoundTripConversion_Val1Val2(4, GET_TYPENAME(double), "3.14159",
-                                        d1_ddp, doc2.GetCell<double>("A", "d")); 
-      checkRoundTripConversion_Val1Val2(5, GET_TYPENAME(double), "3.141592653589793",
-                                        d2_ddp, doc2.GetCell<double>("B", "d")); 
-      checkRoundTripConversion_Val1Val2(6, GET_TYPENAME(double), "3.14159265358979323846",
-                                        d3_ddp, doc2.GetCell<double>("C", "d")); 
+      unittest::STRING2VALUECHECK(double, "test091-04",            \
+            "3.14159", doc2.GetCell<double>("A", "d"), 3.14159,    \
+            doc2.GetCell<std::string>("A", "d"));
+      unittest::STRING2VALUECHECK(double, "test091-05",                             \
+            "3.141592653589793", doc2.GetCell<double>("B", "d"), 3.141592653589793, \
+            doc2.GetCell<std::string>("B", "d"));
+      unittest::STRING2VALUECHECK(double, "test091-06",                                       \
+            "3.14159265358979323846", doc2.GetCell<double>("C", "d"), 3.14159265358979323846, \
+            doc2.GetCell<std::string>("C", "d"));
 
-      checkRoundTripConversion_Val1Val2(7, GET_TYPENAME(long double), "3.14159L",
-                                        ld1_ddp, doc2.GetCell<long double>("A", "ld")); 
-      checkRoundTripConversion_Val1Val2(8, GET_TYPENAME(long double), "3.141592653589793L",
-                                        ld2_ddp, doc2.GetCell<long double>("B", "ld")); 
-      checkRoundTripConversion_Val1Val2(9, GET_TYPENAME(long double), "3.14159265358979323846L",
-                                        ld3_ddp, doc2.GetCell<long double>("C", "ld"));
+      unittest::STRING2VALUECHECK(long double, "test091-07",               \
+            "3.14159L", doc2.GetCell<long double>("A", "ld"), 3.14159L,    \
+            doc2.GetCell<std::string>("A", "ld"));
+      unittest::STRING2VALUECHECK(long double, "test091-08",                                \
+            "3.141592653589793L", doc2.GetCell<long double>("B", "ld"), 3.141592653589793L, \
+            doc2.GetCell<std::string>("B", "ld"));
+      unittest::STRING2VALUECHECK(long double, "test091-09",                                          \
+            "3.14159265358979323846L", doc2.GetCell<long double>("C", "ld"), 3.14159265358979323846L, \
+            doc2.GetCell<std::string>("C", "ld"));
     }
   }
   catch (const std::exception& ex)
