@@ -246,5 +246,6 @@ add_unit_test(test036)
 add_unit_test(test091)
 add_unit_test(testViewYmd001)
 add_unit_test(testViewYmd003)
+add_unit_test(test099)
 #]===========================================]
 

@@ -569,23 +569,34 @@ namespace rapidcsv
     void RemoveColumn(const c_sizet_or_string auto& pColumnNameIdx)
     {
       const size_t columnIdx = GetColumnIdx(pColumnNameIdx);
-      if (_mLabelParams.mColumnNameFlg == FlgColumnName::CN_PRESENT)
-      {
-        _mIdxColumnNames.erase(_mIdxColumnNames.begin() + static_cast<ssize_t>(columnIdx));
-      }
       for (auto itRow = _mData.begin(); itRow != _mData.end(); ++itRow)
       {
-        if (columnIdx < itRow->size())
-        {
-          itRow->erase(itRow->begin() + static_cast<ssize_t>(columnIdx));
-        }
-        else
+        if (columnIdx >= itRow->size())
         {
           const std::string errStr = "column out of range: " +
             std::to_string(columnIdx) + " (on row-index " +
             std::to_string(std::distance(_mData.begin(), itRow)) +
             ")";
           throw std::out_of_range(errStr);
+        }
+      }
+
+      if (_mLabelParams.mColumnNameFlg == FlgColumnName::CN_PRESENT && !_mIdxColumnNames.empty() )
+      {
+        _mIdxColumnNames.erase(_mIdxColumnNames.begin() + static_cast<ssize_t>(columnIdx));
+        _mColumnNamesIdx.clear();
+        for(size_t i = 0 ; i < _mIdxColumnNames.size(); ++i )
+        {
+          const std::string& columnName = _mIdxColumnNames.at(i);
+          _mColumnNamesIdx[columnName] = i;
+        }
+      }
+
+      for (auto itRow = _mData.begin(); itRow != _mData.end(); ++itRow)
+      {
+        if (columnIdx < itRow->size())
+        {
+          itRow->erase(itRow->begin() + static_cast<ssize_t>(columnIdx));
         }
       }
 
@@ -868,7 +879,15 @@ namespace rapidcsv
       if (_mLabelParams.mRowNameFlg == FlgRowName::RN_PRESENT)
       {
         _mIdxRowNames.erase(_mIdxRowNames.begin() + static_cast<ssize_t>(pRowIdx));
+        _mRowNamesIdx.clear();
+        for(size_t i = 0 ; i < _mIdxRowNames.size(); ++i )
+        {
+          const std::string& rowName = _mIdxRowNames.at(i);
+          _mRowNamesIdx[rowName] = i;
+        }
+
       }
+
       _mData.erase(_mData.begin() + static_cast<ssize_t>(pRowIdx));
       _updateRowNames("rapidcsv::Document::RemoveRow()");
     }
