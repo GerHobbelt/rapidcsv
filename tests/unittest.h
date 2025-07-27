@@ -24,6 +24,7 @@
 #define ExpectEqual(t, a, b) ExpectEqualFun<t>(a, b, #a, #b, __FILE__, __LINE__)
 #define ExpectTrue(a) ExpectTrueFun(a, #a, __FILE__, __LINE__)
 
+// *INDENT-OFF*
 #define ExpectException(expr, excp)                                                           \
   do                                                                                          \
   {                                                                                           \
@@ -99,6 +100,7 @@
     }                                                                                         \
   }                                                                                           \
   while (0)
+// *INDENT-ON*
 
 
 namespace unittest

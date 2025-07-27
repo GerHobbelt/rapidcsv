@@ -207,6 +207,9 @@ add_unit_test(test095)
 add_unit_test(test096)
 add_unit_test(test097)
 add_unit_test(test098)
+add_unit_test(test099)
+add_unit_test(test100)
+
 
 add_unit_test(testView001)
 add_unit_test(testView003)

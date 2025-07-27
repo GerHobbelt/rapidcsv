@@ -4,7 +4,7 @@
  * URL:      https://github.com/panchaBhuta/rapidcsv_FilterSort
  * Version:  v4.0
  *
- * Copyright (C) 2022-2024 Gautam Dhar
+ * Copyright (C) 2022-2025 Gautam Dhar
  * All rights reserved.
  *
  * rapidcsv_FilterSort is distributed under the BSD 3-Clause license, see LICENSE for details.
@@ -25,19 +25,22 @@
 #pragma once
 
 #include <algorithm>
-
+#include <cassert>
+#include <cmath>
 #ifdef HAS_CODECVT
 #include <codecvt>
 #include <locale>
 #endif
 
 #include <fstream>
+#include <functional>
+#include <iomanip>
 #include <iostream>
+#include <limits>
+#include <map>
 #include <sstream>
 #include <string>
-#include <map>
 #include <vector>
-#include <cassert>
 
 
 #if defined(_MSC_VER)
@@ -51,7 +54,7 @@ typedef SSIZE_T ssize_t;
 #define RAPIDCSV_VERSION_MINOR 0
 #define RAPIDCSV_VERSION_PATCH 8
 
-#define UPSTREAM___RAPIDCSV__VERSION 8.82
+#define UPSTREAM___RAPIDCSV__VERSION 8.87
 
 //  Project path is removed from the __FILE__
 //  Resulting file-path is relative path from project-root-folder.
@@ -386,8 +389,8 @@ namespace rapidcsv
       _mIdxRowNames.clear();
       _mFirstCornerCell="";
 #ifdef HAS_CODECVT
-      mIsUtf16 = false;
-      mIsLE = false;
+      _mIsUtf16 = false;
+      _mIsLE = false;
 #endif
       _mHasUtf8BOM = false;
     }
@@ -572,7 +575,18 @@ namespace rapidcsv
       }
       for (auto itRow = _mData.begin(); itRow != _mData.end(); ++itRow)
       {
-        itRow->erase(itRow->begin() + static_cast<ssize_t>(columnIdx));
+        if (columnIdx < itRow->size())
+        {
+          itRow->erase(itRow->begin() + static_cast<ssize_t>(columnIdx));
+        }
+        else
+        {
+          const std::string errStr = "column out of range: " +
+            std::to_string(columnIdx) + " (on row-index " +
+            std::to_string(std::distance(_mData.begin(), itRow)) +
+            ")";
+          throw std::out_of_range(errStr);
+        }
       }
 
       _updateColumnNames("rapidcsv::Document::RemoveColumn()");
@@ -630,7 +644,18 @@ namespace rapidcsv
       size_t rowIdx = 0;
       for (auto itRow = _mData.begin(); itRow != _mData.end(); ++itRow, ++rowIdx)
       {
-        itRow->insert(itRow->begin() + static_cast<ssize_t>(pColumnIdx), column.at(rowIdx));
+          if (pColumnIdx <= itRow->size())
+          {
+            itRow->insert(itRow->begin() + static_cast<ssize_t>(pColumnIdx), column.at(rowIdx));
+          }
+          else
+          {
+            const std::string errStr = "column out of range: " +
+              std::to_string(pColumnIdx) + " (on row " +
+              std::to_string(std::distance(_mData.begin(), itRow)) +
+              ")";
+            throw std::out_of_range(errStr);
+          }
       }
 
       if (_mLabelParams.mColumnNameFlg == FlgColumnName::CN_PRESENT)
@@ -1263,13 +1288,13 @@ namespace rapidcsv
       static const std::vector<char> bomU16be = { '\xfe', '\xff' };
       if ((bom2b == bomU16le) || (bom2b == bomU16be))
       {
-        mIsUtf16 = true;
-        mIsLE = (bom2b == bomU16le);
+        _mIsUtf16 = true;
+        _mIsLE = (bom2b == bomU16le);
 
         std::wifstream wstream;
         wstream.exceptions(std::wifstream::failbit | std::wifstream::badbit);
         wstream.open(_mPath, std::ios::binary);
-        if (mIsLE)
+        if (_mIsLE)
         {
           wstream.imbue(std::locale(wstream.getloc(),
                                     new std::codecvt_utf16<wchar_t, 0x10ffff,
@@ -1488,7 +1513,7 @@ namespace rapidcsv
     void _writeCsv() const
     {
 #ifdef HAS_CODECVT
-      if (mIsUtf16)
+      if (_mIsUtf16)
       {
         std::stringstream ss;
         _writeCsv(ss);
@@ -1499,7 +1524,7 @@ namespace rapidcsv
         wstream.exceptions(std::wofstream::failbit | std::wofstream::badbit);
         wstream.open(_mPath, std::ios::binary | std::ios::trunc);
 
-        if (mIsLE)
+        if (_mIsLE)
         {
           wstream.imbue(std::locale(wstream.getloc(),
                                     new std::codecvt_utf16<wchar_t, 0x10ffff,
@@ -1749,8 +1774,8 @@ namespace rapidcsv
     std::vector<std::string>      _mIdxRowNames;
     std::string                   _mFirstCornerCell;  // applicable only when both Row and Column Lables are PRESENT
 #ifdef HAS_CODECVT
-    bool mIsUtf16 = false;
-    bool mIsLE = false;
+    bool _mIsUtf16 = false;
+    bool _mIsLE = false;
 #endif
     bool _mHasUtf8BOM = false;
 
