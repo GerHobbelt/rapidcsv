@@ -13,9 +13,9 @@
  * ***********************************************************************************
  *
  * URL:      https://github.com/d99kris/rapidcsv
- * Version:  8.84
+ * Version:  8.88
  *
- * Copyright (C) 2017-2024 Kristofer Berggren
+ * Copyright (C) 2017-2025 Kristofer Berggren
  * All rights reserved.
  *
  * rapidcsv is distributed under the BSD 3-Clause license, see LICENSE for details.
@@ -54,7 +54,7 @@ typedef SSIZE_T ssize_t;
 #define RAPIDCSV_VERSION_MINOR 0
 #define RAPIDCSV_VERSION_PATCH 8
 
-#define UPSTREAM___RAPIDCSV__VERSION 8.87
+#define UPSTREAM___RAPIDCSV__VERSION 8.88
 
 //  Project path is removed from the __FILE__
 //  Resulting file-path is relative path from project-root-folder.
@@ -1307,24 +1307,17 @@ namespace rapidcsv
         _mIsUtf16 = true;
         _mIsLE = (bom2b == bomU16le);
 
-        std::wifstream wstream;
-        wstream.exceptions(std::wifstream::failbit | std::wifstream::badbit);
-        wstream.open(_mPath, std::ios::binary);
-        if (_mIsLE)
-        {
-          wstream.imbue(std::locale(wstream.getloc(),
-                                    new std::codecvt_utf16<wchar_t, 0x10ffff,
-                                                           static_cast<std::codecvt_mode>(std::consume_header |
-                                                                                          std::little_endian)>));
-        }
-        else
-        {
-          wstream.imbue(std::locale(wstream.getloc(),
-                                    new std::codecvt_utf16<wchar_t, 0x10ffff,
-                                                           std::consume_header>));
-        }
-        std::wstringstream wss;
-        wss << wstream.rdbuf();
+        std::vector<char> buffer(static_cast<size_t>(length));
+        pStream.read(buffer.data(), length);
+
+        const std::codecvt_mode mode = (
+            (_mIsLE) ?
+            (static_cast<std::codecvt_mode>(std::consume_header | std::little_endian)) :
+            (static_cast<std::codecvt_mode>(std::consume_header));
+        std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, mode>> utf16conv;
+        const std::wstring& utf16 = utf16conv.from_bytes(buffer.data(), buffer.data() + length);
+
+        std::wstringstream wss(utf16);
         std::string utf8 = _toString(wss.str());
         std::stringstream ss(utf8);
         _parseCsv(ss, static_cast<std::streamsize>(utf8.size()));

@@ -209,6 +209,9 @@ add_unit_test(test097)
 add_unit_test(test098)
 add_unit_test(test099)
 add_unit_test(test100)
+if(HAS_CODECVT)
+  add_unit_test(test101)
+endif()
 
 
 add_unit_test(testView001)
