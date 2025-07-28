@@ -594,10 +594,7 @@ namespace rapidcsv
 
       for (auto itRow = _mData.begin(); itRow != _mData.end(); ++itRow)
       {
-        if (columnIdx < itRow->size())
-        {
-          itRow->erase(itRow->begin() + static_cast<ssize_t>(columnIdx));
-        }
+        itRow->erase(itRow->begin() + static_cast<ssize_t>(columnIdx));
       }
 
       _updateColumnNames("rapidcsv::Document::RemoveColumn()");
@@ -652,21 +649,22 @@ namespace rapidcsv
         _mData.push_back(row);
       }
 
+      for (auto itRow = _mData.begin(); itRow != _mData.end(); ++itRow)
+      {
+        if (pColumnIdx > itRow->size())
+        {
+          const std::string errStr = "column out of range: " +
+            std::to_string(pColumnIdx) + " (on row " +
+            std::to_string(std::distance(_mData.begin(), itRow)) +
+            ")";
+          throw std::out_of_range(errStr);
+        }
+      }
+
       size_t rowIdx = 0;
       for (auto itRow = _mData.begin(); itRow != _mData.end(); ++itRow, ++rowIdx)
       {
-          if (pColumnIdx <= itRow->size())
-          {
-            itRow->insert(itRow->begin() + static_cast<ssize_t>(pColumnIdx), column.at(rowIdx));
-          }
-          else
-          {
-            const std::string errStr = "column out of range: " +
-              std::to_string(pColumnIdx) + " (on row " +
-              std::to_string(std::distance(_mData.begin(), itRow)) +
-              ")";
-            throw std::out_of_range(errStr);
-          }
+        itRow->insert(itRow->begin() + static_cast<ssize_t>(pColumnIdx), column.at(rowIdx));
       }
 
       if (_mLabelParams.mColumnNameFlg == FlgColumnName::CN_PRESENT)
@@ -885,7 +883,6 @@ namespace rapidcsv
           const std::string& rowName = _mIdxRowNames.at(i);
           _mRowNamesIdx[rowName] = i;
         }
-
       }
 
       _mData.erase(_mData.begin() + static_cast<ssize_t>(pRowIdx));
