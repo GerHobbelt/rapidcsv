@@ -70,18 +70,6 @@ Unit-Test results of last run across multiple OS-versions and Compiler-versions 
 ✖️ : Compilation failure.
 
 <br>
-   
-|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-13** | **macOS-12** | **macOS-11** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
-|------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
-| **g++ 13** | ✅ | ❌1 | ✅ | NA | - | - |
-| **g++ (11,12)** | ✅ (default:11) | ❌1 | ✅ | ✅ | - | - |
-| **clang++ 15** | ✅ | - | - | - | - | - |
-| **clang++ (**<span style="color:grey">12\*,13\#,14\#</span>**)** | ❌2 | - | - | - | - | - |
-| **AppleClang 15** | NA | ✅ | NA | NA | NA | NA |
-| **AppleClang 14** | NA | NA | ✅ | NA | NA | NA |
-| **msvc 19** | NA | NA | NA | NA | ✅ (default) | NA |
-| **clangCL 16** | - | - | - | - | ✅ | - |
-| **clangCL 12** | - | - | - | - | - | ✅ |
 
 ❌1 : <span style="color:grey">macOS-13</span> : New linker breaks the build. Both Cmake and Linker needs an update for this fix.
 

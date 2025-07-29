@@ -52,7 +52,7 @@ typedef SSIZE_T ssize_t;
 
 #define RAPIDCSV_VERSION_MAJOR 4
 #define RAPIDCSV_VERSION_MINOR 0
-#define RAPIDCSV_VERSION_PATCH 8
+#define RAPIDCSV_VERSION_PATCH 9
 
 #define UPSTREAM___RAPIDCSV__VERSION 8.88
 
@@ -1315,7 +1315,7 @@ namespace rapidcsv
             (static_cast<std::codecvt_mode>(std::consume_header | std::little_endian)) :
             (static_cast<std::codecvt_mode>(std::consume_header));
         std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, mode>> utf16conv;
-        const std::wstring& utf16 = utf16conv.from_bytes(buffer.data(), buffer.data() + length);
+        const std::wstring utf16 = utf16conv.from_bytes(buffer.data(), buffer.data() + length);
 
         std::wstringstream wss(utf16);
         std::string utf8 = _toString(wss.str());
