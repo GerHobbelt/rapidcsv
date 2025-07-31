@@ -47,7 +47,7 @@ jobs:
           #             macos-12 -> AppleClang-14 ,
           #             macos-13 -> AppleClang-15 ,
           #             macos-14 -> AppleClang-15 ,
-	  #             macos-15 -> AppleClang-16 ]
+          #             macos-15 -> AppleClang-16 ]
         compiler: [ default, g++-14, g++-13, g++-12 ]
         exclude: [ # skipping a fix for g++-N compilers. refer thread https://github.com/iains/gcc-14-branch/issues/11
                    { os: macos-15, compiler: g++-14 },
@@ -58,7 +58,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
       - name: Get Version
-        run: uname -a && cmake --version
+        run: uname -a && echo "------------" && cmake --version && echo "------------" && bash -c 'COMPILER="${{matrix.compiler}}"; if [ "${COMPILER}" == "default" ]; then COMPILER="clang"; fi; ${COMPILER}  -dM -E - < /dev/null | egrep -i "(apple|mach|gnu|clang|version|major|minor)"'
       - name: Check Generators
         # https://stackoverflow.com/questions/25941536/what-is-a-cmake-generator
         run: cmake --help

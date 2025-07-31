@@ -1,13 +1,13 @@
 #
 # URL:      https://github.com/panchaBhuta/rapidcsv
 #
-# Copyright (c) 2023-2023 Gautam Dhar
+# Copyright (c) 2023-2025 Gautam Dhar
 # All rights reserved.
 #
 # rapidcsv is distributed under the BSD 3-Clause license, see LICENSE for details.
 #
 
-if (CMAKE_VERSION VERSION_GREATER 3.10 OR CMAKE_VERSION VERSION_EQUAL 3.10)
+if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.10)
     # Use include_guard() added in cmake 3.10
     include_guard()
 endif()
@@ -24,7 +24,7 @@ function(rapidcsv_cmake_variables_config)
     set(_CNV_OS_FLAGS_ "OS-flags: UNIX=${UNIX} , APPLE=${APPLE} , WIN32=${WIN32}")
     set(_CNV_OS_NAME_  "OS-name: CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME} , CMAKE_HOST_SYSTEM_NAME=${CMAKE_HOST_SYSTEM_NAME}")
     set(_CNV_SYSTEM_PROCESSOR_ "system-processor: CMAKE_SYSTEM_VERSION=${CMAKE_SYSTEM_VERSION} , CMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}")
-    set(_CNV_CXX_COMPILER_ "cxx-compiler: CMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID} , COMPILE_LANG_AND_ID=${COMPILE_LANG_AND_ID}")
+    set(_CNV_CXX_COMPILER_ "cxx-compiler: CMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID} , COMPILE_LANG_AND_ID=${COMPILE_LANG_AND_ID} , CMAKE_CXX_COMPILER_VERSION=${CMAKE_CXX_COMPILER_VERSION}")
     set(_CNV_BUILD_ENV_ "ENV: MINGW=${MINGW} , MSYS=${MSYS} , CYGWIN=${CYGWIN}")
     set(_CNV_ENV_MSYSTEM_ "ENV: MSYSTEM=$ENV{MSYSTEM}")
 
@@ -85,7 +85,7 @@ function(rapidcsv_getversion version_arg)
 
     # Give feedback to the user. Prefer DEBUG when available since large projects tend to have a lot
     # going on already
-    if (CMAKE_VERSION VERSION_GREATER 3.15 OR CMAKE_VERSION VERSION_EQUAL 3.15)
+    if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.15)
         message(DEBUG "rapidcsv version ${VERSION}")
     else()
         message(STATUS "rapidcsv version ${VERSION}")
@@ -135,7 +135,7 @@ macro(fetch_dependencies)
     include( FetchContent )
     FetchContent_Declare( ${CONVERTERLIB}
                           GIT_REPOSITORY https://github.com/panchaBhuta/converter.git
-                          GIT_TAG        v1.3.27)  # adjust tag/branch/commit as needed
+                          GIT_TAG        v1.3.28)  # adjust tag/branch/commit as needed
     FetchContent_MakeAvailable(${CONVERTERLIB})
 
     #[==================[
@@ -192,6 +192,11 @@ macro(rapidcsv_enable_warnings)
     set(gcc_warnings "${gcc_warnings};-Wcast-qual;-Wno-missing-braces;-Wswitch-default;-Wcast-align;-Winit-self")
     set(gcc_warnings "${gcc_warnings};-Wunreachable-code;-Wundef;-Wuninitialized;-Wold-style-cast;-Wwrite-strings")
     set(gcc_warnings "${gcc_warnings};-Wsign-conversion;-Weffc++")
+    if(CMAKE_SYSTEM_NAME  EQUAL LINUX   AND   CMAKE_CXX_COMPILER_ID EQUAL Clang )
+      if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16.0)
+        set(gcc_warnings "${gcc_warnings};-Wno-defaulted-function-deleted")
+      endif()
+    endif()
 
     # https://cmake.org/cmake/help/v3.27/manual/cmake-generator-expressions.7.html
     #set(is_gnu "$<CXX_COMPILER_ID:GNU>")
@@ -204,7 +209,7 @@ macro(rapidcsv_enable_warnings)
     # To specify this, we wrap our flags in a generator expression using the BUILD_INTERFACE condition.
     #]==================================================================================]
     target_compile_options(rapidcsv INTERFACE
-        "$<${gcc_like_cxx}:$<BUILD_INTERFACE:${gcc_warnings}>>"
+        "$<$<NOT:${msvc_cxx}>:$<BUILD_INTERFACE:${gcc_warnings}>>"
         "$<$<AND:${gcc_like_cxx},$<NOT:${windows_os_clang_cxx}>>:$<BUILD_INTERFACE:-Wall>>" # -Wall for 'windows_os_clang_cxx' gives lot of warnings
         "$<${gcc_cxx_v5_or_later}:$<BUILD_INTERFACE:-Wsuggest-override>>"
         "$<$<NOT:${windows_os}>:$<BUILD_INTERFACE:-g>>"  # for linux and macOS
