@@ -1,7 +1,7 @@
 #
 # URL:      https://github.com/panchaBhuta/rapidcsv
 #
-# Copyright (c) 2023-2023 Gautam Dhar
+# Copyright (c) 2023-2025 Gautam Dhar
 # All rights reserved.
 #
 # rapidcsv is distributed under the BSD 3-Clause license, see LICENSE for details.
@@ -24,7 +24,6 @@ macro(add_unit_test testname)
     # executable ${testname} has to have transitive association to all its dependencies(aka library chain)
     # refer   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements
     # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
-    # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
     set_target_properties(${testname} PROPERTIES  LINKER_LANGUAGE CXX)
   endif()
 endmacro(add_unit_test)
@@ -42,7 +41,6 @@ macro(add_unit_test_properties testname)
     # executable ${testname} has to have transitive association to all its dependencies(aka library chain)
     # refer   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements
     # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
-    # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
     set_target_properties(${testname} PROPERTIES  LINKER_LANGUAGE CXX)
   endif()
 endmacro(add_unit_test_properties)
@@ -57,7 +55,6 @@ macro(add_perf_test testname)
     target_link_libraries(${testname} rapidcsv) # donot specify PUBLIC here,
     # executable ${testname} has to have transitive association to all its dependencies(aka library chain)
     # refer   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements
-    # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
     # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
   endif()
 endmacro(add_perf_test)
@@ -251,4 +248,5 @@ add_unit_test(testViewYmd001)
 add_unit_test(testViewYmd003)
 add_unit_test(test099)
 #]===========================================]
+
 

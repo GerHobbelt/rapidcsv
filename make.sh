@@ -2,7 +2,7 @@
 
 # make.sh
 #
-# Copyright (C) 2023-2024 Gautam Dhar
+# Copyright (C) 2023-2025 Gautam Dhar
 # All rights reserved.
 #
 # See LICENSE for redistribution information.
@@ -140,7 +140,6 @@ if [[ "${BUILD}" == "1" ]]; then
   elif [ "${OS}" == "Darwin" ]; then
     MAKEARGS="-j$(sysctl -n hw.ncpu)"
   fi
-  #mkdir -p build-debug && cd build-debug && cmake -DOPTION_CONVERTER_DEBUG_LOG=ON -DRAPIDCSV_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . ${MAKEARGS} && cd .. && \
   mkdir -p build-debug && cd build-debug && echo "##### START(debug) : processing/configure of CMakeLists.txt #####" && cmake -DRAPIDCSV_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug .. && \
   echo "##### START(debug) : project build #####" && cmake --build . ${MAKEARGS} && cd .. && \
   mkdir -p build-release && cd build-release && echo "##### START(release) : processing/configure of CMakeLists.txt #####" && cmake -DRAPIDCSV_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release .. && \

@@ -126,16 +126,18 @@ endmacro()
 
 # fetch dependencies of rapidcsv
 macro(fetch_dependencies)
+    include( FetchContent )
 
+    ########## converter start  ###############
     set(CONVERTERLIB "converter")  # local-variable
     # https://stackoverflow.com/questions/29892929/variables-set-with-parent-scope-are-empty-in-the-corresponding-child-scope-why
     #set(CONVERTERLIB ${CONVERTERLIB} PARENT_SCOPE)  # global-variable
     set_target_properties(rapidcsv PROPERTIES CONVERTERLIB ${CONVERTERLIB})  # global-variable
 
-    include( FetchContent )
+
     FetchContent_Declare( ${CONVERTERLIB}
                           GIT_REPOSITORY https://github.com/panchaBhuta/converter.git
-                          GIT_TAG        v1.3.28)  # adjust tag/branch/commit as needed
+                          GIT_TAG        v1.3.29)  # adjust tag/branch/commit as needed
     FetchContent_MakeAvailable(${CONVERTERLIB})
 
     #[==================[
@@ -149,6 +151,9 @@ macro(fetch_dependencies)
     #if (NOT TARGET converter::converter)
     #    find_package(converter REQUIRED)
     #endif()
+
+    ########## converter end  ###############
+
 endmacro()
 
 
