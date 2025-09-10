@@ -137,7 +137,7 @@ macro(fetch_dependencies)
 
     FetchContent_Declare( ${CONVERTERLIB}
                           GIT_REPOSITORY https://github.com/panchaBhuta/converter.git
-                          GIT_TAG        v1.3.29)  # adjust tag/branch/commit as needed
+                          GIT_TAG        v1.4.30)  # adjust tag/branch/commit as needed
     FetchContent_MakeAvailable(${CONVERTERLIB})
 
     #[==================[

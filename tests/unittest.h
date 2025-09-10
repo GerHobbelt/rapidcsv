@@ -167,9 +167,8 @@ namespace unittest
   struct SScompatible<T> {
     inline static std::string getVal(const T& val)
     {
-      // https://stackoverflow.com/questions/27720553/conversion-of-wchar-t-to-string
-      std::basic_string<T> ssVal(&val,1);
-      std::string sVal(ssVal.begin(),ssVal.end());
+      std::string sVal{" "};
+      sVal.at(0) = static_cast<char>(val);
       return sVal;
     }
   };
