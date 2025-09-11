@@ -13,7 +13,7 @@
  * ***********************************************************************************
  *
  * URL:      https://github.com/d99kris/rapidcsv
- * Version:  8.88
+ * Version:  8.89
  *
  * Copyright (C) 2017-2025 Kristofer Berggren
  * All rights reserved.
@@ -54,7 +54,7 @@ typedef SSIZE_T ssize_t;
 #define RAPIDCSV_VERSION_MINOR 0
 #define RAPIDCSV_VERSION_PATCH 12
 
-#define UPSTREAM___RAPIDCSV__VERSION 8.88
+#define UPSTREAM___RAPIDCSV__VERSION 8.89
 
 //  Project path is removed from the __FILE__
 //  Resulting file-path is relative path from project-root-folder.
@@ -1383,7 +1383,7 @@ namespace rapidcsv
             {
               // allow whitespace before first mQuoteChar
               const auto firstQuote = std::find(cell.begin(), cell.end(), _mSeparatorParams.mQuoteChar);
-              if (std::all_of(cell.begin(), firstQuote, [](int ch) { return isspace(ch); }))
+              if (std::all_of(cell.begin(), firstQuote, [](unsigned char ch) { return isspace(ch); }))
               {
                 quoted = !quoted;
               }
@@ -1650,10 +1650,10 @@ namespace rapidcsv
         std::string str = pStr;
 
         // ltrim
-        str.erase(str.begin(), std::find_if(str.begin(), str.end(), [](int ch) { return !isspace(ch); }));
+        str.erase(str.begin(), std::find_if(str.begin(), str.end(), [](unsigned char ch) { return !isspace(ch); }));
 
         // rtrim
-        str.erase(std::find_if(str.rbegin(), str.rend(), [](int ch) { return !isspace(ch); }).base(), str.end());
+        str.erase(std::find_if(str.rbegin(), str.rend(), [](unsigned char ch) { return !isspace(ch); }).base(), str.end());
 
         return str;
       }

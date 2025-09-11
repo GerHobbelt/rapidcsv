@@ -122,10 +122,10 @@ open in bcompare using 3-way merge compare (or meld 3 way compare) to manually m
 NOTE: on bcompare open on another tab rapidcsv.h with the current change diff and edit on this tag.
 only use the 3way-diff tab for reference only, donot use for editing.
 
-rapidcsv_FilterSort$ rm rapidcsv_d99kris_*.h
+rapidcsv_FilterSort$ rm rapidcsv_d99kris_*.h  src/rapidcsv.h
 ------------------------------------------------------------
 
-rapidcsv_FilterSort$ git ls-files -s CMakeLists.txt 
+rapidcsv_FilterSort$ git ls-files -s CMakeLists.txt
 ------------------------------------------------------------
 100644 2b6c73ebb41fd7ca01892d2273f97bb16e72bb97 1	CMakeLists.txt
 100644 66f0f7791ee16d6bcadef41c424b587b1054500f 2	CMakeLists.txt
