@@ -182,7 +182,7 @@ macro(rapidcsv_check_cxx_compiler_flag_file_prefix_map)
             "-ffile-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}${_path_separator}=")
     else()
         # as of writing this code, clang does not support option '-ffile-prefix-map=...'
-        message(STATUS "rapidcsv : compiler option '-ffile-prefix-map=old=new' NOT SUPPORTED")
+        message(STATUS "WARNING :: rapidcsv : compiler option '-ffile-prefix-map=old=new' NOT SUPPORTED")
         string(LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" RAPIDCSV_SOURCE_PATH_SIZE)
         target_compile_definitions(rapidcsv INTERFACE
                                         RAPIDCSV_USE_FILEPREFIXMAP=0
