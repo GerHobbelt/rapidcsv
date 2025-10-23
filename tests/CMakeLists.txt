@@ -72,7 +72,7 @@ macro(add_unit_test testname)
   endif()
 endmacro(add_unit_test)
 
-# Test macro add_unit_test
+# Test macro add_unit_test_properties
 macro(add_unit_test_properties testname)
   if(CMAKE_BUILD_TYPE MATCHES "Debug"     OR
      CMAKE_BUILD_TYPE MATCHES "MemCheck"  OR

@@ -71,15 +71,6 @@ Unit-Test results of last run across multiple OS-versions and Compiler-versions 
 
 <br>
 
-❌1 : <span style="color:grey">macOS-13</span> : New linker breaks the build. Both Cmake and Linker needs an update for this fix.
-
-❌2 : <span style="color:grey">clang++ 13\#</span> : Last successful run with [Clang 13.0.1](https://github.com/panchaBhuta/converter/actions/runs/6524732682/job/17716666880) and `OS-id-version=Linux-6.2.0-1012-azure`. **\<chorno>** headers stopped compiling in Newer Ubuntu-image OS-version. Refer [ubuntu-latest runners have an incompatible combination of clang and libstdc++](https://github.com/actions/runner-images/issues/8659).
-
-❌2 : <span style="color:grey">clang++ 14\#</span> : Last successful run with [Clang 14.0.0](https://github.com/panchaBhuta/converter/actions/runs/6524732682/job/17716666951) and `OS-id-version=Linux-6.2.0-1012-azure`. **\<chorno>** headers stopped compiling in Newer Ubuntu-image OS-version. Refer [ubuntu-latest runners have an incompatible combination of clang and libstdc++](https://github.com/actions/runner-images/issues/8659).
-
-
-[//]:  ❌
-
 
 Installation
 ============

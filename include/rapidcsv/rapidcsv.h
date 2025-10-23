@@ -52,9 +52,9 @@ typedef SSIZE_T ssize_t;
 
 #define RAPIDCSV_VERSION_MAJOR 4
 #define RAPIDCSV_VERSION_MINOR 0
-#define RAPIDCSV_VERSION_PATCH 13
+#define RAPIDCSV_VERSION_PATCH 14
 
-#define UPSTREAM___RAPIDCSV__VERSION 8.89
+#define UPSTREAM___RAPIDCSV__VERSION 8.90
 
 //  Project path is removed from the __FILE__
 //  Resulting file-path is relative path from project-root-folder.
