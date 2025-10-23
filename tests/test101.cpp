@@ -1,6 +1,6 @@
 // test101.cpp - read UTF-16 LE stream
 
-#include <rapidcsv.h>
+#include <rapidcsv/rapidcsv.h>
 #include "unittest.h"
 
 int main()
@@ -27,7 +27,7 @@ int main()
   {
     // stream from string
     std::istringstream sstream(csv);
-    rapidcsv::Document doc(sstream, rapidcsv::LabelParams(0, 0));
+    rapidcsv::Document doc(sstream, rapidcsv::LabelParams(rapidcsv::FlgColumnName::CN_PRESENT, rapidcsv::FlgRowName::RN_PRESENT));
     unittest::ExpectEqual(int, doc.GetCell<int>(0, 0), 3);
     unittest::ExpectEqual(int, doc.GetCell<int>(1, 0), 9);
     unittest::ExpectEqual(int, doc.GetCell<int>(2, 0), 81);

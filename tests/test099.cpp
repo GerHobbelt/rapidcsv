@@ -28,11 +28,11 @@ int main()
 
     // doc has columns C (0) and D (1) now, thus 2 is out of range.
     ExpectExceptionMsg(doc.RemoveColumn(2), std::out_of_range,
-                       "column out of range: 2 (on row-index 0)");
+                       "column out of range(_mData): '2:2' (on row-index 0)");
 
-    // column D, while existing, has not data on all rows, thus out of range.
+    // column D, while existing, doesn't have data on all rows, thus out of range.
     ExpectExceptionMsg(doc.RemoveColumn("D"), std::out_of_range,
-                       "column out of range: 1 (on row-index 1)");
+                       "column out of range(_mData): 'D:1' (on row-index 1)");
   }
   catch (const std::exception& ex)
   {

@@ -13,7 +13,7 @@
  * ***********************************************************************************
  *
  * URL:      https://github.com/d99kris/rapidcsv
- * Version:  8.89
+ * Version:  8.90
  *
  * Copyright (C) 2017-2025 Kristofer Berggren
  * All rights reserved.
@@ -573,8 +573,8 @@ namespace rapidcsv
       {
         if (columnIdx >= itRow->size())
         {
-          const std::string errStr = "column out of range: " +
-            std::to_string(columnIdx) + " (on row-index " +
+          const std::string errStr = "column out of range(_mData): '" +
+            _to_string(pColumnNameIdx) + ":" + _to_string(columnIdx) + "' (on row-index " +
             std::to_string(std::distance(_mData.begin(), itRow)) +
             ")";
           throw std::out_of_range(errStr);
@@ -583,6 +583,12 @@ namespace rapidcsv
 
       if (_mLabelParams.mColumnNameFlg == FlgColumnName::CN_PRESENT && !_mIdxColumnNames.empty() )
       {
+        if ( columnIdx >= _mIdxColumnNames.size() )
+        {
+          const std::string errStr = "column out of range(_mIdxColumnNames): " +
+            _to_string(pColumnNameIdx) + ":" + _to_string(columnIdx) + "'";
+          throw std::out_of_range(errStr);
+        }
         _mIdxColumnNames.erase(_mIdxColumnNames.begin() + static_cast<ssize_t>(columnIdx));
         _mColumnNamesIdx.clear();
         for(size_t i = 0 ; i < _mIdxColumnNames.size(); ++i )
@@ -736,8 +742,8 @@ namespace rapidcsv
         {
           return _mRowNamesIdx.at(pRowName);
         } else {
-          static const std::string errMsg("rapidcsv::Document::GetRowIdx(pRowName) row not found for 'pRowName'");
-          RAPIDCSV_DEBUG_LOG(errMsg << " : pRowName='" << pRowName << "'");
+          std::string errMsg = "rapidcsv::Document::GetRowIdx(pRowName) row not found for pRowName='" + pRowName + "'";
+          RAPIDCSV_DEBUG_LOG(errMsg);
           throw std::out_of_range(errMsg);
         }
       } else {
@@ -874,8 +880,21 @@ namespace rapidcsv
     inline void RemoveRow(const c_sizet_or_string auto& pRowNameIdx)
     {
       const size_t pRowIdx = GetRowIdx(pRowNameIdx);
+      if ( pRowIdx >= _mData.size() )
+      {
+        const std::string errStr = "row out of range(_mData): '" +
+          _to_string(pRowNameIdx) + ":" + _to_string(pRowIdx) + "'";
+        throw std::out_of_range(errStr);
+      }
+
       if (_mLabelParams.mRowNameFlg == FlgRowName::RN_PRESENT)
       {
+        if ( pRowIdx >= _mIdxRowNames.size() )
+        {
+          const std::string errStr = "row out of range(_mIdxRowNames): '" +
+          _to_string(pRowNameIdx) + ":" + _to_string(pRowIdx) + "'";
+          throw std::out_of_range(errStr);
+        }
         _mIdxRowNames.erase(_mIdxRowNames.begin() + static_cast<ssize_t>(pRowIdx));
         _mRowNamesIdx.clear();
         for(size_t i = 0 ; i < _mIdxRowNames.size(); ++i )
@@ -1805,6 +1824,20 @@ namespace rapidcsv
           itRow->resize(pRowSize);
         }
       }
+    }
+
+    inline std::string _to_string(const std::string& pName) const
+    {
+      return pName;
+    }
+    inline std::string _to_string(const int pId) const
+    {
+      assert(pId>=0);  // "ERROR :  rapidcsv::Document::_to_string(const int pId) -> pId cannot be negative value"
+      return std::to_string(pId);
+    }
+    inline std::string _to_string(const size_t pId) const
+    {
+      return std::to_string(static_cast<int>(pId));
     }
 
     friend class _ViewDocument;
